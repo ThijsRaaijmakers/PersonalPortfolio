@@ -16,6 +16,11 @@ public static class DependencyInjection
 
         services.AddScoped<IVehicleRepository, VehicleRepository>();
 
+        services.AddHttpClient<IRdwService, RdwService>(client =>
+        {
+            client.BaseAddress = new Uri("https://opendata.rdw.nl/");
+        });
+
         return services;
     }
 }

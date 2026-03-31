@@ -1,5 +1,6 @@
 using MediatR;
 using Portfolio.Domain.Entities;
+using Portfolio.Application.Interfaces.Repositories;
 
 namespace Portfolio.Application.Features.Vehicles.Queries.GetVehicle;
 
