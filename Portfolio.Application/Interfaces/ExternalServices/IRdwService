@@ -1,0 +1,6 @@
+namespace Portfolio.Application.Interfaces.ExternalServices;
+
+public interface IRdwService
+{
+    Task<object?> FetchRawVehicleDataAsync(string licensePlate); 
+}
