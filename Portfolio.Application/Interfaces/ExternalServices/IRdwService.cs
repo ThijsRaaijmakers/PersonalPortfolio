@@ -4,5 +4,5 @@ namespace Portfolio.Application.Interfaces.ExternalServices;
 
 public interface IRdwService
 {
-    Task<RdwVehicleDto?> FetchRawVehicleDataAsync(string licensePlate); 
+    Task<RdwVehicleDto?> FetchVehicleDataAsync(string licensePlate); 
 }
