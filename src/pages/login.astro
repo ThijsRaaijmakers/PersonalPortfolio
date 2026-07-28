@@ -1,0 +1,224 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Terminal Access | Login"
+  description="Secure authentication login portal for administration and management."
+>
+  <div class="max-w-md mx-auto py-12 animate-fade-in-up">
+    
+    <!-- Login Header -->
+    <div class="space-y-3 text-center mb-8">
+      <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-950/10 dark:bg-cyan-950/60 border border-cyan-500/30 font-mono text-xs text-cyan-600 dark:text-cyan-400">
+        <span class="w-2 h-2 rounded-full bg-cyan-500 dark:bg-cyan-400 animate-pulse"></span>
+        <span>SECURE TERMINAL &bull; AUTH</span>
+      </div>
+
+      <h1 id="portal-title" class="text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-sans tracking-tight">
+        Terminal Authentication
+      </h1>
+      <p id="portal-subtitle" class="text-sm text-slate-600 dark:text-slate-400 font-mono">
+        Enter authorized credentials to access restricted systems.
+      </p>
+    </div>
+
+    <!-- Login Card Container -->
+    <div class="p-6 sm:p-8 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-xl space-y-6">
+      
+      <!-- Error Message Container -->
+      <p id="auth-error" class="hidden p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 font-mono text-xs leading-relaxed"></p>
+      
+      <!-- Success Message Container -->
+      <p id="auth-success" class="hidden p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-mono text-xs leading-relaxed"></p>
+
+      <!-- Sign In Form -->
+      <form id="signin-form" class="space-y-5 font-mono text-xs">
+        <div class="space-y-2">
+          <label for="signin-email" class="block text-slate-700 dark:text-slate-300 font-medium">
+            &gt; EMAIL_ADDRESS
+          </label>
+          <input 
+            type="email" 
+            id="signin-email" 
+            name="email" 
+            required
+            autocomplete="username"
+            placeholder="admin@example.com"
+            class="w-full px-4 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition-colors"
+          />
+        </div>
+
+        <div class="space-y-2">
+          <label for="signin-password" class="block text-slate-700 dark:text-slate-300 font-medium">
+            &gt; ACCESS_KEY / PASSWORD
+          </label>
+          <input 
+            type="password" 
+            id="signin-password" 
+            name="password" 
+            required
+            autocomplete="current-password"
+            placeholder="••••••••••••"
+            class="w-full px-4 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition-colors"
+          />
+        </div>
+
+        <button 
+          type="submit" 
+          class="w-full py-3 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold transition-all shadow-lg shadow-cyan-500/20 cursor-pointer flex items-center justify-center space-x-2"
+        >
+          <span>Sign In &amp; Authenticate</span>
+          <span>&rarr;</span>
+        </button>
+
+        <div class="text-center pt-2">
+          <button 
+            type="button" 
+            id="to-signup" 
+            class="text-slate-500 hover:text-cyan-600 dark:hover:text-cyan-400 font-mono text-xs transition-colors cursor-pointer"
+          >
+            Need an account? Sign up
+          </button>
+        </div>
+      </form>
+
+      <!-- Create Account Form -->
+      <form id="signup-form" class="hidden space-y-5 font-mono text-xs">
+        <div class="space-y-2">
+          <label for="signup-email" class="block text-slate-700 dark:text-slate-300 font-medium">
+            &gt; EMAIL_ADDRESS
+          </label>
+          <input 
+            type="email" 
+            id="signup-email" 
+            name="email" 
+            required
+            autocomplete="username"
+            placeholder="admin@example.com"
+            class="w-full px-4 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition-colors"
+          />
+        </div>
+
+        <div class="space-y-2">
+          <label for="signup-password" class="block text-slate-700 dark:text-slate-300 font-medium">
+            &gt; NEW_ACCESS_KEY / PASSWORD
+          </label>
+          <input 
+            type="password" 
+            id="signup-password" 
+            name="password" 
+            required
+            autocomplete="new-password"
+            placeholder="••••••••••••"
+            class="w-full px-4 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition-colors"
+          />
+        </div>
+
+        <button 
+          type="submit" 
+          class="w-full py-3 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold transition-all shadow-lg shadow-cyan-500/20 cursor-pointer flex items-center justify-center space-x-2"
+        >
+          <span>Create Account</span>
+          <span>&rarr;</span>
+        </button>
+
+        <div class="text-center pt-2">
+          <button 
+            type="button" 
+            id="to-signin" 
+            class="text-slate-500 hover:text-cyan-600 dark:hover:text-cyan-400 font-mono text-xs transition-colors cursor-pointer"
+          >
+            Already have an account? Sign in
+          </button>
+        </div>
+      </form>
+
+    </div>
+
+  </div>
+</Layout>
+
+<script>
+  import { supabase } from '../lib/supabase';
+
+  const signinForm = document.getElementById('signin-form') as HTMLFormElement | null;
+  const signupForm = document.getElementById('signup-form') as HTMLFormElement | null;
+  const toSignup = document.getElementById('to-signup');
+  const toSignin = document.getElementById('to-signin');
+  const authError = document.getElementById('auth-error');
+  const authSuccess = document.getElementById('auth-success');
+
+  function clearMessages() {
+    if (authError) {
+      authError.textContent = '';
+      authError.classList.add('hidden');
+    }
+    if (authSuccess) {
+      authSuccess.textContent = '';
+      authSuccess.classList.add('hidden');
+    }
+  }
+
+  function showError(msg: string) {
+    if (authError) {
+      authError.textContent = `[ERROR]: ${msg}`;
+      authError.classList.remove('hidden');
+    }
+  }
+
+  function showSuccess(msg: string) {
+    if (authSuccess) {
+      authSuccess.textContent = `[SUCCESS]: ${msg}`;
+      authSuccess.classList.remove('hidden');
+    }
+  }
+
+  toSignup?.addEventListener('click', () => {
+    clearMessages();
+    signinForm?.classList.add('hidden');
+    signupForm?.classList.remove('hidden');
+  });
+
+  toSignin?.addEventListener('click', () => {
+    clearMessages();
+    signupForm?.classList.add('hidden');
+    signinForm?.classList.remove('hidden');
+  });
+
+  signinForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearMessages();
+
+    const formData = new FormData(signinForm);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      showError(error.message);
+    } else if (data.session) {
+      window.location.href = '/dashboard';
+    }
+  });
+
+  signupForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearMessages();
+
+    const formData = new FormData(signupForm);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    const { data, error } = await supabase.auth.signUp({ email, password });
+
+    if (error) {
+      showError(error.message);
+    } else if (data.session) {
+      window.location.href = '/dashboard';
+    } else {
+      showSuccess('Registration complete! Please check your email for confirmation or sign in.');
+    }
+  });
+</script>

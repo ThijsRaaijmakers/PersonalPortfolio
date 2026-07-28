@@ -1,0 +1,419 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout 
+  title="Thijs | Software Engineer & MSc AI & Cybersecurity Candidate"
+  description="Professional portfolio and resume of Thijs, MSc Candidate in Cognitive Science and Artificial Intelligence at Tilburg University & BSc Informatica alumnus."
+>
+  <div class="space-y-16 sm:space-y-24 animate-fade-in-up">
+    
+    <!-- Hero Section -->
+    <section class="relative py-6 sm:py-10 border-b border-slate-200/80 dark:border-slate-800/80 transition-colors">
+      <div class="max-w-3xl space-y-6">
+        
+        <!-- Location / Status Tag -->
+        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-950/10 dark:bg-cyan-950/60 border border-cyan-500/30 font-mono text-xs text-cyan-600 dark:text-cyan-400">
+          <span class="w-2 h-2 rounded-full bg-cyan-500 dark:bg-cyan-400 animate-pulse"></span>
+          <span>Tilburg University &bull; Netherlands</span>
+        </div>
+
+        <!-- Main Title & Name -->
+        <div class="space-y-3">
+          <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-slate-50 font-sans">
+            Hi, I'm <span class="bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500 dark:from-cyan-400 dark:via-teal-300 dark:to-emerald-400 bg-clip-text text-transparent">Thijs</span>
+          </h1>
+          <p class="text-xl sm:text-2xl font-medium text-slate-700 dark:text-slate-200 font-sans">
+            Software Engineer &amp; MSc AI &amp; Cybersecurity Candidate
+          </p>
+        </div>
+
+        <!-- Summary & Background -->
+        <p class="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed font-sans">
+          Master of Science candidate in <strong class="text-slate-900 dark:text-slate-100 font-semibold">Cognitive Science and Artificial Intelligence (Track: AI &amp; Cybersecurity)</strong> at <span class="text-cyan-600 dark:text-cyan-400 font-mono">Tilburg University</span>, holding a Bachelor of Science in <strong class="text-slate-900 dark:text-slate-100 font-semibold">Informatica</strong> from <span class="text-slate-700 dark:text-slate-200 font-medium">Avans Hogeschool</span>. Combining robust software engineering, cloud automation, and artificial intelligence to build secure, high-performance applications.
+        </p>
+
+        <!-- Action / Social Links -->
+        <div class="pt-2 flex flex-wrap items-center gap-4 font-mono text-xs">
+          <a 
+            href="#work-experience" 
+            class="px-5 py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold transition-all shadow-lg shadow-cyan-500/20 flex items-center space-x-2"
+          >
+            <span>View Experience &amp; Education</span>
+            <span>&darr;</span>
+          </a>
+
+          <div class="flex items-center space-x-3 text-slate-500 dark:text-slate-400 pl-2">
+            <a 
+              href="https://github.com" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              class="px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-cyan-500/40 hover:text-cyan-600 dark:hover:text-cyan-400 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(6,182,212,0.1)] transition-all flex items-center space-x-1.5"
+            >
+              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              <span>GitHub</span>
+            </a>
+            <a 
+              href="https://linkedin.com" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              class="px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-cyan-500/40 hover:text-cyan-600 dark:hover:text-cyan-400 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(6,182,212,0.1)] transition-all flex items-center space-x-1.5"
+            >
+              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.762-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+              <span>LinkedIn</span>
+            </a>
+            <a 
+              href="mailto:contact@example.com" 
+              class="px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-cyan-500/40 hover:text-cyan-600 dark:hover:text-cyan-400 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(6,182,212,0.1)] transition-all flex items-center space-x-1.5"
+            >
+              <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              <span>Email</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Experience Timeline (Reverse Chronological) -->
+    <section id="work-experience" class="space-y-8 scroll-mt-20">
+      <div class="flex items-center space-x-3 border-b border-slate-200/80 dark:border-slate-800/80 pb-4">
+        <span class="text-cyan-600 dark:text-cyan-400 font-mono text-lg font-bold">01.</span>
+        <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 font-sans">
+          Work Experience
+        </h2>
+      </div>
+
+      <div class="relative pl-6 sm:pl-8 border-l border-slate-200 dark:border-slate-800 space-y-8">
+        
+        <!-- Experience Item 1: FleetPort [Sept 2025 – Present] -->
+        <div class="relative group">
+          <div class="absolute -left-[31px] sm:-left-[39px] top-1.5 w-4 h-4 rounded-full bg-cyan-100 dark:bg-cyan-950 border-2 border-cyan-500 dark:border-cyan-400 group-hover:scale-125 transition-transform"></div>
+          
+          <div class="p-6 rounded-xl bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/90 hover:border-cyan-500/40 hover:bg-slate-50 dark:hover:bg-slate-900/80 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(6,182,212,0.1)] transition-all duration-300 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 font-mono text-xs">
+              <span class="text-cyan-600 dark:text-cyan-400 font-semibold uppercase tracking-wider">FleetPort</span>
+              <span class="px-2.5 py-1 rounded bg-cyan-950/10 dark:bg-cyan-950/80 border border-cyan-500/30 text-cyan-600 dark:text-cyan-300 font-mono text-xs inline-flex items-center space-x-1.5">
+                <span>Sept 2025 &ndash; Present</span>
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+              </span>
+            </div>
+            
+            <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 font-sans">
+              Student Chauffeur
+            </h3>
+            
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-sans">
+              A flexible logistics role functioning alongside full-time Master's studies. Responsible for the safe, independent transportation and relocation of vehicles for business and private clients across the Netherlands, requiring a high degree of reliability and careful logistical execution.
+            </p>
+
+            <div class="flex flex-wrap gap-1.5 pt-1 font-mono text-[11px]">
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">Vehicle Logistics</span>
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">Independent Transport</span>
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">Operations</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Experience Item 2: TrueLime [Feb 2025 – Jul 2025] -->
+        <div class="relative group">
+          <div class="absolute -left-[31px] sm:-left-[39px] top-1.5 w-4 h-4 rounded-full bg-slate-100 dark:bg-slate-950 border-2 border-slate-300 dark:border-slate-600 group-hover:border-cyan-500 dark:group-hover:border-cyan-400 group-hover:scale-125 transition-all"></div>
+          
+          <div class="p-6 rounded-xl bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/90 hover:border-cyan-500/40 hover:bg-slate-50 dark:hover:bg-slate-900/80 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(6,182,212,0.1)] transition-all duration-300 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 font-mono text-xs">
+              <span class="text-cyan-600 dark:text-cyan-400 font-semibold uppercase tracking-wider">TrueLime</span>
+              <span class="px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-950 text-slate-700 dark:text-cyan-400 border border-slate-200 dark:border-slate-800 font-mono text-xs">
+                Feb 2025 &ndash; Jul 2025
+              </span>
+            </div>
+            
+            <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 font-sans">
+              Software Engineer (Graduation Intern)
+            </h3>
+            
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-sans">
+              Designed and developed a centralized application automating Kentico and Umbraco CMS upgrades within Azure DevOps. Built a full-stack solution using a .NET 8 backend and React frontend, significantly reducing manual deployment errors and accelerating cycle times.
+            </p>
+
+            <div class="flex flex-wrap gap-1.5 pt-1 font-mono text-[11px]">
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">.NET 8</span>
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">React</span>
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">Azure DevOps</span>
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">Kentico</span>
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">Umbraco</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Experience Item 3: Syntec-IT [Sept 2023 – Jul 2024] -->
+        <div class="relative group">
+          <div class="absolute -left-[31px] sm:-left-[39px] top-1.5 w-4 h-4 rounded-full bg-slate-100 dark:bg-slate-950 border-2 border-slate-300 dark:border-slate-600 group-hover:border-cyan-500 dark:group-hover:border-cyan-400 group-hover:scale-125 transition-all"></div>
+          
+          <div class="p-6 rounded-xl bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/90 hover:border-cyan-500/40 hover:bg-slate-50 dark:hover:bg-slate-900/80 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(6,182,212,0.1)] transition-all duration-300 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 font-mono text-xs">
+              <span class="text-cyan-600 dark:text-cyan-400 font-semibold uppercase tracking-wider">Syntec-IT</span>
+              <span class="px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-950 text-slate-700 dark:text-cyan-400 border border-slate-200 dark:border-slate-800 font-mono text-xs">
+                Sept 2023 &ndash; Jul 2024
+              </span>
+            </div>
+            
+            <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 font-sans">
+              Software Engineer (Part-time &amp; Intern)
+            </h3>
+            
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-sans">
+              Optimized and expanded existing software monitoring systems within an agile team. Gained hands-on experience implementing CI/CD pipelines, version control, and performance enhancements.
+            </p>
+
+            <div class="flex flex-wrap gap-1.5 pt-1 font-mono text-[11px]">
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">CI/CD Pipelines</span>
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">Software Monitoring</span>
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">Agile</span>
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">Version Control</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Academic Background (Reverse Chronological) -->
+    <section class="space-y-8">
+      <div class="flex items-center space-x-3 border-b border-slate-200/80 dark:border-slate-800/80 pb-4">
+        <span class="text-cyan-600 dark:text-cyan-400 font-mono text-lg font-bold">02.</span>
+        <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 font-sans">
+          Academic Background
+        </h2>
+      </div>
+
+      <div class="relative pl-6 sm:pl-8 border-l border-slate-200 dark:border-slate-800 space-y-8">
+        
+        <!-- Academic Item 1: Tilburg University [Sept 2025 – Present] -->
+        <div class="relative group">
+          <div class="absolute -left-[31px] sm:-left-[39px] top-1.5 w-4 h-4 rounded-full bg-cyan-100 dark:bg-cyan-950 border-2 border-cyan-500 dark:border-cyan-400 group-hover:scale-125 transition-transform"></div>
+          
+          <div class="p-6 rounded-xl bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/90 hover:border-cyan-500/40 hover:bg-slate-50 dark:hover:bg-slate-900/80 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(6,182,212,0.1)] transition-all duration-300 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 font-mono text-xs">
+              <span class="text-cyan-600 dark:text-cyan-400 font-semibold uppercase tracking-wider">Tilburg University</span>
+              <span class="px-2.5 py-1 rounded bg-cyan-950/10 dark:bg-cyan-950/80 border border-cyan-500/30 text-cyan-600 dark:text-cyan-300 font-mono text-xs inline-flex items-center space-x-1.5">
+                <span>Sept 2025 &ndash; Present</span>
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+              </span>
+            </div>
+            
+            <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 font-sans">
+              MSc Cognitive Science &amp; AI (Track: AI &amp; Cybersecurity)
+            </h3>
+            
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-sans">
+              A specialized two-year, 120 ECTS program bridging technical AI development with digital security. The curriculum focuses on deep learning, forensic data analysis, cryptography, and the ethical implications of artificial intelligence.
+            </p>
+
+            <div class="flex flex-wrap gap-1.5 pt-1 font-mono text-[11px]">
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">120 ECTS</span>
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">Deep Learning</span>
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">Forensic Data Analysis</span>
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">Cryptography</span>
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">AI Ethics</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Academic Item 2: Oslo Metropolitan University [Aug 2024 – Dec 2024] -->
+        <div class="relative group">
+          <div class="absolute -left-[31px] sm:-left-[39px] top-1.5 w-4 h-4 rounded-full bg-slate-100 dark:bg-slate-950 border-2 border-slate-300 dark:border-slate-600 group-hover:border-cyan-500 dark:group-hover:border-cyan-400 group-hover:scale-125 transition-all"></div>
+          
+          <div class="p-6 rounded-xl bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/90 hover:border-cyan-500/40 hover:bg-slate-50 dark:hover:bg-slate-900/80 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(6,182,212,0.1)] transition-all duration-300 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 font-mono text-xs">
+              <span class="text-cyan-600 dark:text-cyan-400 font-semibold uppercase tracking-wider">Oslo Metropolitan University</span>
+              <span class="px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-950 text-slate-700 dark:text-cyan-400 border border-slate-200 dark:border-slate-800 font-mono text-xs">
+                Aug 2024 &ndash; Dec 2024
+              </span>
+            </div>
+            
+            <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 font-sans">
+              Minor in Computer Science (Exchange)
+            </h3>
+            
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-sans">
+              Completed an international academic exchange focused on advanced software engineering methodologies and IT research. Collaborated with diverse, international teams to solve complex developmental challenges and enhance intercultural communication.
+            </p>
+
+            <div class="flex flex-wrap gap-1.5 pt-1 font-mono text-[11px]">
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">Software Engineering</span>
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">IT Research</span>
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">International Exchange</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Academic Item 3: Avans Hogeschool [Sept 2021 – Jul 2025] -->
+        <div class="relative group">
+          <div class="absolute -left-[31px] sm:-left-[39px] top-1.5 w-4 h-4 rounded-full bg-slate-100 dark:bg-slate-950 border-2 border-slate-300 dark:border-slate-600 group-hover:border-cyan-500 dark:group-hover:border-cyan-400 group-hover:scale-125 transition-all"></div>
+          
+          <div class="p-6 rounded-xl bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/90 hover:border-cyan-500/40 hover:bg-slate-50 dark:hover:bg-slate-900/80 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(6,182,212,0.1)] transition-all duration-300 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 font-mono text-xs">
+              <span class="text-cyan-600 dark:text-cyan-400 font-semibold uppercase tracking-wider">Avans Hogeschool</span>
+              <span class="px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-950 text-slate-700 dark:text-cyan-400 border border-slate-200 dark:border-slate-800 font-mono text-xs">
+                Sept 2021 &ndash; Jul 2025
+              </span>
+            </div>
+            
+            <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 font-sans">
+              BSc Informatica
+            </h3>
+            
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-sans">
+              Established a robust engineering foundation emphasizing C#, .NET, Azure, and SQL. Consistently applied Agile/Scrum methodologies across team-based software development life cycles.
+            </p>
+
+            <div class="flex flex-wrap gap-1.5 pt-1 font-mono text-[11px]">
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">C#</span>
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">.NET</span>
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">Azure</span>
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">SQL</span>
+              <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">Agile / Scrum</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Technical Skill Matrix -->
+    <section class="space-y-8">
+      <div class="flex items-center space-x-3 border-b border-slate-200/80 dark:border-slate-800/80 pb-4">
+        <span class="text-cyan-600 dark:text-cyan-400 font-mono text-lg font-bold">03.</span>
+        <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 font-sans">
+          Technical Skill Matrix
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Category 1: Languages & Frameworks -->
+        <div class="p-6 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 hover:border-cyan-500/40 hover:bg-slate-50 dark:hover:bg-slate-900/80 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(6,182,212,0.1)] transition-all duration-300 space-y-4">
+          <div class="flex items-center space-x-2 font-mono text-sm font-semibold text-cyan-600 dark:text-cyan-400">
+            <span>//</span>
+            <span>Languages &amp; Frameworks</span>
+          </div>
+          <div class="flex flex-wrap gap-2 font-mono text-xs">
+            <span class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200">C#</span>
+            <span class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200">Python</span>
+            <span class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200">JavaScript</span>
+            <span class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200">.NET 8</span>
+            <span class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200">React</span>
+            <span class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200">Astro</span>
+            <span class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200">Node.js</span>
+          </div>
+        </div>
+
+        <!-- Category 2: Cloud & DevOps -->
+        <div class="p-6 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 hover:border-cyan-500/40 hover:bg-slate-50 dark:hover:bg-slate-900/80 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(6,182,212,0.1)] transition-all duration-300 space-y-4">
+          <div class="flex items-center space-x-2 font-mono text-sm font-semibold text-cyan-600 dark:text-cyan-400">
+            <span>//</span>
+            <span>Cloud &amp; DevOps</span>
+          </div>
+          <div class="flex flex-wrap gap-2 font-mono text-xs">
+            <span class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200">Azure DevOps</span>
+            <span class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200">Docker</span>
+            <span class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200">Git</span>
+            <span class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200">CI/CD Pipelines</span>
+          </div>
+        </div>
+
+        <!-- Category 3: Specialized -->
+        <div class="p-6 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 hover:border-cyan-500/40 hover:bg-slate-50 dark:hover:bg-slate-900/80 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(6,182,212,0.1)] transition-all duration-300 space-y-4">
+          <div class="flex items-center space-x-2 font-mono text-sm font-semibold text-cyan-600 dark:text-cyan-400">
+            <span>//</span>
+            <span>Specialized Focus</span>
+          </div>
+          <div class="flex flex-wrap gap-2 font-mono text-xs">
+            <span class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200">Deep Learning</span>
+            <span class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200">Cybersecurity</span>
+            <span class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200">Agile/Scrum</span>
+            <span class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200">Database Optimization</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Personal Engineering Projects Section -->
+    <section id="featured-project" class="space-y-8 scroll-mt-20">
+      <div class="flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800/80 pb-4">
+        <div class="flex items-center space-x-3">
+          <span class="text-cyan-600 dark:text-cyan-400 font-mono text-lg font-bold">04.</span>
+          <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 font-sans">
+            Personal Engineering Projects
+          </h2>
+        </div>
+        <a 
+          href="/projects" 
+          class="font-mono text-xs text-cyan-600 dark:text-cyan-400 hover:underline flex items-center space-x-1"
+        >
+          <span>View All Projects</span>
+          <span>&rarr;</span>
+        </a>
+      </div>
+
+      <!-- FleetPort Car Hiker Tracker - Decoupled Personal Engineering Project -->
+      <div class="p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-white via-slate-50 to-cyan-50/40 dark:from-slate-900/90 dark:via-slate-900/60 dark:to-cyan-950/20 border border-slate-200 dark:border-slate-800 hover:border-cyan-500/40 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(6,182,212,0.1)] transition-all duration-300 space-y-6 group">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-mono text-xs border-b border-slate-200/80 dark:border-slate-800/80 pb-4">
+          <span class="px-3 py-1 rounded-full bg-cyan-950/10 dark:bg-cyan-950/80 border border-cyan-500/40 text-cyan-700 dark:text-cyan-300 uppercase tracking-wider font-semibold">
+            Personal Engineering Project
+          </span>
+          <span class="text-slate-500 dark:text-slate-400">Web Application &amp; Automation</span>
+        </div>
+
+        <div class="space-y-3">
+          <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors font-sans">
+            <a href="/projects/car-hiker-tracker">
+              FleetPort Car Hiker Tracker
+            </a>
+          </h3>
+          <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed font-sans max-w-3xl">
+            Automated vehicle delivery tracking system integrating RDW open data API for real-time vehicle specs and deterministic regex email parsing for shift logging. Built independently as a personal engineering project to automate logistics management.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 font-mono text-xs">
+          <div class="p-3 rounded-lg bg-white/80 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 text-slate-700 dark:text-slate-300">
+            <span class="text-cyan-600 dark:text-cyan-400 font-bold block mb-0.5">&gt; RDW API Integration</span>
+            Instant vehicle metadata lookup using live Dutch Open Data API endpoint.
+          </div>
+          <div class="p-3 rounded-lg bg-white/80 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 text-slate-700 dark:text-slate-300">
+            <span class="text-cyan-600 dark:text-cyan-400 font-bold block mb-0.5">&gt; Email Regex Parser</span>
+            Automated, deterministic pattern matching engine for driver shift logs.
+          </div>
+        </div>
+
+        <div class="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-slate-200/80 dark:border-slate-800/60">
+          <div class="flex flex-wrap gap-2 font-mono text-xs">
+            <span class="px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-950 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800">Astro</span>
+            <span class="px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-950 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800">Tailwind CSS</span>
+            <span class="px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-950 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800">Supabase</span>
+            <span class="px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-950 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800">RDW API</span>
+          </div>
+
+          <a 
+            href="/projects/car-hiker-tracker" 
+            class="px-4 py-2 rounded-lg bg-cyan-500/10 hover:bg-cyan-500 hover:text-slate-950 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30 font-mono text-xs font-semibold transition-all flex items-center justify-center space-x-2"
+          >
+            <span>Explore Project Specs</span>
+            <span>&rarr;</span>
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+</Layout>

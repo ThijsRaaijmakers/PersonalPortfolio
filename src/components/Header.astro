@@ -1,0 +1,166 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+import LanguageToggle from './LanguageToggle.astro';
+
+const pathname = new URL(Astro.request.url).pathname;
+const currentPath = pathname.replace(/\/$/, ""); // remove trailing slash for matching
+const isNl = pathname.startsWith('/nl');
+
+const navItems = [
+  { name: isNl ? "Home" : "Home", href: isNl ? "/nl" : "/" },
+  { name: isNl ? "Projecten" : "Projects", href: "/projects" },
+];
+---
+
+<header class="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-slate-950/80 border-b border-slate-200/80 dark:border-slate-800/80 transition-colors">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      
+      <!-- Logo / Identity -->
+      <a href={isNl ? "/nl" : "/"} class="flex items-center space-x-3 group">
+        <div class="w-8 h-8 rounded-lg bg-cyan-950/10 dark:bg-cyan-950/60 border border-cyan-500/30 flex items-center justify-center text-cyan-600 dark:text-cyan-400 font-mono font-bold text-sm group-hover:border-cyan-500 transition-colors shadow-sm shadow-cyan-500/10">
+          T
+        </div>
+        <div class="flex flex-col">
+          <span class="font-mono text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-100 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
+            Thijs <span class="text-cyan-500/70">|</span> Software &amp; AI
+          </span>
+          <span class="text-[10px] font-mono text-slate-500 dark:text-slate-400">
+            {isNl ? "MSc Kandidaat @ Tilburg University" : "MSc Candidate @ Tilburg University"}
+          </span>
+        </div>
+      </a>
+
+      <!-- Right Navigation & Tools -->
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <!-- Navigation Links -->
+        <nav class="flex items-center space-x-1">
+          {navItems.map((item) => {
+            const isActive = (item.href === "/" || item.href === "/nl") 
+              ? (currentPath === "" || currentPath === "/nl") 
+              : currentPath.startsWith(item.href);
+            return (
+              <a
+                href={item.href}
+                class={`px-3 py-1.5 rounded-md font-mono text-xs transition-all duration-200 ${
+                  isActive
+                    ? "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30 shadow-sm shadow-cyan-500/10"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900/60 border border-transparent"
+                }`}
+              >
+                {item.name}
+              </a>
+            );
+          })}
+        </nav>
+
+        <!-- System Status Indicator (Desktop) -->
+        <div class="hidden md:flex items-center space-x-2 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-[11px] font-mono text-slate-600 dark:text-slate-400">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span class="text-slate-700 dark:text-slate-300">SYS_STATUS: ACTIVE</span>
+        </div>
+
+        <!-- Language Toggle -->
+        <LanguageToggle />
+
+        <!-- Auth Container -->
+        <div id="auth-container" class="relative">
+          <!-- Logged Out State -->
+          <a id="login-link" href={isNl ? '/nl/login' : '/login'} class="px-2.5 py-1 rounded-md font-mono text-xs transition-all duration-200 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900/60 border border-transparent">
+            {isNl ? 'Inloggen' : 'Login'}
+          </a>
+
+          <!-- Logged In State (Hidden by default) -->
+          <div id="user-menu-container" class="hidden">
+            <button id="user-menu-btn" class="flex items-center justify-center w-8 h-8 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/20 transition-colors cursor-pointer" aria-label="User Menu">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </button>
+
+            <!-- Dropdown -->
+            <div id="user-dropdown" class="absolute right-0 mt-2 w-56 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl hidden flex-col overflow-hidden z-50 transition-opacity">
+              <div class="p-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50">
+                <p class="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5">{isNl ? 'Ingelogd als' : 'Signed in as'}</p>
+                <p id="dropdown-email" class="text-xs font-mono text-slate-900 dark:text-slate-100 truncate"></p>
+              </div>
+              <div class="p-1.5 flex flex-col font-mono text-xs">
+                <a href={isNl ? '/nl/dashboard' : '/dashboard'} class="px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors flex items-center justify-between">
+                  <span>Dashboard (Tracker)</span>
+                  <span class="text-cyan-500/50">&rarr;</span>
+                </a>
+                <a href={isNl ? '/nl/profile' : '/profile'} class="px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors flex items-center justify-between">
+                  <span>{isNl ? 'Profiel & Instellingen' : 'Profile & Settings'}</span>
+                  <span class="text-cyan-500/50">&rarr;</span>
+                </a>
+              </div>
+              <div class="p-1.5 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30">
+                <button id="logout-btn" class="w-full px-3 py-2 rounded-lg text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors font-mono text-xs font-bold cursor-pointer">
+                  {isNl ? 'Uitloggen' : 'Sign Out'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Theme Toggle Button -->
+        <ThemeToggle />
+      </div>
+
+    </div>
+  </div>
+</header>
+
+<script>
+  import { supabase } from '../lib/supabase';
+  import { signOut } from '../lib/auth';
+  
+  const setupAuthUI = async () => {
+    const loginLink = document.getElementById('login-link');
+    const userMenuContainer = document.getElementById('user-menu-container');
+    const userDropdown = document.getElementById('user-dropdown');
+    const userMenuBtn = document.getElementById('user-menu-btn');
+    const dropdownEmail = document.getElementById('dropdown-email');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (session) {
+      loginLink?.classList.add('hidden');
+      userMenuContainer?.classList.remove('hidden');
+      if (dropdownEmail) dropdownEmail.textContent = session.user.email || 'Admin';
+    } else {
+      loginLink?.classList.remove('hidden');
+      userMenuContainer?.classList.add('hidden');
+    }
+
+    // Toggle Dropdown
+    userMenuBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      userDropdown?.classList.toggle('hidden');
+      userDropdown?.classList.toggle('flex');
+    });
+
+    // Close Dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!userMenuContainer?.contains(e.target as Node)) {
+        userDropdown?.classList.add('hidden');
+        userDropdown?.classList.remove('flex');
+      }
+    });
+
+    // Handle Logout
+    logoutBtn?.addEventListener('click', async () => {
+      await signOut();
+      const isNl = window.location.pathname.startsWith('/nl');
+      window.location.href = isNl ? '/nl/login' : '/login';
+    });
+  };
+
+  setupAuthUI();
+
+  supabase.auth.onAuthStateChange(() => {
+    setupAuthUI();
+  });
+</script>

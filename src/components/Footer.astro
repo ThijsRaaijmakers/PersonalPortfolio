@@ -1,0 +1,80 @@
+---
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="border-t border-slate-200/80 dark:border-slate-800/80 bg-slate-100 dark:bg-slate-950/60 py-10 mt-20 text-slate-600 dark:text-slate-400 font-sans transition-colors">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-slate-200/80 dark:border-slate-800/60">
+      
+      <!-- Left Column: Credentials & Overview -->
+      <div class="space-y-3">
+        <div class="flex items-center space-x-2 font-mono text-xs text-slate-900 dark:text-slate-200">
+          <span class="text-cyan-600 dark:text-cyan-400">///</span>
+          <span class="font-bold">THIJS</span>
+        </div>
+        <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+          MSc Candidate in AI &amp; Cybersecurity @ Tilburg University &amp; BSc Informatica Alumnus @ Avans Hogeschool. Focused on software engineering, cloud automation, and artificial intelligence.
+        </p>
+      </div>
+
+      <!-- Center Column: Quick Links -->
+      <div class="space-y-3">
+        <div class="font-mono text-xs text-slate-900 dark:text-slate-200 font-bold uppercase tracking-wider">
+          Quick Links
+        </div>
+        <ul class="space-y-1.5 font-mono text-xs text-slate-600 dark:text-slate-400">
+          <li>
+            <a href="/" class="hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors flex items-center space-x-2">
+              <span class="text-cyan-500/70">&gt;</span>
+              <span>Home</span>
+            </a>
+          </li>
+          <li>
+            <a href="/projects" class="hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors flex items-center space-x-2">
+              <span class="text-cyan-500/70">&gt;</span>
+              <span>Projects</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Right Column: Connect -->
+      <div class="space-y-3 md:text-right">
+        <div class="font-mono text-xs text-slate-900 dark:text-slate-200 font-bold uppercase tracking-wider">
+          Connect
+        </div>
+        <div class="flex md:justify-end space-x-4 font-mono text-xs">
+          <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">
+            GitHub
+          </a>
+          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">
+            LinkedIn
+          </a>
+          <a href="mailto:contact@example.com" class="text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">
+            Email
+          </a>
+        </div>
+        <div class="pt-2 text-[11px] font-mono text-slate-500 dark:text-slate-500">
+          Tilburg, Netherlands
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="pt-6 flex flex-col sm:flex-row items-center justify-between font-mono text-xs text-slate-500 dark:text-slate-500 gap-4">
+      <div>
+        &copy; {currentYear} Thijs. Built with Astro &amp; Tailwind CSS.
+      </div>
+      <div class="flex items-center space-x-2 text-[11px]">
+        <span class="px-2.5 py-1 rounded bg-slate-200/80 dark:bg-slate-900 border border-slate-300/80 dark:border-slate-800 text-slate-700 dark:text-slate-400 flex items-center space-x-1.5">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span>Status: MSc Student @ Tilburg</span>
+        </span>
+      </div>
+    </div>
+  </div>
+</footer>

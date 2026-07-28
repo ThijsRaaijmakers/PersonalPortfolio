@@ -1,0 +1,135 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+export function getStaticPaths() {
+  const projects = [
+    {
+      slug: "car-hiker-tracker",
+      title: "FleetPort Car Hiker Tracker",
+      category: "Web Application & Automation",
+      description: "Automated vehicle delivery tracking system integrating RDW open data API for real-time vehicle specs and deterministic regex email parsing for shift logging.",
+      architecture: "Built with Astro and Tailwind CSS on the frontend and Supabase on the backend. Integrates directly with the Dutch RDW Open Data API to dynamically retrieve official vehicle specifications via license plate lookup. Uses deterministic regex pattern matching to parse shift logging emails and automate driver activity tracking.",
+      status: "Active System",
+      date: "2024",
+      tags: ["Astro", "Tailwind CSS", "Supabase", "RDW API", "TypeScript"],
+      highlights: [
+        "Real-time RDW Open Data API integration for instant vehicle specifications lookup by license plate.",
+        "Deterministic regex parsing engine for automated extraction of shift logs from driver dispatch emails.",
+        "Decoupled backend architecture using Supabase (PostgreSQL) for secure shift data storage and authentication.",
+        "High-performance responsive UI built with Astro and Tailwind CSS for seamless mobile and desktop use."
+      ]
+    }
+  ];
+
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+---
+
+<Layout
+  title={`${project.title} | Projects`}
+  description={project.description}
+>
+  <div class="space-y-8 max-w-4xl mx-auto">
+    
+    <!-- Back to gallery -->
+    <a href="/projects" class="inline-flex items-center space-x-2 font-mono text-xs text-slate-500 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">
+      <span>&larr;</span>
+      <span>Back to Projects Gallery</span>
+    </a>
+
+    <!-- Detail Header -->
+    <div class="space-y-4 border-b border-slate-200 dark:border-slate-800 pb-8 transition-colors">
+      <div class="flex items-center space-x-3 text-xs font-mono">
+        <span class="px-2.5 py-1 rounded bg-cyan-950/10 dark:bg-cyan-950/60 border border-cyan-500/30 text-cyan-700 dark:text-cyan-400 uppercase">
+          {project.category}
+        </span>
+        <span class="text-slate-500 dark:text-slate-400">{project.date}</span>
+        <span class="px-2 py-0.5 rounded bg-cyan-950/10 dark:bg-cyan-950/80 border border-cyan-500/30 text-cyan-700 dark:text-cyan-300 text-[10px]">
+          {project.status}
+        </span>
+      </div>
+
+      <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-50 font-sans">
+        {project.title}
+      </h1>
+
+      <p class="text-slate-600 dark:text-slate-300 text-base leading-relaxed">
+        {project.description}
+      </p>
+
+      <div class="flex flex-wrap gap-2 pt-2">
+        {project.tags.map((tag) => (
+          <span class="px-2.5 py-1 rounded font-mono text-xs bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300">
+            {tag}
+          </span>
+        ))}
+      </div>
+    </div>
+
+    <!-- Architecture & Technical Highlights -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      
+      <!-- Main Overview -->
+      <div class="md:col-span-2 space-y-6">
+        <div class="space-y-3">
+          <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100 font-sans flex items-center space-x-2">
+            <span class="text-cyan-600 dark:text-cyan-400 font-mono text-sm">///</span>
+            <span>System Architecture</span>
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed p-4 rounded-xl bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 font-mono">
+            {project.architecture}
+          </p>
+        </div>
+
+        <div class="space-y-3">
+          <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100 font-sans flex items-center space-x-2">
+            <span class="text-cyan-600 dark:text-cyan-400 font-mono text-sm">///</span>
+            <span>Technical Highlights &amp; Core Capabilities</span>
+          </h2>
+          <ul class="space-y-3">
+            {project.highlights.map((highlight) => (
+              <li class="flex items-start space-x-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
+                <span class="text-cyan-600 dark:text-cyan-400 font-mono font-bold mt-0.5">&gt;</span>
+                <span>{highlight}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <!-- Sidebar Metadata -->
+      <div class="space-y-6">
+        <div class="p-5 rounded-xl bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 space-y-4 font-mono text-xs">
+          <div class="text-slate-900 dark:text-slate-200 font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800 pb-2">
+            Project Metadata
+          </div>
+          <div class="space-y-3 text-slate-600 dark:text-slate-400">
+            <div>
+              <span class="text-slate-500 dark:text-slate-500 block">System Type:</span>
+              <span class="text-slate-900 dark:text-slate-200">Web App &amp; Automation</span>
+            </div>
+            <div>
+              <span class="text-slate-500 dark:text-slate-500 block">Affiliation:</span>
+              <span class="text-slate-900 dark:text-slate-200">FleetPort Operations</span>
+            </div>
+            <div>
+              <span class="text-slate-500 dark:text-slate-500 block">Integrations:</span>
+              <span class="text-slate-900 dark:text-slate-200">Dutch RDW Open Data API</span>
+            </div>
+            <div>
+              <span class="text-slate-500 dark:text-slate-500 block">Backend:</span>
+              <span class="text-slate-900 dark:text-slate-200">Supabase (PostgreSQL)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</Layout>

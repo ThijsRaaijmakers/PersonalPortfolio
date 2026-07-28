@@ -1,0 +1,78 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Dashboard | Terminal Authenticated"
+  description="Protected terminal dashboard for authorized accounts."
+>
+  <div id="loading-state" class="py-16 text-center font-mono text-xs text-slate-500 dark:text-slate-400">
+    <div class="inline-flex items-center space-x-2">
+      <span class="w-2 h-2 rounded-full bg-cyan-500 animate-ping"></span>
+      <span>VERIFYING_SECURITY_CREDENTIALS...</span>
+    </div>
+  </div>
+
+  <div id="dashboard-content" class="hidden space-y-8 max-w-4xl mx-auto py-8 animate-fade-in-up">
+    
+    <!-- Header Banner -->
+    <div class="p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-white via-slate-50 to-cyan-50/40 dark:from-slate-900/90 dark:via-slate-900/60 dark:to-cyan-950/20 border border-slate-200 dark:border-slate-800 space-y-4 shadow-xl">
+      <div class="flex flex-wrap items-center justify-between gap-4 font-mono text-xs border-b border-slate-200 dark:border-slate-800/80 pb-4">
+        <span class="px-3 py-1 rounded-full bg-cyan-950/10 dark:bg-cyan-950/80 border border-cyan-500/40 text-cyan-600 dark:text-cyan-300 font-semibold uppercase">
+          PROTECTED TERMINAL
+        </span>
+        <span id="user-email" class="text-slate-600 dark:text-slate-300"></span>
+      </div>
+
+      <div class="space-y-2">
+        <h1 class="text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-sans">
+          Secure Terminal Authenticated.
+        </h1>
+        <p class="text-sm text-slate-600 dark:text-slate-300 font-mono">
+          Session token validated. Role-based access control active.
+        </p>
+      </div>
+
+      <div class="pt-2 flex items-center justify-between">
+        <button 
+          id="logout-btn"
+          class="px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-red-500 hover:text-white text-slate-700 dark:text-slate-300 font-mono text-xs font-semibold transition-all cursor-pointer"
+        >
+          Terminate Session (Sign Out)
+        </button>
+      </div>
+    </div>
+
+  </div>
+</Layout>
+
+<script>
+  import { getSession, signOut } from '../lib/auth';
+
+  async function checkAuth() {
+    const loadingState = document.getElementById('loading-state');
+    const dashboardContent = document.getElementById('dashboard-content');
+    const userEmailSpan = document.getElementById('user-email');
+
+    const { session } = await getSession();
+
+    if (!session) {
+      window.location.href = '/login';
+      return;
+    }
+
+    if (userEmailSpan && session.user?.email) {
+      userEmailSpan.textContent = `USER: ${session.user.email}`;
+    }
+
+    loadingState?.classList.add('hidden');
+    dashboardContent?.classList.remove('hidden');
+  }
+
+  document.getElementById('logout-btn')?.addEventListener('click', async () => {
+    await signOut();
+    window.location.href = '/login';
+  });
+
+  checkAuth();
+</script>
