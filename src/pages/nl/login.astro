@@ -6,25 +6,25 @@ import Layout from '../../layouts/Layout.astro';
   title="Terminal Toegang | Inloggen"
   description="Beveiligd authenticatieportaal voor beheerders en geautoriseerde gebruikers."
 >
-  <div class="max-w-md mx-auto py-12 animate-fade-in-up">
+  <div class="max-w-md w-full mx-auto py-8 sm:py-12 animate-fade-in-up">
     
     <!-- Login Header -->
-    <div class="space-y-3 text-center mb-8">
+    <div class="space-y-3 text-center mb-6 sm:mb-8">
       <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-950/10 dark:bg-cyan-950/60 border border-cyan-500/30 font-mono text-xs text-cyan-600 dark:text-cyan-400">
         <span class="w-2 h-2 rounded-full bg-cyan-500 dark:bg-cyan-400 animate-pulse"></span>
         <span>BEVEILIGDE TERMINAL &bull; AUTH</span>
       </div>
 
-      <h1 id="portal-title" class="text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-sans tracking-tight">
+      <h1 id="portal-title" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-sans tracking-tight">
         Terminal Authenticatie
       </h1>
-      <p id="portal-subtitle" class="text-sm text-slate-600 dark:text-slate-400 font-mono">
+      <p id="portal-subtitle" class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-mono">
         Voer geautoriseerde inloggegevens in om toegang te krijgen.
       </p>
     </div>
 
     <!-- Login Card Container -->
-    <div class="p-6 sm:p-8 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-xl space-y-6">
+    <div class="p-5 sm:p-8 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-xl space-y-6 w-full max-w-full">
       
       <!-- Error Message Container -->
       <p id="auth-error" class="hidden p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 font-mono text-xs leading-relaxed"></p>

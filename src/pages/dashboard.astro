@@ -16,19 +16,19 @@ import Layout from '../layouts/Layout.astro';
   <div id="dashboard-content" class="hidden space-y-8 max-w-4xl mx-auto py-8 animate-fade-in-up">
     
     <!-- Header Banner -->
-    <div class="p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-white via-slate-50 to-cyan-50/40 dark:from-slate-900/90 dark:via-slate-900/60 dark:to-cyan-950/20 border border-slate-200 dark:border-slate-800 space-y-4 shadow-xl">
+    <div class="p-5 sm:p-8 rounded-2xl bg-gradient-to-br from-white via-slate-50 to-cyan-50/40 dark:from-slate-900/90 dark:via-slate-900/60 dark:to-cyan-950/20 border border-slate-200 dark:border-slate-800 space-y-4 shadow-xl">
       <div class="flex flex-wrap items-center justify-between gap-4 font-mono text-xs border-b border-slate-200 dark:border-slate-800/80 pb-4">
         <span class="px-3 py-1 rounded-full bg-cyan-950/10 dark:bg-cyan-950/80 border border-cyan-500/40 text-cyan-600 dark:text-cyan-300 font-semibold uppercase">
           PROTECTED TERMINAL
         </span>
-        <span id="user-email" class="text-slate-600 dark:text-slate-300"></span>
+        <span id="user-email" class="text-slate-600 dark:text-slate-300 truncate max-w-xs sm:max-w-md"></span>
       </div>
 
       <div class="space-y-2">
-        <h1 class="text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-sans">
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-sans">
           Secure Terminal Authenticated.
         </h1>
-        <p class="text-sm text-slate-600 dark:text-slate-300 font-mono">
+        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-mono">
           Session token validated. Role-based access control active.
         </p>
       </div>

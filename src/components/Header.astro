@@ -8,37 +8,37 @@ const isNl = pathname.startsWith('/nl');
 
 const navItems = [
   { name: isNl ? "Home" : "Home", href: isNl ? "/nl" : "/" },
-  { name: isNl ? "Projecten" : "Projects", href: "/projects" },
+  { name: isNl ? "Projecten" : "Projects", href: isNl ? "/nl/projects" : "/projects" },
 ];
 ---
 
-<header class="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-slate-950/80 border-b border-slate-200/80 dark:border-slate-800/80 transition-colors">
+<header class="sticky top-0 z-50 relative backdrop-blur-md bg-white/80 dark:bg-slate-950/80 border-b border-slate-200/80 dark:border-slate-800/80 transition-colors">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
       
       <!-- Logo / Identity -->
-      <a href={isNl ? "/nl" : "/"} class="flex items-center space-x-3 group">
-        <div class="w-8 h-8 rounded-lg bg-cyan-950/10 dark:bg-cyan-950/60 border border-cyan-500/30 flex items-center justify-center text-cyan-600 dark:text-cyan-400 font-mono font-bold text-sm group-hover:border-cyan-500 transition-colors shadow-sm shadow-cyan-500/10">
+      <a href={isNl ? "/nl" : "/"} class="flex items-center space-x-3 group min-w-0">
+        <div class="w-8 h-8 rounded-lg bg-cyan-950/10 dark:bg-cyan-950/60 border border-cyan-500/30 flex items-center justify-center text-cyan-600 dark:text-cyan-400 font-mono font-bold text-sm group-hover:border-cyan-500 transition-colors shadow-sm shadow-cyan-500/10 flex-shrink-0">
           T
         </div>
-        <div class="flex flex-col">
-          <span class="font-mono text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-100 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
+        <div class="flex flex-col truncate">
+          <span class="font-mono text-xs sm:text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-100 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors truncate">
             Thijs <span class="text-cyan-500/70">|</span> Software &amp; AI
           </span>
-          <span class="text-[10px] font-mono text-slate-500 dark:text-slate-400">
-            {isNl ? "MSc Kandidaat @ Tilburg University" : "MSc Candidate @ Tilburg University"}
+          <span class="text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate">
+            {isNl ? "MSc Kandidaat @ Tilburg" : "MSc Candidate @ Tilburg"}
           </span>
         </div>
       </a>
 
-      <!-- Right Navigation & Tools -->
-      <div class="flex items-center space-x-2 sm:space-x-3">
+      <!-- Desktop Navigation & Tools -->
+      <div class="hidden md:flex items-center space-x-2 sm:space-x-3">
         <!-- Navigation Links -->
         <nav class="flex items-center space-x-1">
           {navItems.map((item) => {
             const isActive = (item.href === "/" || item.href === "/nl") 
               ? (currentPath === "" || currentPath === "/nl") 
-              : currentPath.startsWith(item.href);
+              : (currentPath === item.href || currentPath.startsWith(item.href + "/"));
             return (
               <a
                 href={item.href}
@@ -55,7 +55,7 @@ const navItems = [
         </nav>
 
         <!-- System Status Indicator (Desktop) -->
-        <div class="hidden md:flex items-center space-x-2 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-[11px] font-mono text-slate-600 dark:text-slate-400">
+        <div class="flex items-center space-x-2 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-[11px] font-mono text-slate-600 dark:text-slate-400">
           <span class="relative flex h-2 w-2">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -66,7 +66,7 @@ const navItems = [
         <!-- Language Toggle -->
         <LanguageToggle />
 
-        <!-- Auth Container -->
+        <!-- Auth Container (Desktop) -->
         <div id="auth-container" class="relative">
           <!-- Logged Out State -->
           <a id="login-link" href={isNl ? '/nl/login' : '/login'} class="px-2.5 py-1 rounded-md font-mono text-xs transition-all duration-200 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900/60 border border-transparent">
@@ -108,6 +108,104 @@ const navItems = [
         <ThemeToggle />
       </div>
 
+      <!-- Mobile Controls & Hamburger Toggle -->
+      <div class="flex items-center space-x-2 md:hidden">
+        <LanguageToggle />
+        <ThemeToggle />
+
+        <!-- Hamburger Button -->
+        <button
+          id="mobile-menu-btn"
+          type="button"
+          class="p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-colors cursor-pointer"
+          aria-label="Toggle navigation menu"
+          aria-expanded="false"
+        >
+          <svg id="hamburger-icon" class="w-6 h-6 block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Mobile Floating Overlay Drawer -->
+  <div
+    id="mobile-menu"
+    class="absolute top-full left-0 right-0 z-50 md:hidden mx-4 mt-2 p-4 rounded-2xl bg-white/98 dark:bg-slate-950/98 backdrop-blur-xl border border-slate-200 dark:border-slate-800 shadow-2xl space-y-3 origin-top transition-all duration-300 ease-out scale-y-0 opacity-0 pointer-events-none"
+  >
+    <!-- Navigation Links -->
+    <nav class="flex flex-col space-y-1 font-mono text-xs sm:text-sm">
+      {navItems.map((item) => {
+        const isActive = (item.href === "/" || item.href === "/nl") 
+          ? (currentPath === "" || currentPath === "/nl") 
+          : (currentPath === item.href || currentPath.startsWith(item.href + "/"));
+        return (
+          <a
+            href={item.href}
+            class={`px-3 py-2 rounded-lg transition-colors ${
+              isActive
+                ? "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 font-semibold border border-cyan-500/30"
+                : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900"
+            }`}
+          >
+            {item.name}
+          </a>
+        );
+      })}
+    </nav>
+
+    <!-- Mobile Auth Section -->
+    <div class="pt-2 border-t border-slate-200 dark:border-slate-800 font-mono text-xs">
+      <a
+        id="mobile-login-link"
+        href={isNl ? '/nl/login' : '/login'}
+        class="block w-full px-3 py-2 rounded-lg text-center font-semibold bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/20 transition-colors"
+      >
+        {isNl ? 'Inloggen' : 'Login'}
+      </a>
+
+      <div id="mobile-user-menu" class="hidden space-y-2">
+        <div class="px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+          <span class="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider block">{isNl ? 'Ingelogd als' : 'Signed in as'}</span>
+          <span id="mobile-dropdown-email" class="text-xs text-slate-900 dark:text-slate-100 font-bold truncate block"></span>
+        </div>
+        <a
+          href={isNl ? '/nl/dashboard' : '/dashboard'}
+          class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors"
+        >
+          <span>Dashboard (Tracker)</span>
+          <span class="text-cyan-500/50">&rarr;</span>
+        </a>
+        <a
+          href={isNl ? '/nl/profile' : '/profile'}
+          class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors"
+        >
+          <span>{isNl ? 'Profiel & Instellingen' : 'Profile & Settings'}</span>
+          <span class="text-cyan-500/50">&rarr;</span>
+        </a>
+        <button
+          id="mobile-logout-btn"
+          class="w-full text-left px-3 py-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 font-bold transition-colors cursor-pointer"
+        >
+          {isNl ? 'Uitloggen' : 'Sign Out'}
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile SYS_STATUS -->
+    <div class="pt-2 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between font-mono text-[11px] text-slate-500 dark:text-slate-400">
+      <span class="flex items-center space-x-2">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        </span>
+        <span>SYS_STATUS: ACTIVE</span>
+      </span>
     </div>
   </div>
 </header>
@@ -117,6 +215,7 @@ const navItems = [
   import { signOut } from '../lib/auth';
   
   const setupAuthUI = async () => {
+    // Desktop elements
     const loginLink = document.getElementById('login-link');
     const userMenuContainer = document.getElementById('user-menu-container');
     const userDropdown = document.getElementById('user-dropdown');
@@ -124,25 +223,38 @@ const navItems = [
     const dropdownEmail = document.getElementById('dropdown-email');
     const logoutBtn = document.getElementById('logout-btn');
 
+    // Mobile elements
+    const mobileLoginLink = document.getElementById('mobile-login-link');
+    const mobileUserMenu = document.getElementById('mobile-user-menu');
+    const mobileDropdownEmail = document.getElementById('mobile-dropdown-email');
+    const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+
     const { data: { session } } = await supabase.auth.getSession();
     
     if (session) {
       loginLink?.classList.add('hidden');
       userMenuContainer?.classList.remove('hidden');
       if (dropdownEmail) dropdownEmail.textContent = session.user.email || 'Admin';
+
+      mobileLoginLink?.classList.add('hidden');
+      mobileUserMenu?.classList.remove('hidden');
+      if (mobileDropdownEmail) mobileDropdownEmail.textContent = session.user.email || 'Admin';
     } else {
       loginLink?.classList.remove('hidden');
       userMenuContainer?.classList.add('hidden');
+
+      mobileLoginLink?.classList.remove('hidden');
+      mobileUserMenu?.classList.add('hidden');
     }
 
-    // Toggle Dropdown
+    // Toggle Desktop Dropdown
     userMenuBtn?.addEventListener('click', (e) => {
       e.stopPropagation();
       userDropdown?.classList.toggle('hidden');
       userDropdown?.classList.toggle('flex');
     });
 
-    // Close Dropdown when clicking outside
+    // Close Desktop Dropdown when clicking outside
     document.addEventListener('click', (e) => {
       if (!userMenuContainer?.contains(e.target as Node)) {
         userDropdown?.classList.add('hidden');
@@ -151,16 +263,67 @@ const navItems = [
     });
 
     // Handle Logout
-    logoutBtn?.addEventListener('click', async () => {
+    const handleLogout = async () => {
       await signOut();
       const isNl = window.location.pathname.startsWith('/nl');
       window.location.href = isNl ? '/nl/login' : '/login';
+    };
+
+    logoutBtn?.addEventListener('click', handleLogout);
+    mobileLogoutBtn?.addEventListener('click', handleLogout);
+  };
+
+  const setupMobileMenu = () => {
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const hamburgerIcon = document.getElementById('hamburger-icon');
+    const closeIcon = document.getElementById('close-icon');
+
+    mobileMenuBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isExpanded = mobileMenuBtn.getAttribute('aria-expanded') === 'true';
+      const nextState = !isExpanded;
+      mobileMenuBtn.setAttribute('aria-expanded', nextState.toString());
+      
+      if (nextState) {
+        mobileMenu?.classList.remove('scale-y-0', 'opacity-0', 'pointer-events-none');
+        mobileMenu?.classList.add('scale-y-100', 'opacity-100', 'pointer-events-auto');
+      } else {
+        mobileMenu?.classList.remove('scale-y-100', 'opacity-100', 'pointer-events-auto');
+        mobileMenu?.classList.add('scale-y-0', 'opacity-0', 'pointer-events-none');
+      }
+
+      hamburgerIcon?.classList.toggle('hidden', nextState);
+      hamburgerIcon?.classList.toggle('block', !nextState);
+      closeIcon?.classList.toggle('hidden', !nextState);
+      closeIcon?.classList.toggle('block', nextState);
+    });
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (
+        mobileMenuBtn &&
+        mobileMenu &&
+        !mobileMenuBtn.contains(e.target as Node) &&
+        !mobileMenu.contains(e.target as Node) &&
+        mobileMenuBtn.getAttribute('aria-expanded') === 'true'
+      ) {
+        mobileMenuBtn.setAttribute('aria-expanded', 'false');
+        mobileMenu.classList.remove('scale-y-100', 'opacity-100', 'pointer-events-auto');
+        mobileMenu.classList.add('scale-y-0', 'opacity-0', 'pointer-events-none');
+        hamburgerIcon?.classList.remove('hidden');
+        hamburgerIcon?.classList.add('block');
+        closeIcon?.classList.remove('block');
+        closeIcon?.classList.add('hidden');
+      }
     });
   };
 
   setupAuthUI();
+  setupMobileMenu();
 
   supabase.auth.onAuthStateChange(() => {
     setupAuthUI();
   });
 </script>
+
