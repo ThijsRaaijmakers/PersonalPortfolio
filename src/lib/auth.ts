@@ -69,3 +69,19 @@ export async function updateProfileName(userId: string, fullName: string) {
   return { data, error };
 }
 
+export async function requestPasswordReset(email: string, redirectToPath?: string) {
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const redirectUrl = `${origin}${redirectToPath || '/update-password'}`;
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: redirectUrl,
+  });
+  return { data, error };
+}
+
+export async function updatePasswordAfterReset(newPassword: string) {
+  const { data, error } = await supabase.auth.updateUser({
+    password: newPassword,
+  });
+  return { data, error };
+}
+
