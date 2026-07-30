@@ -3,17 +3,336 @@ import Layout from '../../layouts/Layout.astro';
 ---
 
 <Layout
-  title="Gebruikersprofiel"
-  description="Beheer gebruikersaccountinstellingen en profielinformatie."
+  title="Gebruikersprofiel | Beveiligingsbeheer"
+  description="Beheer gebruikersaccountinstellingen, profielinformatie en beveiligingssleutels."
 >
-  <div class="max-w-4xl mx-auto space-y-8 animate-fade-in-up">
-    <div class="border-b border-slate-200 dark:border-slate-800 pb-5">
-      <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 font-sans tracking-tight">
-        Gebruikersprofiel
+  <div class="max-w-4xl mx-auto py-8 sm:py-12 space-y-8 animate-fade-in-up">
+    
+    <!-- Profile Header -->
+    <div class="space-y-3 border-b border-slate-200 dark:border-slate-800 pb-6">
+      <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-950/10 dark:bg-cyan-950/60 border border-cyan-500/30 font-mono text-xs text-cyan-600 dark:text-cyan-400">
+        <span class="w-2 h-2 rounded-full bg-cyan-500 dark:bg-cyan-400 animate-pulse"></span>
+        <span>BEVEILIGDE TERMINAL &bull; GEBRUIKERSPROFIEL</span>
+      </div>
+
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-sans tracking-tight">
+        Profiel- &amp; Beveiligingsinstellingen
       </h1>
-      <p class="mt-2 text-sm text-slate-600 dark:text-slate-400 font-mono">
-        Accountbeheer binnenkort beschikbaar.
+      <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-mono">
+        Beheer geautoriseerde profielidentiteitsgegevens en toegangscodes.
       </p>
     </div>
+
+    <!-- Forms Container (Responsive 2-Column Grid) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      
+      <!-- Card 1: Update Profile Form -->
+      <div class="p-6 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-xl space-y-6 flex flex-col justify-between">
+        <div class="space-y-5">
+          <div class="flex items-center space-x-2 border-b border-slate-100 dark:border-slate-800/60 pb-3">
+            <svg class="w-5 h-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+            </svg>
+            <h2 class="text-base font-bold text-slate-900 dark:text-slate-100 font-mono">
+              Profiel Bijwerken
+            </h2>
+          </div>
+
+          <!-- Profile Error & Success Messages -->
+          <p id="profile-error" class="hidden p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 font-mono text-xs leading-relaxed"></p>
+          <p id="profile-success" class="hidden p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-mono text-xs leading-relaxed"></p>
+
+          <form id="profile-form" class="space-y-4 font-mono text-xs">
+            <div class="space-y-2">
+              <label for="profile-email" class="block text-slate-700 dark:text-slate-300 font-medium">
+                &gt; E-mailadres
+              </label>
+              <input 
+                type="email" 
+                id="profile-email" 
+                disabled 
+                class="w-full px-4 py-2.5 rounded-lg bg-slate-100 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 cursor-not-allowed"
+              />
+            </div>
+
+            <div class="space-y-2">
+              <label for="full-name" class="block text-slate-700 dark:text-slate-300 font-medium">
+                &gt; Volledige Naam
+              </label>
+              <input 
+                type="text" 
+                id="full-name" 
+                name="fullName" 
+                required
+                placeholder="Jan Jansen"
+                class="w-full px-4 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition-colors"
+              />
+            </div>
+
+            <button 
+              type="submit" 
+              class="w-full py-3 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold transition-all shadow-lg shadow-cyan-500/20 cursor-pointer flex items-center justify-center space-x-2 mt-4"
+            >
+              <span>Profiel Bijwerken</span>
+              <span>&rarr;</span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Card 2: Change Security Key Form -->
+      <div class="p-6 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-xl space-y-6 flex flex-col justify-between">
+        <div class="space-y-5">
+          <div class="flex items-center space-x-2 border-b border-slate-100 dark:border-slate-800/60 pb-3">
+            <svg class="w-5 h-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
+            <h2 class="text-base font-bold text-slate-900 dark:text-slate-100 font-mono">
+              Beveiligingssleutel Wijzigen
+            </h2>
+          </div>
+
+          <!-- Password Error & Success Messages -->
+          <p id="password-error" class="hidden p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 font-mono text-xs leading-relaxed"></p>
+          <p id="password-success" class="hidden p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-mono text-xs leading-relaxed"></p>
+
+          <form id="password-form" class="space-y-4 font-mono text-xs">
+            <div class="space-y-2">
+              <label for="current-password" class="block text-slate-700 dark:text-slate-300 font-medium">
+                &gt; Huidig Wachtwoord
+              </label>
+              <div class="relative">
+                <input 
+                  type="password" 
+                  id="current-password" 
+                  name="currentPassword" 
+                  required
+                  autocomplete="current-password"
+                  placeholder="••••••••••••"
+                  class="w-full px-4 py-2.5 pr-10 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition-colors"
+                />
+                <button 
+                  type="button" 
+                  class="toggle-password absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 focus:outline-none cursor-pointer p-1"
+                  aria-label="Wachtwoord zichtbaarheid wijzigen"
+                  data-target="current-password"
+                >
+                  <svg class="w-4 h-4 password-eye-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label for="new-password" class="block text-slate-700 dark:text-slate-300 font-medium">
+                &gt; Nieuw Wachtwoord
+              </label>
+              <div class="relative">
+                <input 
+                  type="password" 
+                  id="new-password" 
+                  name="newPassword" 
+                  required
+                  autocomplete="new-password"
+                  placeholder="••••••••••••"
+                  class="w-full px-4 py-2.5 pr-10 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition-colors"
+                />
+                <button 
+                  type="button" 
+                  class="toggle-password absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 focus:outline-none cursor-pointer p-1"
+                  aria-label="Wachtwoord zichtbaarheid wijzigen"
+                  data-target="new-password"
+                >
+                  <svg class="w-4 h-4 password-eye-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label for="confirm-password" class="block text-slate-700 dark:text-slate-300 font-medium">
+                &gt; Bevestig Wachtwoord
+              </label>
+              <div class="relative">
+                <input 
+                  type="password" 
+                  id="confirm-password" 
+                  name="confirmPassword" 
+                  required
+                  autocomplete="new-password"
+                  placeholder="••••••••••••"
+                  class="w-full px-4 py-2.5 pr-10 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition-colors"
+                />
+                <button 
+                  type="button" 
+                  class="toggle-password absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 focus:outline-none cursor-pointer p-1"
+                  aria-label="Wachtwoord zichtbaarheid wijzigen"
+                  data-target="confirm-password"
+                >
+                  <svg class="w-4 h-4 password-eye-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <button 
+              type="submit" 
+              class="w-full py-3 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold transition-all shadow-lg shadow-cyan-500/20 cursor-pointer flex items-center justify-center space-x-2 mt-4"
+            >
+              <span>Beveiligingssleutel Wijzigen</span>
+              <span>&rarr;</span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+
   </div>
 </Layout>
+
+<script>
+  import { getUser, updateProfileName, updatePassword } from '../../lib/auth';
+  import { supabase } from '../../lib/supabase';
+
+  const profileForm = document.getElementById('profile-form') as HTMLFormElement | null;
+  const passwordForm = document.getElementById('password-form') as HTMLFormElement | null;
+
+  const profileEmailInput = document.getElementById('profile-email') as HTMLInputElement | null;
+  const fullNameInput = document.getElementById('full-name') as HTMLInputElement | null;
+
+  const profileError = document.getElementById('profile-error');
+  const profileSuccess = document.getElementById('profile-success');
+  const passwordError = document.getElementById('password-error');
+  const passwordSuccess = document.getElementById('password-success');
+
+  let currentUserId = '';
+
+  const EYE_NORMAL = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>`;
+  const EYE_SLASHED = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908a10.025 10.025 0 013.122-.863c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21M3 3l18 18"></path>`;
+
+  function showMsg(el: HTMLElement | null, msg: string, isError: boolean) {
+    if (!el) return;
+    const prefix = isError ? '[FOUT]: ' : '[SUCCES]: ';
+    el.textContent = `${prefix}${msg}`;
+    el.classList.remove('hidden');
+  }
+
+  function hideMsg(el: HTMLElement | null) {
+    if (!el) return;
+    el.textContent = '';
+    el.classList.add('hidden');
+  }
+
+  document.querySelectorAll('.toggle-password').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.getAttribute('data-target');
+      if (!targetId) return;
+      const input = document.getElementById(targetId) as HTMLInputElement | null;
+      const svg = btn.querySelector('.password-eye-svg');
+      if (!input || !svg) return;
+
+      if (input.type === 'password') {
+        input.type = 'text';
+        svg.innerHTML = EYE_SLASHED;
+      } else {
+        input.type = 'password';
+        svg.innerHTML = EYE_NORMAL;
+      }
+    });
+  });
+
+  async function initProfile() {
+    const { user, error } = await getUser();
+    if (error || !user) {
+      window.location.href = '/nl/login';
+      return;
+    }
+
+    currentUserId = user.id;
+
+    if (profileEmailInput) {
+      profileEmailInput.value = user.email || '';
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('id', user.id)
+      .single();
+
+    if (fullNameInput) {
+      fullNameInput.value = profile?.full_name || user.user_metadata?.full_name || '';
+    }
+  }
+
+  initProfile();
+
+  profileForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideMsg(profileError);
+    hideMsg(profileSuccess);
+
+    if (!currentUserId) {
+      showMsg(profileError, 'Gebruikerssessie ongeldig. Log opnieuw in.', true);
+      return;
+    }
+
+    const formData = new FormData(profileForm);
+    const fullName = (formData.get('fullName') as string)?.trim();
+
+    if (!fullName) {
+      showMsg(profileError, 'Volledige naam mag niet leeg zijn.', true);
+      return;
+    }
+
+    const { error } = await updateProfileName(currentUserId, fullName);
+
+    if (error) {
+      showMsg(profileError, error.message || 'Fout bij het bijwerken van profielnaam.', true);
+    } else {
+      showMsg(profileSuccess, 'Profielnaam succesvol bijgewerkt.', false);
+    }
+  });
+
+  passwordForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideMsg(passwordError);
+    hideMsg(passwordSuccess);
+
+    const formData = new FormData(passwordForm);
+    const currentPassword = formData.get('currentPassword') as string;
+    const newPassword = formData.get('newPassword') as string;
+    const confirmPassword = formData.get('confirmPassword') as string;
+
+    if (!currentPassword) {
+      showMsg(passwordError, 'Huidig wachtwoord is verplicht.', true);
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      showMsg(passwordError, 'Wachtwoorden komen niet overeen.', true);
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      showMsg(passwordError, 'Wachtwoord moet ten minste 6 tekens lang zijn.', true);
+      return;
+    }
+
+    const { error } = await updatePassword(currentPassword, newPassword);
+
+    if (error) {
+      showMsg(passwordError, error.message || 'Fout bij het bijwerken van wachtwoord.', true);
+    } else {
+      showMsg(passwordSuccess, 'Beveiligingssleutel succesvol bijgewerkt.', false);
+      passwordForm.reset();
+    }
+  });
+</script>

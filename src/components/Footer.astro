@@ -1,10 +1,12 @@
 ---
+const pathname = new URL(Astro.request.url).pathname;
+const isNl = pathname.startsWith('/nl');
 const currentYear = new Date().getFullYear();
 ---
 
 <footer class="border-t border-slate-200/80 dark:border-slate-800/80 bg-slate-100 dark:bg-slate-950/60 py-10 mt-20 text-slate-600 dark:text-slate-400 font-sans transition-colors">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-slate-200/80 dark:border-slate-800/60">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 pb-8 border-b border-slate-200/80 dark:border-slate-800/60">
       
       <!-- Left Column: Credentials & Overview -->
       <div class="space-y-3">
@@ -13,26 +15,49 @@ const currentYear = new Date().getFullYear();
           <span class="font-bold">THIJS</span>
         </div>
         <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-          MSc Candidate in AI &amp; Cybersecurity @ Tilburg University &amp; BSc Informatica Alumnus @ Avans Hogeschool. Focused on software engineering, cloud automation, and artificial intelligence.
+          {isNl 
+            ? "MSc Kandidaat in AI & Cybersecurity @ Universiteit Tilburg & BSc Informatica Alumnus @ Avans Hogeschool." 
+            : "MSc Candidate in AI & Cybersecurity @ Tilburg University & BSc Computer Science Alumnus @ Avans University."}
         </p>
       </div>
 
-      <!-- Center Column: Quick Links -->
+      <!-- Center Column 1: Quick Links -->
       <div class="space-y-3">
         <div class="font-mono text-xs text-slate-900 dark:text-slate-200 font-bold uppercase tracking-wider">
-          Quick Links
+          {isNl ? 'Snelle Links' : 'Quick Links'}
         </div>
         <ul class="space-y-1.5 font-mono text-xs text-slate-600 dark:text-slate-400">
           <li>
-            <a href="/" class="hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors flex items-center space-x-2">
+            <a href={isNl ? '/nl' : '/'} class="hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors flex items-center space-x-2">
               <span class="text-cyan-500/70">&gt;</span>
               <span>Home</span>
             </a>
           </li>
           <li>
-            <a href="/projects" class="hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors flex items-center space-x-2">
+            <a href={isNl ? '/nl/projects' : '/projects'} class="hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors flex items-center space-x-2">
               <span class="text-cyan-500/70">&gt;</span>
-              <span>Projects</span>
+              <span>{isNl ? 'Projecten' : 'Projects'}</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Center Column 2: Legal -->
+      <div class="space-y-3">
+        <div class="font-mono text-xs text-slate-900 dark:text-slate-200 font-bold uppercase tracking-wider">
+          {isNl ? 'Juridisch' : 'Legal'}
+        </div>
+        <ul class="space-y-1.5 font-mono text-xs text-slate-600 dark:text-slate-400">
+          <li>
+            <a href={isNl ? '/nl/terms' : '/terms'} class="hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors flex items-center space-x-2">
+              <span class="text-cyan-500/70">&gt;</span>
+              <span>{isNl ? 'Algemene Voorwaarden' : 'Terms of Service'}</span>
+            </a>
+          </li>
+          <li>
+            <a href={isNl ? '/nl/privacy' : '/privacy'} class="hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors flex items-center space-x-2">
+              <span class="text-cyan-500/70">&gt;</span>
+              <span>{isNl ? 'Privacybeleid' : 'Privacy Policy'}</span>
             </a>
           </li>
         </ul>
@@ -41,21 +66,21 @@ const currentYear = new Date().getFullYear();
       <!-- Right Column: Connect -->
       <div class="space-y-3 md:text-right">
         <div class="font-mono text-xs text-slate-900 dark:text-slate-200 font-bold uppercase tracking-wider">
-          Connect
+          {isNl ? 'Contact' : 'Connect'}
         </div>
         <div class="flex md:justify-end space-x-4 font-mono text-xs">
-          <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">
+          <a href="https://github.com/ThijsRaaijmakers" target="_blank" rel="noopener noreferrer" class="text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">
             GitHub
           </a>
-          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">
+          <a href="https://linkedin.com/in/thijs-raaijmakers-649644236" target="_blank" rel="noopener noreferrer" class="text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">
             LinkedIn
           </a>
-          <a href="mailto:contact@example.com" class="text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">
+          <a href="mailto:info@thijsraaijmakers.me" class="text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">
             Email
           </a>
         </div>
         <div class="pt-2 text-[11px] font-mono text-slate-500 dark:text-slate-500">
-          Tilburg, Netherlands
+          Bergen op Zoom, Netherlands
         </div>
       </div>
 
@@ -72,7 +97,7 @@ const currentYear = new Date().getFullYear();
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
           </span>
-          <span>Status: MSc Student @ Tilburg</span>
+          <span>Status: MSc Student @ Tilburg University</span>
         </span>
       </div>
     </div>

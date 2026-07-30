@@ -1,0 +1,72 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Privacy Policy | Legal"
+  description="Privacy policy and data protection guidelines."
+>
+  <div class="max-w-3xl mx-auto py-8 sm:py-12 space-y-6 animate-fade-in-up">
+    <div class="border-b border-slate-200 dark:border-slate-800 pb-6 space-y-3">
+      <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-950/10 dark:bg-cyan-950/60 border border-cyan-500/30 font-mono text-xs text-cyan-600 dark:text-cyan-400">
+        <span class="w-2 h-2 rounded-full bg-cyan-500 dark:bg-cyan-400 animate-pulse"></span>
+        <span>LEGAL &bull; PRIVACY</span>
+      </div>
+
+      <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-slate-50 font-sans tracking-tight">
+        Privacy Policy
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-mono">
+        Last updated: July 2026
+      </p>
+    </div>
+
+    <div class="prose dark:prose-invert max-w-none font-sans text-slate-700 dark:text-slate-300 space-y-4">
+      <p class="text-sm text-slate-500 dark:text-slate-400 mb-8">Last Updated: July 2026</p>
+
+      <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 mt-6 mb-3">1. Introduction</h3>
+      <p class="text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
+        This Privacy Policy explains how data is collected, used, and protected on thijsraaijmakers.me. As a platform built with a strong focus on cybersecurity and data integrity, your privacy is taken seriously. This policy applies to the main portfolio and all hosted sub-projects, including the secure terminal and the Car Hiker Tracker.
+      </p>
+
+      <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 mt-6 mb-3">2. Information We Collect</h3>
+      <p class="text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+        We only collect information that is strictly necessary for the functionality of the system:
+      </p>
+      <ul class="list-disc pl-6 space-y-2 text-slate-600 dark:text-slate-300 mb-6 marker:text-cyan-500">
+        <li><strong>Authentication Data:</strong> When you register for an account, we collect your email address and a securely hashed password.</li>
+        <li><strong>Profile Data:</strong> You may optionally provide a display name ("Full Name") within your account settings.</li>
+        <li><strong>Logistical Data:</strong> For authorized users of the Car Hiker Tracker, the system processes parsed shift logs and vehicle license plates to interface with the RDW Open Data API.</li>
+      </ul>
+
+      <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 mt-6 mb-3">3. How We Use Your Information</h3>
+      <p class="text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
+        Your data is used exclusively to provide and secure the services on this website. Email addresses are used for identity verification (via 6-digit OTP codes) and securing access to restricted terminal environments. Logistical data is used strictly to automate and demonstrate tracking workflows. We do not sell, rent, or share your personal data with third parties for marketing purposes.
+      </p>
+
+      <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 mt-6 mb-3">4. Third-Party Services</h3>
+      <p class="text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
+        To operate this infrastructure, we utilize trusted third-party service providers acting as data processors. <strong>Supabase</strong> provides our backend database and authentication layer, securely storing user credentials. <strong>Resend</strong> is used to securely route automated transactional emails (such as OTP codes). These providers are fully compliant with modern data protection regulations.
+      </p>
+
+      <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 mt-6 mb-3">5. Cookies and Local Storage</h3>
+      <p class="text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
+        This website does not use invasive tracking or advertising cookies. We use standard browser Local Storage strictly for functional purposes: to remember your UI theme preference (Dark/Light mode) and to maintain your active authentication session tokens.
+      </p>
+
+      <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 mt-6 mb-3">6. Your Data Rights (GDPR)</h3>
+      <p class="text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
+        Under the General Data Protection Regulation (GDPR), you have the right to access, rectify, or request the complete deletion of your personal data stored on this system. You can manage your profile data directly via the Profile Settings dashboard. For full account deletion requests, please use the contact method below.
+      </p>
+
+      <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 mt-6 mb-3">7. Contact</h3>
+      <p class="text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
+        For any privacy-related inquiries or to exercise your data rights, please reach out via the email address provided in the website footer.
+      </p>
+      
+      <p class="text-sm leading-relaxed font-mono">
+        We respect your privacy and are committed to protecting personal data.
+      </p>
+    </div>
+  </div>
+</Layout>
