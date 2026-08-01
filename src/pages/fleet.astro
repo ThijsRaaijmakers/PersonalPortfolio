@@ -89,7 +89,7 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
     <div id="fleet-error" class="hidden p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 font-mono text-xs"></div>
 
     <!-- Fleet Grid Container -->
-    <div id="fleet-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 hidden"></div>
+    <div id="fleet-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-h-[700px] overflow-y-auto pr-2 overflow-x-hidden [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full hidden"></div>
 
   </div>
 </Layout>
@@ -192,7 +192,7 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 
     // 4. Render Vehicle Cards
     if (gridEl) {
-      gridEl.innerHTML = shifts.map(shift => {
+      gridEl.innerHTML = shifts.map((shift, idx) => {
         const make = shift.vehicle_make || '';
         const model = shift.vehicle_model || '';
         const plate = shift.vehicle_license_plate || '';
