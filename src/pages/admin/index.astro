@@ -1,0 +1,335 @@
+---
+export const prerender = false;
+
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+---
+
+<Layout description="Centralized Admin Control Panel for user directory and security logs." title="Admin Control Panel | FleetPort Logistics">
+  <div class="max-w-7xl mx-auto py-8 sm:py-12 space-y-10 animate-fade-in-up">
+    
+    <!-- Breadcrumbs -->
+    <Breadcrumbs 
+      items={[
+        { label: 'Home', href: '/' },
+        { label: 'Dashboard', href: '/dashboard' },
+        { label: 'Admin Control Panel' }
+      ]} 
+    />
+
+    <!-- Loading State Container (Visible by default) -->
+    <div id="loading-container" class="p-12 text-center rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl space-y-4 font-mono">
+      <div class="inline-flex items-center justify-center space-x-3 text-cyan-600 dark:text-cyan-400">
+        <svg class="animate-spin h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span class="text-sm font-bold tracking-wider animate-pulse">// AUTHENTICATING_ADMIN_SESSION...</span>
+      </div>
+      <p class="text-xs text-slate-500 dark:text-slate-400">
+        Verifying security clearance and fetching system telemetry...
+      </p>
+    </div>
+
+    <!-- Main Admin Content Container (Hidden by default) -->
+    <div id="admin-content" class="hidden space-y-10">
+      
+      <!-- Header Section -->
+      <div class="space-y-3 border-b border-slate-300 dark:border-slate-800 pb-6">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div class="space-y-1.5">
+            <div class="flex items-center space-x-2.5 flex-wrap gap-y-1">
+              <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-950/10 dark:bg-cyan-950/60 border border-cyan-500/30 font-mono text-xs text-cyan-600 dark:text-cyan-400">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>SECURE TERMINAL &bull; ADMIN CONTROL PANEL</span>
+              </div>
+
+              <span class="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30 font-mono text-[10px] font-bold tracking-wider uppercase shadow-sm shadow-cyan-500/10">
+                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+                <span>ADMIN</span>
+              </span>
+            </div>
+
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-sans tracking-tight">
+              Admin Control Panel
+            </h1>
+            <p id="admin-identity" class="text-xs font-mono text-slate-500 dark:text-slate-400"></p>
+          </div>
+
+          <a 
+            href="/dashboard" 
+            class="group inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-slate-100/80 dark:bg-slate-950 hover:bg-slate-200/80 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-800 font-mono text-xs font-semibold transition-colors shadow-sm"
+          >
+            <svg class="w-4 h-4 text-cyan-500 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            <span>Back to Dashboard</span>
+          </a>
+        </div>
+
+        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-mono">
+          Centralized administration console for inspecting registered user profiles, role-based access controls, and real-time system audit telemetry.
+        </p>
+      </div>
+
+      <!-- Overview Metrics Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono">
+        <div class="p-5 rounded-xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-sm space-y-1">
+          <span class="text-xs text-slate-500 dark:text-slate-400 block">// Registered Users</span>
+          <span id="metric-total-users" class="text-2xl font-bold text-slate-900 dark:text-slate-100">...</span>
+        </div>
+        <div class="p-5 rounded-xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-sm space-y-1">
+          <span class="text-xs text-slate-500 dark:text-slate-400 block">// System Admins</span>
+          <span id="metric-admin-users" class="text-2xl font-bold text-cyan-600 dark:text-cyan-400">...</span>
+        </div>
+        <div class="p-5 rounded-xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-sm space-y-1">
+          <span class="text-xs text-slate-500 dark:text-slate-400 block">// Audit Log Records</span>
+          <span id="metric-total-logs" class="text-2xl font-bold text-blue-600 dark:text-blue-400">...</span>
+        </div>
+      </div>
+
+      <!-- Section A: User Directory -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <svg class="w-5 h-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+            <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100 font-mono tracking-tight">
+              // Section A: User Directory &amp; Roles
+            </h2>
+          </div>
+          <span id="user-count" class="font-mono text-xs text-slate-500 dark:text-slate-400">Loading users...</span>
+        </div>
+
+        <div class="rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl overflow-hidden">
+          <!-- Table Header -->
+          <div class="hidden sm:grid sm:grid-cols-12 gap-4 p-4 font-mono text-xs font-semibold bg-slate-100/80 dark:bg-slate-950/80 text-slate-500 dark:text-slate-400 border-b border-slate-300 dark:border-slate-800">
+            <div class="sm:col-span-4">Email Address</div>
+            <div class="sm:col-span-3">Full Name</div>
+            <div class="sm:col-span-2">Assigned Role</div>
+            <div class="sm:col-span-3 text-right">Registration Date</div>
+          </div>
+
+          <!-- Users Rows Container -->
+          <div id="users-rows-container" class="divide-y divide-slate-300 dark:divide-slate-800/60 font-mono text-xs max-h-[450px] overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full">
+            <div class="p-6 text-center text-slate-400 font-mono">Fetching user directory...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section B: System Activity Logs -->
+      <div class="space-y-4 pt-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <svg class="w-5 h-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100 font-mono tracking-tight">
+              // Section B: Recent System Audit Logs
+            </h2>
+          </div>
+          <span id="log-count" class="font-mono text-xs text-slate-500 dark:text-slate-400">Loading logs...</span>
+        </div>
+
+        <div class="rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl overflow-hidden">
+          <div id="logs-rows-container" class="divide-y divide-slate-300 dark:divide-slate-800/60 font-mono text-xs max-h-[600px] overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full">
+            <div class="p-6 text-center text-slate-400 font-mono">Fetching audit logs...</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</Layout>
+
+<script>
+  import { supabase } from '../../lib/supabase';
+
+  async function initAdminPanel() {
+    // 1. Session check
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      window.location.href = '/login';
+      return;
+    }
+
+    const adminIdentity = document.getElementById('admin-identity');
+    if (adminIdentity && session.user.email) {
+      adminIdentity.textContent = `// Identity: ${session.user.email}`;
+    }
+
+    // 2. Fetch role from profiles table
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', session.user.id)
+      .single();
+
+    if (profile?.role !== 'admin') {
+      window.location.href = '/dashboard';
+      return;
+    }
+
+    // 3. Fetch data concurrently
+    const [{ data: users, error: usersError }, { data: logs, error: logsError }] = await Promise.all([
+      supabase.from('profiles').select('*').order('created_at', { ascending: false }),
+      supabase.from('admin_logs').select('*').order('created_at', { ascending: false }).limit(50)
+    ]);
+
+    // 4. Update UI Elements
+    const loadingContainer = document.getElementById('loading-container');
+    const adminContent = document.getElementById('admin-content');
+
+    const userCountEl = document.getElementById('user-count');
+    const logCountEl = document.getElementById('log-count');
+    const totalUsersMetric = document.getElementById('metric-total-users');
+    const adminUsersMetric = document.getElementById('metric-admin-users');
+    const totalLogsMetric = document.getElementById('metric-total-logs');
+
+    const usersContainer = document.getElementById('users-rows-container');
+    const logsContainer = document.getElementById('logs-rows-container');
+
+    const userList = users || [];
+    const logList = logs || [];
+
+    if (totalUsersMetric) totalUsersMetric.textContent = userList.length.toString();
+    if (adminUsersMetric) adminUsersMetric.textContent = userList.filter(u => u.role === 'admin').length.toString();
+    if (totalLogsMetric) totalLogsMetric.textContent = logList.length.toString();
+
+    if (userCountEl) userCountEl.textContent = `${userList.length} ${userList.length === 1 ? 'user' : 'users'} registered`;
+    if (logCountEl) logCountEl.textContent = `${logList.length} ${logList.length === 1 ? 'record' : 'records'}`;
+
+    // Render Users Directory
+    if (usersContainer) {
+      if (usersError) {
+        usersContainer.innerHTML = `<div class="p-6 text-center text-red-500 font-mono">[ERROR]: ${usersError.message}</div>`;
+      } else if (userList.length === 0) {
+        usersContainer.innerHTML = `<div class="p-6 text-center text-slate-500 font-mono">// No user profiles found in database.</div>`;
+      } else {
+        usersContainer.innerHTML = userList.map((user, idx) => {
+          const formattedCreated = new Date(user.created_at).toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+          });
+
+          const isAdminRole = user.role === 'admin';
+          const roleBadgeClasses = isAdminRole
+            ? 'bg-cyan-500/10 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 border-cyan-500/30'
+            : 'bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700';
+
+          const hasName = user.full_name && user.full_name.trim().length > 0;
+          const fullNameBlock = hasName 
+            ? `
+              <div class="sm:col-span-3 min-w-0">
+                <span class="sm:hidden text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-0.5">// FULL NAME:</span>
+                <span class="font-mono text-xs text-slate-700 dark:text-slate-300 truncate block">${user.full_name}</span>
+              </div>
+            `
+            : `
+              <div class="hidden sm:block sm:col-span-3 min-w-0">
+                <span class="font-mono text-xs text-slate-400 dark:text-slate-600">&mdash;</span>
+              </div>
+            `;
+
+          return `
+            <div class="animate-fade-in-up flex flex-col space-y-2.5 sm:space-y-0 p-4 sm:p-5 sm:grid sm:grid-cols-12 sm:items-center sm:gap-4 hover:bg-slate-100/50 dark:hover:bg-slate-900/40 transition-colors border-b border-slate-300 dark:border-slate-800/60 last:border-b-0" style="animation-delay: ${idx * 50}ms; animation-fill-mode: both;">
+              <div class="sm:col-span-4 min-w-0">
+                <span class="sm:hidden text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-0.5">// EMAIL ADDRESS:</span>
+                <span class="font-bold font-mono text-xs text-slate-900 dark:text-slate-100 truncate block" title="${user.email}">${user.email}</span>
+              </div>
+
+              ${fullNameBlock}
+
+              <div class="sm:col-span-2">
+                <span class="sm:hidden text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">// ASSIGNED ROLE:</span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider border ${roleBadgeClasses}">
+                  ${user.role}
+                </span>
+              </div>
+
+              <div class="sm:col-span-3 sm:text-right">
+                <span class="sm:hidden text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-0.5">// REGISTERED DATE:</span>
+                <span class="font-mono text-xs text-slate-500 dark:text-slate-400 block">${formattedCreated}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // Render System Audit Logs
+    if (logsContainer) {
+      if (logsError) {
+        logsContainer.innerHTML = `<div class="p-6 text-center text-red-500 font-mono">[ERROR]: ${logsError.message}</div>`;
+      } else if (logList.length === 0) {
+        logsContainer.innerHTML = `<div class="p-6 text-center text-slate-500 font-mono">// No system logs recorded yet.</div>`;
+      } else {
+        logsContainer.innerHTML = logList.map((log, idx) => {
+          const formattedDate = new Date(log.created_at).toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+          });
+
+          const isShift = log.event_type === 'SHIFT_ADDED';
+          const isUser = log.event_type === 'USER_REGISTERED';
+          
+          const badgeClasses = isShift
+            ? 'bg-blue-500/10 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border-blue-500/30'
+            : isUser
+            ? 'bg-emerald-500/10 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+            : 'bg-purple-500/10 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 border-purple-500/30';
+
+          const metadataStr = log.metadata && Object.keys(log.metadata).length > 0
+            ? JSON.stringify(log.metadata, null, 2)
+            : null;
+
+          return `
+            <div class="animate-fade-in-up p-4 sm:p-5 hover:bg-slate-100/50 dark:hover:bg-slate-900/40 transition-colors space-y-2 border-b border-slate-300 dark:border-slate-800/60 last:border-b-0" style="animation-delay: ${idx * 50}ms; animation-fill-mode: both;">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div class="flex items-center space-x-3">
+                  <span class="px-2.5 py-1 rounded-md text-[11px] font-mono font-semibold border ${badgeClasses}">
+                    ${log.event_type}
+                  </span>
+                  <span class="text-xs font-mono text-slate-500 dark:text-slate-400">
+                    ${formattedDate}
+                  </span>
+                </div>
+                <span class="text-[10px] font-mono text-slate-400 dark:text-slate-500 truncate">
+                  ID: ${log.id}
+                </span>
+              </div>
+              
+              <p class="text-xs sm:text-sm font-sans font-medium text-slate-900 dark:text-slate-100">
+                ${log.description}
+              </p>
+
+              ${metadataStr ? `
+                <div class="mt-2 p-3 rounded-lg bg-slate-100/80 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800/80 font-mono text-[11px] text-slate-700 dark:text-slate-300 overflow-x-auto">
+                  <span class="text-cyan-600 dark:text-cyan-400 font-semibold block mb-1">// METADATA:</span>
+                  <pre class="text-[11px] leading-relaxed whitespace-pre-wrap">${metadataStr}</pre>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // 5. Reveal Content Container & Hide Loading State
+    loadingContainer?.classList.add('hidden');
+    adminContent?.classList.remove('hidden');
+  }
+
+  initAdminPanel();
+</script>

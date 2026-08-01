@@ -1,6 +1,27 @@
 ---
+export const prerender = false;
+
 import Layout from '../layouts/Layout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { supabase } from '../lib/supabase';
+
+// Perform server-side profiles check for admin authorization
+const { data: { session } } = await supabase.auth.getSession();
+let isAdmin = false;
+let userEmail = '';
+
+if (session) {
+  userEmail = session.user.email || '';
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', session.user.id)
+    .single();
+
+  if (profile?.role === 'admin') {
+    isAdmin = true;
+  }
+}
 ---
 
 <Layout description="Secure FleetPort logistics and shifts overview." title="Dashboard | FleetPort Logistics">
@@ -16,33 +37,68 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 
     <!-- Top Bar / Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-300 dark:border-slate-800 pb-6">
-      <div class="space-y-1">
-        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-950/10 dark:bg-cyan-950/60 border border-cyan-500/30 font-mono text-xs text-cyan-600 dark:text-cyan-400">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span>ADMINISTRATIVE &bull; SECURE CONSOLE</span>
+      <div class="space-y-1.5">
+        <div class="flex items-center space-x-2.5 flex-wrap gap-y-1">
+          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-950/10 dark:bg-cyan-950/60 border border-cyan-500/30 font-mono text-xs text-cyan-600 dark:text-cyan-400">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>ADMINISTRATIVE &bull; SECURE CONSOLE</span>
+          </div>
+
+          <!-- Terminal-Styled ADMIN Badge (Visual Feedback for Admin Users) -->
+          <span 
+            id="admin-badge" 
+            class={`${isAdmin ? '' : 'hidden '}inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30 font-mono text-[10px] font-bold tracking-wider uppercase shadow-sm shadow-cyan-500/10`}
+          >
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+            <span>ADMIN</span>
+          </span>
         </div>
+
         <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-sans tracking-tight">
           FleetPort Operations Dashboard
         </h1>
+        <p id="user-identity" class="text-xs font-mono text-slate-500 dark:text-slate-400">
+          {userEmail ? `// Identity: ${userEmail}` : ''}
+        </p>
       </div>
       
       <div class="flex flex-wrap items-center gap-3">
         <a 
           href="/fleet" 
-          class="px-4 py-2 rounded-lg bg-slate-100/80 dark:bg-slate-950 hover:bg-slate-200/80 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-800 font-mono text-xs font-semibold transition-colors flex items-center space-x-2 shadow-sm"
+          class="group px-4 py-2 rounded-lg bg-slate-100/80 dark:bg-slate-950 hover:bg-slate-200/80 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-800 font-mono text-xs font-semibold transition-colors flex items-center space-x-2 shadow-sm"
         >
+          <svg class="w-3.5 h-3.5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/>
+          </svg>
           <span>Search Auto Archive</span>
         </a>
         <button 
           id="sort-dashboard-btn" 
-          class="px-4 py-2 rounded-lg bg-slate-100/80 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-xs font-mono text-slate-700 dark:text-slate-300 font-semibold shadow-sm transition-colors hover:bg-slate-200/80 dark:hover:bg-slate-900 cursor-pointer"
+          class="px-4 py-2 rounded-lg bg-slate-100/80 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-xs font-mono text-slate-700 dark:text-slate-300 font-semibold shadow-sm transition-colors hover:bg-slate-200/80 dark:hover:bg-slate-900 cursor-pointer flex items-center space-x-2"
         >
-          Sort: Newest First
+          <svg class="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+          </svg>
+          <span>Sort: Newest First</span>
         </button>
+
+        <!-- Admin Only Navigation Link pointing to /admin -->
+        <a 
+          id="admin-logs-btn"
+          href="/admin" 
+          class={`${isAdmin ? '' : 'hidden '}px-4 py-2 rounded-lg bg-cyan-950/20 dark:bg-cyan-950/60 hover:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30 font-mono text-xs font-semibold transition-colors flex items-center space-x-2 shadow-sm`}
+        >
+          <svg class="w-3.5 h-3.5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          <span>Admin Panel</span>
+        </a>
+
+        <!-- Admin Only Button pointing to /add-shift -->
         <a 
           id="add-shift-btn"
           href="/add-shift" 
-          class="hidden px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold font-mono text-xs transition-all shadow-md shadow-cyan-500/20 flex items-center space-x-2"
+          class={`${isAdmin ? '' : 'hidden '}px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold font-mono text-xs transition-all shadow-md shadow-cyan-500/20 flex items-center space-x-2`}
         >
           <span>+ Parse New Shift</span>
         </a>
@@ -102,30 +158,46 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 
 <script>
   import { supabase } from '../lib/supabase';
-  import { getSession, checkIsAdmin } from '../lib/auth';
   import { formatDate, formatPrice, formatVehicleTitle } from '../lib/formatters';
 
   async function loadDashboard() {
-    // 1. Enforce RBAC Session Check
-    const { session } = await getSession();
+    // 1. Enforce Session Check
+    const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
       window.location.href = '/login';
       return;
     }
 
-    const isAdmin = await checkIsAdmin(session.user);
-
-    // Toggle button visibility based on role
-    const addShiftBtn = document.getElementById('add-shift-btn');
-    if (addShiftBtn) {
-      if (isAdmin) {
-        addShiftBtn.classList.remove('hidden');
-      } else {
-        addShiftBtn.classList.add('hidden');
-      }
+    const userIdentity = document.getElementById('user-identity');
+    if (userIdentity && session.user.email) {
+      userIdentity.textContent = `// Identity: ${session.user.email}`;
     }
 
-    // 2. Fetch Shifts based on role (Admin = 'shifts', Standard User = 'portfolio_shifts')
+    // 2. Query profiles table for role
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', session.user.id)
+      .single();
+
+    const isAdmin = profile?.role === 'admin';
+
+    // Toggle Admin Badge & Navigation Links based on profiles role
+    const adminBadge = document.getElementById('admin-badge');
+    const adminLogsBtn = document.getElementById('admin-logs-btn');
+    const addShiftBtn = document.getElementById('add-shift-btn');
+
+    if (adminBadge) {
+      adminBadge.classList.toggle('hidden', !isAdmin);
+    }
+    if (adminLogsBtn) {
+      adminLogsBtn.classList.toggle('hidden', !isAdmin);
+    }
+    if (addShiftBtn) {
+      addShiftBtn.classList.toggle('hidden', !isAdmin);
+    }
+
+    // 3. Fetch Shifts based on role (Admin = 'shifts', Standard User = 'portfolio_shifts')
     const targetTable = isAdmin ? 'shifts' : 'portfolio_shifts';
     const { data: shifts, error } = await supabase
       .from(targetTable)
@@ -144,212 +216,114 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
       if (rowsContainer) rowsContainer.innerHTML = `<div class="p-8 text-center text-slate-500">No shifts logged yet. Use the 'Parse New Shift' button above to add your first record.</div>`;
       if (tableCount) tableCount.textContent = `0 records found`;
       
-      // Zero out metrics
       document.getElementById('metric-total')!.textContent = '0';
       document.getElementById('metric-vehicles')!.textContent = '0';
       document.getElementById('metric-models')!.textContent = '0';
       document.getElementById('metric-hp')!.textContent = '0 HP';
-      document.getElementById('metric-fleet-value')!.textContent = formatPrice(0);
+      document.getElementById('metric-fleet-value')!.textContent = '€0';
       return;
     }
 
-    // 3. Calculate Overall Metrics
-    const totalShifts = new Set(shifts.map(s => s.shift_date)).size;
-    const uniqueVehicles = isAdmin 
-      ? new Set(shifts.map(s => s.vehicle_license_plate)).size
-      : new Set(shifts.map(s => `${s.vehicle_make || ''}_${s.vehicle_model || ''}_${s.vehicle_build_year || ''}_${s.vehicle_color || ''}_${s.vehicle_fuel || ''}`)).size;
-    
-    const uniqueModels = new Set(
-      shifts
-        .map(s => {
-          const make = s.vehicle_make ? s.vehicle_make.trim() : '';
-          const model = s.vehicle_model ? s.vehicle_model.trim() : '';
-          return `${make} ${model}`.trim().toLowerCase().replace(/\s+/g, ' ');
-        })
-        .filter(m => m.length > 0)
-    ).size;
-
-    const hpValues = shifts.map(s => s.rdw_power_hp).filter((hp): hp is number => hp !== null);
-    const avgHp = hpValues.length > 0 ? Math.round(hpValues.reduce((a, b) => a + b, 0) / hpValues.length) : 0;
-
-    const totalFleetValue = shifts.reduce((sum, s) => sum + (s.rdw_catalog_price || 0), 0);
-
-    document.getElementById('metric-total')!.textContent = totalShifts.toString();
-    document.getElementById('metric-vehicles')!.textContent = uniqueVehicles.toString();
-    document.getElementById('metric-models')!.textContent = uniqueModels.toString();
-    document.getElementById('metric-hp')!.textContent = `${avgHp} HP`;
-    document.getElementById('metric-fleet-value')!.textContent = formatPrice(totalFleetValue);
-
-    // 4. Group Shifts by shift_date (maintaining descending date order)
-    const groupedMap = new Map<string, typeof shifts>();
-    shifts.forEach(shift => {
-      const date = shift.shift_date;
-      if (!groupedMap.has(date)) {
-        groupedMap.set(date, []);
+    // Group shifts by shift_date
+    const grouped = shifts.reduce((acc: any, shift: any) => {
+      const dateKey = shift.shift_date;
+      if (!acc[dateKey]) {
+        acc[dateKey] = [];
       }
-      groupedMap.get(date)!.push(shift);
-    });
+      acc[dateKey].push(shift);
+      return acc;
+    }, {});
 
-    const shiftGroups = Array.from(groupedMap.entries()).map(([shiftDate, dateShifts]) => {
-      const ridesCount = dateShifts.length;
-      
-      // Collect distinct models with clean vehicle titles
-      const models = Array.from(new Set(
-        dateShifts
-          .map(s => formatVehicleTitle(s.vehicle_build_year, s.vehicle_make, s.vehicle_model))
-          .filter(Boolean)
-      ));
-
-      // Calculate Combined HP for the shift
-      const combinedHp = dateShifts.reduce((sum, s) => sum + (s.rdw_power_hp || 0), 0);
-
-      return {
-        shiftDate,
-        ridesCount,
-        models,
-        combinedHp
-      };
-    });
-
-    if (tableCount) tableCount.textContent = `${shiftGroups.length} shift day${shiftGroups.length === 1 ? '' : 's'} (${shifts.length} total ride${shiftGroups.length === 1 ? '' : 's'})`;
-
-    // 5. Render Table Function & Sorting Logic
-    let isNewestFirst = true;
-
-    function renderTable() {
-      if (!rowsContainer) return;
-
-      rowsContainer.innerHTML = shiftGroups.map(group => {
-        const formattedDate = formatDate(group.shiftDate);
-        const modelBadges = group.models.length > 0
-          ? group.models.map((m, idx) => `
-              <span class="inline-flex items-center px-2 py-0.5 rounded bg-cyan-950/20 dark:bg-cyan-950/60 border border-cyan-500/30 text-cyan-700 dark:text-cyan-300 font-mono text-[11px]">
-                ${m}${idx < group.models.length - 1 ? ',' : ''}
-              </span>
-            `).join(' ')
-          : '<span class="text-slate-400">N/A</span>';
-
-        const hpDisplay = group.combinedHp > 0 ? `${group.combinedHp} HP` : 'N/A';
-
-        if (isAdmin) {
-          return `
-            <a 
-              href="/shift?date=${group.shiftDate}" 
-              class="p-4 hover:bg-cyan-500/5 dark:hover:bg-cyan-950/20 cursor-pointer transition-colors group block text-slate-700 dark:text-slate-300"
-            >
-              <!-- Mobile Layout -->
-              <div class="flex flex-col space-y-3 sm:hidden w-full">
-                <div class="flex items-center justify-between font-bold text-slate-900 dark:text-slate-100 group-hover:text-cyan-600 dark:group-hover:text-cyan-400">
-                  <span>${formattedDate}</span>
-                  <span class="text-cyan-600 dark:text-cyan-400 group-hover:translate-x-0.5 transition-transform">&rarr;</span>
-                </div>
-                <div class="flex flex-wrap gap-1.5 items-center">
-                  ${modelBadges}
-                </div>
-                <div class="flex items-center gap-2">
-                  <span class="px-2 py-1 rounded text-[10px] font-bold bg-slate-100/80 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200">
-                    ${group.ridesCount} ${group.ridesCount === 1 ? 'Ride' : 'Rides'}
-                  </span>
-                  <span class="px-2 py-1 rounded text-[10px] font-semibold bg-slate-100/80 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200">
-                    ${hpDisplay}
-                  </span>
-                </div>
-              </div>
-
-              <!-- Desktop Layout -->
-              <div class="hidden sm:grid sm:grid-cols-12 gap-3 items-center w-full">
-                <div class="sm:col-span-2 font-bold text-slate-900 dark:text-slate-100 group-hover:text-cyan-600 dark:group-hover:text-cyan-400">
-                  ${formattedDate}
-                </div>
-                <div class="sm:col-span-2">
-                  <span class="px-2.5 py-1 rounded-full bg-slate-100/80 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs">
-                    ${group.ridesCount} ${group.ridesCount === 1 ? 'Ride' : 'Rides'}
-                  </span>
-                </div>
-                <div class="sm:col-span-5 w-full">
-                  <div class="flex flex-wrap gap-1.5 items-center">
-                    ${modelBadges}
-                  </div>
-                </div>
-                <div class="sm:col-span-1 font-semibold text-slate-800 dark:text-slate-200">
-                  ${hpDisplay}
-                </div>
-                <div class="sm:col-span-2 sm:text-right w-full sm:w-auto">
-                  <span class="inline-flex items-center space-x-1 px-3 py-1 rounded bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30 font-bold group-hover:bg-cyan-500 group-hover:text-slate-950 transition-all text-xs">
-                    <span>View Shift</span>
-                    <span>&rarr;</span>
-                  </span>
-                </div>
-              </div>
-            </a>
-          `;
-        } else {
-          return `
-            <div 
-              class="p-4 opacity-75 cursor-not-allowed text-slate-700 dark:text-slate-300"
-            >
-              <!-- Mobile Layout -->
-              <div class="flex flex-col space-y-3 sm:hidden w-full">
-                <div class="flex items-center justify-between font-bold text-slate-900 dark:text-slate-100">
-                  <span>${formattedDate}</span>
-                </div>
-                <div class="flex flex-wrap gap-1.5 items-center">
-                  ${modelBadges}
-                </div>
-                <div class="flex items-center gap-2">
-                  <span class="px-2 py-1 rounded text-[10px] font-bold bg-slate-100/80 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200">
-                    ${group.ridesCount} ${group.ridesCount === 1 ? 'Ride' : 'Rides'}
-                  </span>
-                  <span class="px-2 py-1 rounded text-[10px] font-semibold bg-slate-100/80 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200">
-                    ${hpDisplay}
-                  </span>
-                  <span class="px-2 py-1 rounded text-[10px] font-semibold bg-slate-200 dark:bg-slate-800 text-slate-400">
-                    RESTRICTED
-                  </span>
-                </div>
-              </div>
-
-              <!-- Desktop Layout -->
-              <div class="hidden sm:grid sm:grid-cols-12 gap-3 items-center w-full">
-                <div class="sm:col-span-2 font-bold text-slate-900 dark:text-slate-100">
-                  ${formattedDate}
-                </div>
-                <div class="sm:col-span-2">
-                  <span class="px-2.5 py-1 rounded-full bg-slate-100/80 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs">
-                    ${group.ridesCount} ${group.ridesCount === 1 ? 'Ride' : 'Rides'}
-                  </span>
-                </div>
-                <div class="sm:col-span-5 w-full">
-                  <div class="flex flex-wrap gap-1.5 items-center">
-                    ${modelBadges}
-                  </div>
-                </div>
-                <div class="sm:col-span-1 font-semibold text-slate-800 dark:text-slate-200">
-                  ${hpDisplay}
-                </div>
-                <div class="sm:col-span-2 sm:text-right w-full sm:w-auto">
-                  <span class="inline-flex items-center space-x-1 px-3 py-1 rounded bg-slate-200 dark:bg-slate-800 text-slate-400 font-semibold text-xs">
-                    <span>Restricted</span>
-                  </span>
-                </div>
-              </div>
-            </div>
-          `;
-        }
-      }).join('');
-    }
-
-    renderTable();
+    let sortedDates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
+    let isAscending = false;
 
     const sortBtn = document.getElementById('sort-dashboard-btn');
     if (sortBtn) {
       sortBtn.addEventListener('click', () => {
-        isNewestFirst = !isNewestFirst;
-        sortBtn.textContent = isNewestFirst ? 'Sort: Newest First' : 'Sort: Oldest First';
-        shiftGroups.reverse();
-        renderTable();
+        isAscending = !isAscending;
+        sortedDates.sort((a, b) => isAscending ? a.localeCompare(b) : b.localeCompare(a));
+        sortBtn.textContent = isAscending ? 'Sort: Oldest First' : 'Sort: Newest First';
+        renderRows();
       });
     }
+
+    function calculateOverallMetrics() {
+      const totalShifts = new Set(shifts.map((s: any) => s.shift_date)).size;
+      const uniqueVehicles = new Set(shifts.map((s: any) => s.vehicle_license_plate)).size;
+      const uniqueModels = new Set(shifts.map((s: any) => `${s.vehicle_make} ${s.vehicle_model}`)).size;
+
+      const hpValues = shifts.map((s: any) => s.rdw_power_hp).filter((hp: any) => typeof hp === 'number' && hp > 0);
+      const avgHp = hpValues.length > 0 
+        ? Math.round(hpValues.reduce((sum: number, val: number) => sum + val, 0) / hpValues.length)
+        : 0;
+
+      const totalValue = shifts.reduce((sum: number, s: any) => sum + (s.rdw_catalog_price || 0), 0);
+
+      document.getElementById('metric-total')!.textContent = totalShifts.toString();
+      document.getElementById('metric-vehicles')!.textContent = uniqueVehicles.toString();
+      document.getElementById('metric-models')!.textContent = uniqueModels.toString();
+      document.getElementById('metric-hp')!.textContent = `${avgHp} HP`;
+      document.getElementById('metric-fleet-value')!.textContent = formatPrice(totalValue);
+    }
+
+    function renderRows() {
+      if (!rowsContainer) return;
+      if (tableCount) tableCount.textContent = `${sortedDates.length} shift dates (${shifts.length} total rides)`;
+
+      const html = sortedDates.map((dateStr, index) => {
+        const dayShifts = grouped[dateStr];
+        const ridesCount = dayShifts.length;
+        const formattedShiftDate = formatDate(dateStr);
+
+        const modelsList = dayShifts.map((s: any) => 
+          formatVehicleTitle(s.vehicle_build_year, s.vehicle_make, s.vehicle_model)
+        ).join(', ');
+
+        const combinedHp = dayShifts.reduce((sum: number, s: any) => sum + (s.rdw_power_hp || 0), 0);
+
+        return `
+          <div class="animate-fade-in-up grid grid-cols-1 sm:grid-cols-12 gap-3 p-4 items-center hover:bg-slate-100/50 dark:hover:bg-slate-900/40 transition-colors" style="animation-delay: ${index * 50}ms; animation-fill-mode: both;">
+            <div class="sm:col-span-2 font-bold text-slate-900 dark:text-slate-100 flex items-center justify-between sm:justify-start">
+              <span>${formattedShiftDate}</span>
+              <span class="sm:hidden text-xs text-slate-400 font-normal">${ridesCount} ride(s)</span>
+            </div>
+            
+            <div class="hidden sm:block sm:col-span-2 font-medium text-slate-600 dark:text-slate-300">
+              <span class="px-2 py-0.5 rounded-full bg-slate-200/60 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono text-[11px]">
+                ${ridesCount} ${ridesCount === 1 ? 'ride' : 'rides'}
+              </span>
+            </div>
+
+            <div class="sm:col-span-5 text-slate-700 dark:text-slate-300 truncate" title="${modelsList}">
+              <span class="sm:hidden text-slate-500 font-mono text-[10px] block">// Vehicles:</span>
+              ${modelsList}
+            </div>
+
+            <div class="sm:col-span-1 font-mono text-cyan-600 dark:text-cyan-400 font-semibold">
+              <span class="sm:hidden text-slate-500 text-[10px] font-normal block">// Combined HP:</span>
+              ${combinedHp ? `${combinedHp} HP` : 'N/A'}
+            </div>
+
+            <div class="sm:col-span-2 text-left sm:text-right pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200 dark:border-slate-800/40">
+              <a 
+                href="/shift?date=${dateStr}" 
+                class="group inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-md bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 font-mono text-xs transition-colors border border-cyan-500/30"
+              >
+                <span>Inspect Day Log</span>
+                <svg class="w-3.5 h-3.5 text-cyan-500 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      rowsContainer.innerHTML = html;
+    }
+
+    calculateOverallMetrics();
+    renderRows();
   }
 
   loadDashboard();

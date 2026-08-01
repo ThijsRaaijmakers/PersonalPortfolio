@@ -29,9 +29,12 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 
       <a 
         href="/dashboard"
-        class="inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-slate-100/80 dark:bg-slate-950 hover:bg-slate-200/80 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-800 font-mono text-xs font-semibold transition-colors w-fit shadow-sm"
+        class="group inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-slate-100/80 dark:bg-slate-950 hover:bg-slate-200/80 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-800 font-mono text-xs font-semibold transition-colors w-fit shadow-sm"
       >
-        <span>&larr; Back to Dashboard</span>
+        <svg class="w-4 h-4 text-cyan-500 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        <span>Back to Dashboard</span>
       </a>
     </div>
 
@@ -86,7 +89,7 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
     <div id="fleet-error" class="hidden p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 font-mono text-xs"></div>
 
     <!-- Fleet Grid Container -->
-    <div id="fleet-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 hidden"></div>
+    <div id="fleet-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 hidden"></div>
 
   </div>
 </Layout>
@@ -216,7 +219,8 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 
         return `
           <div 
-            class="vehicle-card p-5 rounded-2xl bg-slate-50/90 dark:bg-slate-900/70 border border-slate-300 dark:border-slate-800 shadow-md shadow-slate-200/70 dark:shadow-none space-y-4 font-mono transition-all hover:border-cyan-500/40"
+            class="animate-fade-in-up vehicle-card p-5 rounded-2xl bg-slate-50/90 dark:bg-slate-900/70 border border-slate-300 dark:border-slate-800 shadow-md shadow-slate-200/70 dark:shadow-none space-y-4 font-mono transition-all hover:border-cyan-500/40"
+            style="animation-delay: ${idx * 50}ms; animation-fill-mode: both;"
             data-search="${searchTag}"
             data-date="${shift.shift_date}"
             data-hp="${shift.rdw_power_hp || 0}"
@@ -261,10 +265,12 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
               ${isAdmin ? `
                 <a 
                   href="/shift?date=${shift.shift_date}" 
-                  class="text-cyan-600 dark:text-cyan-400 hover:underline font-bold text-[11px] flex items-center space-x-1"
+                  class="group text-cyan-600 dark:text-cyan-400 hover:underline font-bold text-[11px] flex items-center space-x-1"
                 >
                   <span>View Shift Date (${formattedShiftDate})</span>
-                  <span>&rarr;</span>
+                  <svg class="w-3.5 h-3.5 text-cyan-500 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
                 </a>
               ` : `
                 <span 
