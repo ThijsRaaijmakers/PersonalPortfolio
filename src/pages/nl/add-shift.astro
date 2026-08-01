@@ -1,0 +1,280 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+---
+
+<Layout description="Beveiligde portal voor het verwerken en opslaan van FleetPort dienstgegevens." title="Dienst Toevoegen | FleetPort Logistics">
+  <div class="max-w-5xl mx-auto py-8 sm:py-12 space-y-8 animate-fade-in-up">
+    
+    <!-- Breadcrumbs -->
+    <Breadcrumbs 
+      items={[
+        { label: 'Home', href: '/nl' },
+        { label: 'Dashboard', href: '/nl/dashboard' },
+        { label: 'Dienst Toevoegen' }
+      ]} 
+    />
+
+    <!-- Header -->
+    <div class="space-y-3 border-b border-slate-300 dark:border-slate-800 pb-6">
+      <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-950/10 dark:bg-cyan-950/60 border border-cyan-500/30 font-mono text-xs text-cyan-600 dark:text-cyan-400">
+        <span class="w-2 h-2 rounded-full bg-cyan-500 dark:bg-cyan-400 animate-pulse"></span>
+        <span>LOGISTIEK &bull; INVOER GEGEVENS</span>
+      </div>
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-sans tracking-tight">
+          Dienst Verwerkingsengine
+        </h1>
+        <a 
+          href="/nl/dashboard" 
+          class="inline-flex items-center space-x-2 px-3.5 py-2 rounded-lg bg-slate-100/80 dark:bg-slate-950 hover:bg-slate-200/80 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-800 font-mono text-xs font-semibold transition-colors w-fit shadow-sm"
+        >
+          <span>&larr; Terug naar Dashboard</span>
+        </a>
+      </div>
+      <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-mono">
+        Plak de ruwe e-mail hieronder. Het systeem zal automatisch logistieke parameters parseren en voertuiggegevens verrijken via de RDW API.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      
+      <!-- Left Column: Input Area -->
+      <div class="space-y-4">
+        <div class="p-5 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-md shadow-slate-200/70 dark:shadow-none space-y-4">
+          <label for="raw-email" class="block text-slate-700 dark:text-slate-300 font-mono text-sm font-bold">
+            &gt; Ruwe E-mail HTML
+          </label>
+          <textarea 
+            id="raw-email" 
+            rows="12" 
+            class="w-full px-4 py-3 rounded-lg bg-slate-100/80 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-cyan-500 font-mono text-xs transition-colors resize-none"
+            placeholder="Plak hier de inhoud van de FleetPort e-mail..."
+          ></textarea>
+          
+          <button 
+            id="parse-btn"
+            class="w-full py-3 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold font-mono text-sm transition-all shadow-lg shadow-cyan-500/20 cursor-pointer flex items-center justify-center space-x-2"
+          >
+            <span>Verwerkingsengine Uitvoeren</span>
+            <span>&rarr;</span>
+          </button>
+        </div>
+
+        <!-- Status Messages -->
+        <p id="status-error" class="hidden p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 font-mono text-xs leading-relaxed"></p>
+        <p id="status-success" class="hidden p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-mono text-xs leading-relaxed"></p>
+      </div>
+
+      <!-- Right Column: Preview Area -->
+      <div id="preview-area" class="opacity-50 pointer-events-none transition-opacity duration-300">
+        <div class="p-6 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-md shadow-slate-200/70 dark:shadow-none space-y-6">
+          <h2 class="font-mono text-sm font-bold text-slate-900 dark:text-slate-100 border-b border-slate-300 dark:border-slate-800/80 pb-2">
+            // Geëxtraheerde Payload Voorbeeld
+          </h2>
+          
+          <div class="grid grid-cols-2 gap-4 font-mono text-xs">
+            <div class="space-y-1">
+              <span class="text-cyan-600 dark:text-cyan-400 block">Datum &amp; Tijd</span>
+              <span id="prev-date" class="text-slate-800 dark:text-slate-200 block">-</span>
+              <span id="prev-time" class="text-slate-800 dark:text-slate-200 block">-</span>
+            </div>
+            <div class="space-y-1">
+              <span class="text-cyan-600 dark:text-cyan-400 block">Voertuig Identiteit</span>
+              <span id="prev-plate" class="text-slate-800 dark:text-slate-200 font-bold block">-</span>
+              <span id="prev-model" class="text-slate-800 dark:text-slate-200 block">-</span>
+            </div>
+            <div class="space-y-1">
+              <span class="text-cyan-600 dark:text-cyan-400 block">RDW Specificaties</span>
+              <span id="prev-engine" class="text-slate-800 dark:text-slate-200 block">-</span>
+            </div>
+            <div class="space-y-1">
+              <span class="text-cyan-600 dark:text-cyan-400 block">Ophaalstad</span>
+              <span id="prev-pickup" class="text-slate-800 dark:text-slate-200 block">-</span>
+            </div>
+            <div class="space-y-1">
+              <span class="text-cyan-600 dark:text-cyan-400 block">Afleverstad</span>
+              <span id="prev-dropoff" class="text-slate-800 dark:text-slate-200 block">-</span>
+            </div>
+          </div>
+
+          <button 
+            id="save-btn"
+            disabled
+            class="w-full py-3 rounded-lg bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-white text-white dark:text-slate-900 font-bold font-mono text-sm transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center space-x-2"
+          >
+            <span>Bevestigen &amp; Opslaan in Database</span>
+            <span>&rarr;</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</Layout>
+
+<script>
+  import { parseFleetPortEmail } from '../../lib/parser';
+  import { fetchVehicleSpecs } from '../../lib/rdw';
+  import { supabase } from '../../lib/supabase';
+  import { getSession, checkIsAdmin } from '../../lib/auth';
+  import { formatEngineCapacity, formatVehicleTitle } from '../../lib/formatters';
+
+  let preparedPayload: any = null;
+
+  const parseBtn = document.getElementById('parse-btn') as HTMLButtonElement;
+  const saveBtn = document.getElementById('save-btn') as HTMLButtonElement;
+  const rawEmailInput = document.getElementById('raw-email') as HTMLTextAreaElement;
+  const previewArea = document.getElementById('preview-area');
+  const statusError = document.getElementById('status-error');
+  const statusSuccess = document.getElementById('status-success');
+
+  // Enforce Admin Access on Client Mount
+  async function verifyAccess() {
+    const { session } = await getSession();
+    if (!session) {
+      window.location.href = '/nl/login';
+      return;
+    }
+
+    const isAdmin = await checkIsAdmin(session.user);
+    if (!isAdmin) {
+      window.location.href = '/nl/dashboard';
+    }
+  }
+  verifyAccess();
+
+  function showMsg(el: HTMLElement | null, msg: string, isError = true) {
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.remove('hidden');
+    if (isError && statusSuccess) statusSuccess.classList.add('hidden');
+    if (!isError && statusError) statusError.classList.add('hidden');
+  }
+
+  if (parseBtn) {
+    parseBtn.addEventListener('click', async () => {
+      const htmlData = rawEmailInput.value;
+      if (!htmlData || !htmlData.trim()) {
+        showMsg(statusError, 'Plak de ruwe e-mailinhoud voordat u parsed.');
+        return;
+      }
+
+      parseBtn.disabled = true;
+      parseBtn.innerHTML = `<span>RDW Gegevens Verwerken...</span>`;
+      statusError?.classList.add('hidden');
+      statusSuccess?.classList.add('hidden');
+
+      try {
+        // 1. Execute Regex/DOM Parser
+        const parsedData = parseFleetPortEmail(htmlData);
+        
+        if (!parsedData.vehicle_license_plate) {
+          throw new Error("Kon geen kenteken detecteren in de opgegeven tekst.");
+        }
+
+        // 2. Fetch RDW Enrichment Data
+        const rdwData = await fetchVehicleSpecs(parsedData.vehicle_license_plate);
+
+        // Fallback logic for "Niet bekend" vehicle names
+        const toTitleCase = (str: string) => str.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.substring(1)).join(' ');
+        
+        let finalMake = parsedData.vehicle_make || '';
+        let finalModel = parsedData.vehicle_model || '';
+        const combinedName = `${finalMake} ${finalModel}`.toLowerCase();
+        
+        if (combinedName.includes('niet bekend') || !finalMake.trim()) {
+          if (rdwData?.rdw_make) finalMake = toTitleCase(rdwData.rdw_make);
+          if (rdwData?.rdw_model && combinedName.includes('niet bekend')) finalModel = toTitleCase(rdwData.rdw_model);
+        }
+
+        const { rdw_make, rdw_model, ...cleanRdwData } = rdwData || {};
+
+        let finalHp = cleanRdwData.rdw_power_hp;
+        const pkMatch = finalModel.match(/(\d+)\s*pk/i);
+        const kwMatch = finalModel.match(/(\d+)\s*kw/i);
+        
+        if (pkMatch) {
+          finalHp = parseInt(pkMatch[1], 10);
+        } else if (kwMatch) {
+          finalHp = Math.round(parseInt(kwMatch[1], 10) * 1.362);
+        }
+        
+        cleanRdwData.rdw_power_hp = finalHp;
+
+        // 3. Merge Payload
+        preparedPayload = {
+          ...parsedData,
+          ...cleanRdwData,
+          vehicle_make: finalMake,
+          vehicle_model: finalModel
+        };
+
+        // 4. Populate DOM Preview
+        document.getElementById('prev-date')!.textContent = preparedPayload.shift_date || 'N/V';
+        document.getElementById('prev-time')!.textContent = `Vertrek: ${preparedPayload.departure_time || 'N/V'} | Venster:${preparedPayload.pickup_window || 'N/V'}`;
+        document.getElementById('prev-plate')!.textContent = preparedPayload.vehicle_license_plate;
+        const fullVehicleName = formatVehicleTitle(
+          preparedPayload.vehicle_build_year,
+          preparedPayload.vehicle_make,
+          preparedPayload.vehicle_model
+        );
+
+        document.getElementById('prev-model')!.textContent = fullVehicleName || 'N/V';
+        document.getElementById('prev-pickup')!.textContent = preparedPayload.pickup_postal_city || 'N/V';
+        document.getElementById('prev-dropoff')!.textContent = preparedPayload.dropoff_postal_city || 'N/V';
+        
+        const hp = preparedPayload.rdw_power_hp ? `${preparedPayload.rdw_power_hp} HP` : 'N/V';
+        const cyl = preparedPayload.rdw_cylinders ? `${preparedPayload.rdw_cylinders} Cil` : 'EV/Onbekend';
+        const cap = formatEngineCapacity(preparedPayload.rdw_capacity_cc);
+        document.getElementById('prev-engine')!.textContent = `${hp} | ${cyl} | ${cap}`;
+
+        // 5. Unlock UI
+        previewArea?.classList.remove('opacity-50', 'pointer-events-none');
+        saveBtn.disabled = false;
+        showMsg(statusSuccess, 'Payload succesvol geëxtraheerd en verrijkt.', false);
+
+      } catch (err: any) {
+        showMsg(statusError, err.message || 'Fout bij het verwerken van de e-mailinhoud.');
+        previewArea?.classList.add('opacity-50', 'pointer-events-none');
+        saveBtn.disabled = true;
+      } finally {
+        parseBtn.disabled = false;
+        parseBtn.innerHTML = `<span>Verwerkingsengine Uitvoeren</span><span>&rarr;</span>`;
+      }
+    });
+  }
+
+  if (saveBtn) {
+    saveBtn.addEventListener('click', async () => {
+      if (!preparedPayload) return;
+
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = `<span>Schrijven naar Database...</span>`;
+
+      try {
+        const { session } = await getSession();
+        if (!session) throw new Error("Gebruikerssessie verlopen. Log opnieuw in.");
+
+        const payload = {
+          ...preparedPayload,
+          user_id: session.user.id
+        };
+
+        const { error } = await supabase.from('shifts').insert([payload]);
+        if (error) throw error;
+
+        showMsg(statusSuccess, 'Dienst succesvol opgeslagen in Supabase database!', false);
+        setTimeout(() => {
+          window.location.href = '/nl/dashboard';
+        }, 1200);
+
+      } catch (err: any) {
+        showMsg(statusError, `Fout bij invoeren in database: ${err.message}`);
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = `<span>Bevestigen &amp; Opslaan in Database</span><span>&rarr;</span>`;
+      }
+    });
+  }
+</script>

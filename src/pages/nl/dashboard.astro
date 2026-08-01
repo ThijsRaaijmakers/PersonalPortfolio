@@ -1,45 +1,99 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
 ---
 
-<Layout
-  title="Dashboard | Terminal Geauthenticeerd"
-  description="Beveiligd terminal dashboard voor geautoriseerde accounts."
->
-  <div id="loading-state" class="py-16 text-center font-mono text-xs text-slate-500 dark:text-slate-400">
-    <div class="inline-flex items-center space-x-2">
-      <span class="w-2 h-2 rounded-full bg-cyan-500 animate-ping"></span>
-      <span>BEVEILIGINGSGEGEVENS_VERIFIËREN...</span>
-    </div>
-  </div>
-
-  <div id="dashboard-content" class="hidden space-y-8 max-w-4xl mx-auto py-8 animate-fade-in-up">
+<Layout description="Beveiligd FleetPort logistiek en diensten overzicht." title="Dashboard | FleetPort Logistics">
+  <div class="max-w-7xl mx-auto py-8 sm:py-12 space-y-8 animate-fade-in-up">
     
-    <!-- Header Banner -->
-    <div class="p-5 sm:p-8 rounded-2xl bg-gradient-to-br from-white via-slate-50 to-cyan-50/40 dark:from-slate-900/90 dark:via-slate-900/60 dark:to-cyan-950/20 border border-slate-200 dark:border-slate-800 space-y-4 shadow-xl">
-      <div class="flex flex-wrap items-center justify-between gap-4 font-mono text-xs border-b border-slate-200 dark:border-slate-800/80 pb-4">
-        <span class="px-3 py-1 rounded-full bg-cyan-950/10 dark:bg-cyan-950/80 border border-cyan-500/40 text-cyan-600 dark:text-cyan-300 font-semibold uppercase">
-          BEVEILIGDE TERMINAL
-        </span>
-        <span id="user-email" class="text-slate-600 dark:text-slate-300 truncate max-w-xs sm:max-w-md"></span>
-      </div>
+    <!-- Breadcrumbs -->
+    <Breadcrumbs 
+      items={[
+        { label: 'Home', href: '/nl' },
+        { label: 'Dashboard' }
+      ]} 
+    />
 
-      <div class="space-y-2">
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-sans">
-          Beveiligde Terminal Geauthenticeerd.
+    <!-- Top Bar / Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-300 dark:border-slate-800 pb-6">
+      <div class="space-y-1">
+        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-950/10 dark:bg-cyan-950/60 border border-cyan-500/30 font-mono text-xs text-cyan-600 dark:text-cyan-400">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>ADMINISTRATIEF &bull; BEVEILIGDE CONSOLE</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-sans tracking-tight">
+          FleetPort Operationeel Dashboard
         </h1>
-        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-mono">
-          Sessie goedgekeurd. Rolgebaseerde toegangscontrole actief.
-        </p>
+      </div>
+      
+      <div class="flex flex-wrap items-center gap-3">
+        <a 
+          href="/nl/fleet" 
+          class="px-4 py-2 rounded-lg bg-slate-100/80 dark:bg-slate-950 hover:bg-slate-200/80 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-800 font-mono text-xs font-semibold transition-colors flex items-center space-x-2 shadow-sm"
+        >
+          <span>Auto Archief Doorzoeken</span>
+        </a>
+        <button 
+          id="sort-dashboard-btn" 
+          class="px-4 py-2 rounded-lg bg-slate-100/80 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-xs font-mono text-slate-700 dark:text-slate-300 font-semibold shadow-sm transition-colors hover:bg-slate-200/80 dark:hover:bg-slate-900 cursor-pointer"
+        >
+          Sortering: Nieuwste Eerst
+        </button>
+        <a 
+          id="add-shift-btn"
+          href="/nl/add-shift" 
+          class="hidden px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold font-mono text-xs transition-all shadow-md shadow-cyan-500/20 flex items-center space-x-2"
+        >
+          <span>+ Nieuwe Dienst Verwerken</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Metrics Overview Grid (Mobile: 2 cols, Desktop: 5 cols) -->
+    <div id="metrics-grid" class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <div class="p-4 sm:p-5 rounded-xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-md shadow-slate-200/70 dark:shadow-none space-y-1 font-mono">
+        <span class="text-xs text-slate-500 dark:text-slate-400 block truncate">// Totaal Aantal Diensten</span>
+        <span id="metric-total" class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight truncate block">...</span>
+      </div>
+      <div class="p-4 sm:p-5 rounded-xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-md shadow-slate-200/70 dark:shadow-none space-y-1 font-mono">
+        <span class="text-xs text-slate-500 dark:text-slate-400 block truncate">// Unieke Voertuigen</span>
+        <span id="metric-vehicles" class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight truncate block">...</span>
+      </div>
+      <div class="p-4 sm:p-5 rounded-xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-md shadow-slate-200/70 dark:shadow-none space-y-1 font-mono">
+        <span class="text-xs text-slate-500 dark:text-slate-400 block truncate">// Unieke Modellen</span>
+        <span id="metric-models" class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight truncate block">...</span>
+      </div>
+      <div class="p-4 sm:p-5 rounded-xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-md shadow-slate-200/70 dark:shadow-none space-y-1 font-mono">
+        <span class="text-xs text-slate-500 dark:text-slate-400 block truncate">// Gemiddeld Vermogen</span>
+        <span id="metric-hp" class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight truncate block">...</span>
+      </div>
+      <div class="p-4 sm:p-5 rounded-xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-md shadow-slate-200/70 dark:shadow-none space-y-1 font-mono col-span-2 sm:col-span-1">
+        <span class="text-xs text-slate-500 dark:text-slate-400 block truncate">// Totale Autowaarde</span>
+        <span id="metric-fleet-value" class="text-xl sm:text-2xl font-bold text-cyan-600 dark:text-cyan-400 tracking-tight truncate block">...</span>
+      </div>
+    </div>
+
+    <!-- Shifts List Container -->
+    <div class="rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl overflow-hidden">
+      <div class="p-4 sm:p-6 border-b border-slate-300 dark:border-slate-800 flex items-center justify-between">
+        <h2 class="font-mono text-sm font-bold text-slate-900 dark:text-slate-100">
+          // Dagelijks Dienstoverzicht Logboek
+        </h2>
+        <span id="table-count" class="font-mono text-xs text-slate-500 dark:text-slate-400">Gegevens laden...</span>
       </div>
 
-      <div class="pt-2 flex items-center justify-between">
-        <button 
-          id="logout-btn"
-          class="px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-red-500 hover:text-white text-slate-700 dark:text-slate-300 font-mono text-xs font-semibold transition-all cursor-pointer"
-        >
-          Sessie Beëindigen (Uitloggen)
-        </button>
+      <!-- Table Header (12-column grid: 2-2-5-1-2 balance) -->
+      <div class="hidden sm:grid sm:grid-cols-12 gap-3 p-4 font-mono text-xs font-semibold bg-slate-100/80 dark:bg-slate-950/80 text-slate-500 dark:text-slate-400 border-b border-slate-300 dark:border-slate-800">
+        <div class="sm:col-span-2">Dienstdatum</div>
+        <div class="sm:col-span-2">Rides Logged</div>
+        <div class="sm:col-span-5">Voertuigmodellen</div>
+        <div class="sm:col-span-1">Gecombineerd HP</div>
+        <div class="sm:col-span-2 text-right">Actie</div>
+      </div>
+
+      <!-- Rows Container -->
+      <div id="shifts-rows-container" class="divide-y divide-slate-300 dark:divide-slate-800/60 font-mono text-xs max-h-[500px] overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full">
+        <div class="p-8 text-center text-slate-400">Databasegegevens ophalen...</div>
       </div>
     </div>
 
@@ -47,32 +101,256 @@ import Layout from '../../layouts/Layout.astro';
 </Layout>
 
 <script>
-  import { getSession, signOut } from '../../lib/auth';
+  import { supabase } from '../../lib/supabase';
+  import { getSession, checkIsAdmin } from '../../lib/auth';
+  import { formatDate, formatPrice, formatVehicleTitle } from '../../lib/formatters';
 
-  async function checkAuth() {
-    const loadingState = document.getElementById('loading-state');
-    const dashboardContent = document.getElementById('dashboard-content');
-    const userEmailSpan = document.getElementById('user-email');
-
+  async function loadDashboard() {
+    // 1. Enforce RBAC Session Check
     const { session } = await getSession();
-
     if (!session) {
       window.location.href = '/nl/login';
       return;
     }
 
-    if (userEmailSpan && session.user?.email) {
-      userEmailSpan.textContent = `GEBRUIKER: ${session.user.email}`;
+    const isAdmin = await checkIsAdmin(session.user);
+
+    // Toggle button visibility based on role
+    const addShiftBtn = document.getElementById('add-shift-btn');
+    if (addShiftBtn) {
+      if (isAdmin) {
+        addShiftBtn.classList.remove('hidden');
+      } else {
+        addShiftBtn.classList.add('hidden');
+      }
     }
 
-    loadingState?.classList.add('hidden');
-    dashboardContent?.classList.remove('hidden');
+    // 2. Fetch Shifts based on role (Admin = 'shifts', Standard User = 'portfolio_shifts')
+    const targetTable = isAdmin ? 'shifts' : 'portfolio_shifts';
+    const { data: shifts, error } = await supabase
+      .from(targetTable)
+      .select('*')
+      .order('shift_date', { ascending: false });
+
+    const rowsContainer = document.getElementById('shifts-rows-container');
+    const tableCount = document.getElementById('table-count');
+
+    if (error) {
+      if (rowsContainer) rowsContainer.innerHTML = `<div class="p-6 text-center text-red-500">[FOUT]: ${error.message}</div>`;
+      return;
+    }
+
+    if (!shifts || shifts.length === 0) {
+      if (rowsContainer) rowsContainer.innerHTML = `<div class="p-8 text-center text-slate-500">Nog geen diensten geregistreerd. Gebruik de knop '+ Nieuwe Dienst Verwerken' hierboven om een eerste record toe te voegen.</div>`;
+      if (tableCount) tableCount.textContent = `0 records gevonden`;
+      
+      // Zero out metrics
+      document.getElementById('metric-total')!.textContent = '0';
+      document.getElementById('metric-vehicles')!.textContent = '0';
+      document.getElementById('metric-models')!.textContent = '0';
+      document.getElementById('metric-hp')!.textContent = '0 HP';
+      document.getElementById('metric-fleet-value')!.textContent = formatPrice(0);
+      return;
+    }
+
+    // 3. Calculate Overall Metrics
+    const totalShifts = new Set(shifts.map(s => s.shift_date)).size;
+    const uniqueVehicles = isAdmin 
+      ? new Set(shifts.map(s => s.vehicle_license_plate)).size
+      : new Set(shifts.map(s => `${s.vehicle_make || ''}_${s.vehicle_model || ''}_${s.vehicle_build_year || ''}_${s.vehicle_color || ''}_${s.vehicle_fuel || ''}`)).size;
+    
+    const uniqueModels = new Set(
+      shifts
+        .map(s => {
+          const make = s.vehicle_make ? s.vehicle_make.trim() : '';
+          const model = s.vehicle_model ? s.vehicle_model.trim() : '';
+          return `${make} ${model}`.trim().toLowerCase().replace(/\s+/g, ' ');
+        })
+        .filter(m => m.length > 0)
+    ).size;
+
+    const hpValues = shifts.map(s => s.rdw_power_hp).filter((hp): hp is number => hp !== null);
+    const avgHp = hpValues.length > 0 ? Math.round(hpValues.reduce((a, b) => a + b, 0) / hpValues.length) : 0;
+
+    const totalFleetValue = shifts.reduce((sum, s) => sum + (s.rdw_catalog_price || 0), 0);
+
+    document.getElementById('metric-total')!.textContent = totalShifts.toString();
+    document.getElementById('metric-vehicles')!.textContent = uniqueVehicles.toString();
+    document.getElementById('metric-models')!.textContent = uniqueModels.toString();
+    document.getElementById('metric-hp')!.textContent = `${avgHp} HP`;
+    document.getElementById('metric-fleet-value')!.textContent = formatPrice(totalFleetValue);
+
+    // 4. Group Shifts by shift_date (maintaining descending date order)
+    const groupedMap = new Map<string, typeof shifts>();
+    shifts.forEach(shift => {
+      const date = shift.shift_date;
+      if (!groupedMap.has(date)) {
+        groupedMap.set(date, []);
+      }
+      groupedMap.get(date)!.push(shift);
+    });
+
+    const shiftGroups = Array.from(groupedMap.entries()).map(([shiftDate, dateShifts]) => {
+      const ridesCount = dateShifts.length;
+      
+      // Collect distinct models with clean vehicle titles
+      const models = Array.from(new Set(
+        dateShifts
+          .map(s => formatVehicleTitle(s.vehicle_build_year, s.vehicle_make, s.vehicle_model))
+          .filter(Boolean)
+      ));
+
+      // Calculate Combined HP for the shift
+      const combinedHp = dateShifts.reduce((sum, s) => sum + (s.rdw_power_hp || 0), 0);
+
+      return {
+        shiftDate,
+        ridesCount,
+        models,
+        combinedHp
+      };
+    });
+
+    if (tableCount) tableCount.textContent = `${shiftGroups.length} dienstdag${shiftGroups.length === 1 ? '' : 'en'} (${shifts.length} totale rit${shifts.length === 1 ? '' : 'ten'})`;
+
+    // 5. Render Table Function & Sorting Logic
+    let isNewestFirst = true;
+
+    function renderTable() {
+      if (!rowsContainer) return;
+
+      rowsContainer.innerHTML = shiftGroups.map(group => {
+        const formattedDate = formatDate(group.shiftDate);
+        const modelBadges = group.models.length > 0
+          ? group.models.map((m, idx) => `
+              <span class="inline-flex items-center px-2 py-0.5 rounded bg-cyan-950/20 dark:bg-cyan-950/60 border border-cyan-500/30 text-cyan-700 dark:text-cyan-300 font-mono text-[11px]">
+                ${m}${idx < group.models.length - 1 ? ',' : ''}
+              </span>
+            `).join(' ')
+          : '<span class="text-slate-400">N/V</span>';
+
+        const hpDisplay = group.combinedHp > 0 ? `${group.combinedHp} HP` : 'N/V';
+
+        if (isAdmin) {
+          return `
+            <a 
+              href="/nl/shift?date=${group.shiftDate}" 
+              class="p-4 hover:bg-cyan-500/5 dark:hover:bg-cyan-950/20 cursor-pointer transition-colors group block text-slate-700 dark:text-slate-300"
+            >
+              <!-- Mobile Layout -->
+              <div class="flex flex-col space-y-3 sm:hidden w-full">
+                <div class="flex items-center justify-between font-bold text-slate-900 dark:text-slate-100 group-hover:text-cyan-600 dark:group-hover:text-cyan-400">
+                  <span>${formattedDate}</span>
+                  <span class="text-cyan-600 dark:text-cyan-400 group-hover:translate-x-0.5 transition-transform">&rarr;</span>
+                </div>
+                <div class="flex flex-wrap gap-1.5 items-center">
+                  ${modelBadges}
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-1 rounded text-[10px] font-bold bg-slate-100/80 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200">
+                    ${group.ridesCount} ${group.ridesCount === 1 ? 'Rit' : 'Ritten'}
+                  </span>
+                  <span class="px-2 py-1 rounded text-[10px] font-semibold bg-slate-100/80 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200">
+                    ${hpDisplay}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Desktop Layout -->
+              <div class="hidden sm:grid sm:grid-cols-12 gap-3 items-center w-full">
+                <div class="sm:col-span-2 font-bold text-slate-900 dark:text-slate-100 group-hover:text-cyan-600 dark:group-hover:text-cyan-400">
+                  ${formattedDate}
+                </div>
+                <div class="sm:col-span-2">
+                  <span class="px-2.5 py-1 rounded-full bg-slate-100/80 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs">
+                    ${group.ridesCount} ${group.ridesCount === 1 ? 'Rit' : 'Ritten'}
+                  </span>
+                </div>
+                <div class="sm:col-span-5 w-full">
+                  <div class="flex flex-wrap gap-1.5 items-center">
+                    ${modelBadges}
+                  </div>
+                </div>
+                <div class="sm:col-span-1 font-semibold text-slate-800 dark:text-slate-200">
+                  ${hpDisplay}
+                </div>
+                <div class="sm:col-span-2 sm:text-right w-full sm:w-auto">
+                  <span class="inline-flex items-center space-x-1 px-3 py-1 rounded bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30 font-bold group-hover:bg-cyan-500 group-hover:text-slate-950 transition-all text-xs">
+                    <span>Bekijk Dienst</span>
+                    <span>&rarr;</span>
+                  </span>
+                </div>
+              </div>
+            </a>
+          `;
+        } else {
+          return `
+            <div 
+              class="p-4 opacity-75 cursor-not-allowed text-slate-700 dark:text-slate-300"
+            >
+              <!-- Mobile Layout -->
+              <div class="flex flex-col space-y-3 sm:hidden w-full">
+                <div class="flex items-center justify-between font-bold text-slate-900 dark:text-slate-100">
+                  <span>${formattedDate}</span>
+                </div>
+                <div class="flex flex-wrap gap-1.5 items-center">
+                  ${modelBadges}
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-1 rounded text-[10px] font-bold bg-slate-100/80 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200">
+                    ${group.ridesCount} ${group.ridesCount === 1 ? 'Rit' : 'Ritten'}
+                  </span>
+                  <span class="px-2 py-1 rounded text-[10px] font-semibold bg-slate-100/80 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200">
+                    ${hpDisplay}
+                  </span>
+                  <span class="px-2 py-1 rounded text-[10px] font-semibold bg-slate-200 dark:bg-slate-800 text-slate-400">
+                    BEPERKT
+                  </span>
+                </div>
+              </div>
+
+              <!-- Desktop Layout -->
+              <div class="hidden sm:grid sm:grid-cols-12 gap-3 items-center w-full">
+                <div class="sm:col-span-2 font-bold text-slate-900 dark:text-slate-100">
+                  ${formattedDate}
+                </div>
+                <div class="sm:col-span-2">
+                  <span class="px-2.5 py-1 rounded-full bg-slate-100/80 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs">
+                    ${group.ridesCount} ${group.ridesCount === 1 ? 'Rit' : 'Ritten'}
+                  </span>
+                </div>
+                <div class="sm:col-span-5 w-full">
+                  <div class="flex flex-wrap gap-1.5 items-center">
+                    ${modelBadges}
+                  </div>
+                </div>
+                <div class="sm:col-span-1 font-semibold text-slate-800 dark:text-slate-200">
+                  ${hpDisplay}
+                </div>
+                <div class="sm:col-span-2 sm:text-right w-full sm:w-auto">
+                  <span class="inline-flex items-center space-x-1 px-3 py-1 rounded bg-slate-200 dark:bg-slate-800 text-slate-400 font-semibold text-xs">
+                    <span>BEPERKT</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      }).join('');
+    }
+
+    renderTable();
+
+    const sortBtn = document.getElementById('sort-dashboard-btn');
+    if (sortBtn) {
+      sortBtn.addEventListener('click', () => {
+        isNewestFirst = !isNewestFirst;
+        sortBtn.textContent = isNewestFirst ? 'Sortering: Nieuwste Eerst' : 'Sortering: Oudste Eerst';
+        shiftGroups.reverse();
+        renderTable();
+      });
+    }
   }
 
-  document.getElementById('logout-btn')?.addEventListener('click', async () => {
-    await signOut();
-    window.location.href = '/nl/login';
-  });
-
-  checkAuth();
+  loadDashboard();
 </script>

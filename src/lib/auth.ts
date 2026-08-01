@@ -85,3 +85,46 @@ export async function updatePasswordAfterReset(newPassword: string) {
   return { data, error };
 }
 
+export async function checkIsAdmin(user?: any): Promise<boolean> {
+  try {
+    let currentUser = user;
+    if (!currentUser) {
+      const { user: fetchedUser } = await getUser();
+      currentUser = fetchedUser;
+    }
+    if (!currentUser) return false;
+
+    // 1. Check user metadata or role attributes
+    if (
+      currentUser.app_metadata?.role === 'admin' ||
+      currentUser.user_metadata?.role === 'admin' ||
+      currentUser.role === 'admin'
+    ) {
+      return true;
+    }
+
+    // 2. Check owner/admin email address
+    const adminEmail = import.meta.env.PUBLIC_ADMIN_EMAIL || 'info@thijsraaijmakers.me';
+    if (currentUser.email && currentUser.email.toLowerCase() === adminEmail.toLowerCase()) {
+      return true;
+    }
+
+    // 3. Query profiles table
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', currentUser.id)
+      .single();
+
+    if (!error && profile && profile.role === 'admin') {
+      return true;
+    }
+
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+
+

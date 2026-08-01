@@ -1,0 +1,343 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+---
+
+<Layout description="Shift details ledger and vehicle telemetry." title="Shift Details | FleetPort Tracker">
+  <div class="max-w-6xl mx-auto py-8 sm:py-12 space-y-8 animate-fade-in-up">
+    
+    <!-- Breadcrumbs Wrapper -->
+    <div id="breadcrumbs-wrapper">
+      <Breadcrumbs 
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Dashboard', href: '/dashboard' },
+          { label: 'Shift' },
+          { label: 'Details' }
+        ]} 
+      />
+    </div>
+
+    <!-- Header Section with Back Button -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-300 dark:border-slate-800 pb-6">
+      <div class="space-y-2">
+        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-950/10 dark:bg-cyan-950/60 border border-cyan-500/30 font-mono text-xs text-cyan-600 dark:text-cyan-400">
+          <span class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></span>
+          <span>SHIFT LEDGER ENTRY &bull; <span id="header-date">Loading...</span></span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-sans tracking-tight">
+          Shift Details &amp; Route Telemetry
+        </h1>
+      </div>
+
+      <button 
+        onclick="window.history.length > 2 ? window.history.back() : window.location.href='/dashboard'"
+        class="inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-slate-100/80 dark:bg-slate-950 hover:bg-slate-200/80 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-800 font-mono text-xs font-semibold transition-colors w-fit shadow-sm cursor-pointer"
+      >
+        <span>&larr; Go Back</span>
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div id="shift-loading" class="py-12 text-center font-mono text-xs text-slate-500 dark:text-slate-400">
+      <div class="inline-flex items-center space-x-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-cyan-500 animate-ping"></span>
+        <span>LOADING_TELEMETRY...</span>
+      </div>
+    </div>
+
+    <!-- Access Denied State (For Non-Admins) -->
+    <div id="shift-access-denied" class="hidden p-8 sm:p-12 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 text-center space-y-4 shadow-xl font-mono">
+      <div class="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/30 text-red-500 flex items-center justify-center mx-auto">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+        </svg>
+      </div>
+      <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 max-w-lg mx-auto leading-snug">
+        Access Denied: You do not have permission to view detailed shift routing.
+      </h2>
+      <p class="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+        Logistical, location, and schedule data is restricted to authorized administration accounts only.
+      </p>
+      <div class="pt-2">
+        <button 
+          onclick="window.history.length > 2 ? window.history.back() : window.location.href='/dashboard'"
+          class="inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-slate-100/80 dark:bg-slate-950 text-slate-700 dark:text-slate-300 font-semibold text-xs transition-colors hover:bg-slate-200/80 dark:hover:bg-slate-900 cursor-pointer"
+        >
+          <span>&larr; Go Back</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="shift-error" class="hidden p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 font-mono text-xs"></div>
+
+    <!-- Content Container (Only rendered if Admin) -->
+    <div id="shift-content" class="hidden space-y-8">
+      
+      <!-- Summary Card Header -->
+      <div id="summary-card" class="p-6 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-md shadow-slate-200/70 dark:shadow-none font-mono">
+        <h2 class="text-xs uppercase tracking-wider font-bold text-cyan-600 dark:text-cyan-400 mb-4 border-b border-slate-300 dark:border-slate-800 pb-2">
+          // Shift Summary Overview
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div class="space-y-1">
+            <span class="text-slate-500 dark:text-slate-400 text-xs block">Total Rides</span>
+            <span id="summary-total-rides" class="text-2xl font-bold text-slate-900 dark:text-slate-100">-</span>
+          </div>
+          <div class="space-y-1">
+            <span class="text-slate-500 dark:text-slate-400 text-xs block">Combined Horsepower</span>
+            <span id="summary-combined-hp" class="text-2xl font-bold text-slate-900 dark:text-slate-100">-</span>
+          </div>
+          <div class="space-y-1">
+            <span class="text-slate-500 dark:text-slate-400 text-xs block">Engine Breakdown (EV / ICE)</span>
+            <span id="summary-ev-ice" class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">-</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rides List -->
+      <div class="space-y-6">
+        <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100 font-mono flex items-center space-x-2">
+          <span class="text-cyan-600 dark:text-cyan-400">&gt;</span>
+          <span>Logged Vehicle Rides</span>
+        </h2>
+        <div id="rides-container" class="space-y-6"></div>
+      </div>
+
+    </div>
+
+  </div>
+</Layout>
+
+<script>
+  import { supabase } from '../lib/supabase';
+  import { getSession, checkIsAdmin } from '../lib/auth';
+  import { formatDate, formatPrice, formatEngineCapacity, formatVehicleTitle } from '../lib/formatters';
+
+  async function loadShiftDetail() {
+    const loadingEl = document.getElementById('shift-loading');
+    const errorEl = document.getElementById('shift-error');
+    const contentEl = document.getElementById('shift-content');
+    const accessDeniedEl = document.getElementById('shift-access-denied');
+    const headerDateEl = document.getElementById('header-date');
+
+    // 1. Session & Access Control Verification
+    const { session } = await getSession();
+    if (!session) {
+      window.location.href = '/login';
+      return;
+    }
+
+    const isAdmin = await checkIsAdmin(session.user);
+    if (!isAdmin) {
+      if (loadingEl) loadingEl.classList.add('hidden');
+      if (accessDeniedEl) accessDeniedEl.classList.remove('hidden');
+      return; // Bypass database query entirely for non-admins
+    }
+
+    // Extract shift date from query parameters
+    const params = new URLSearchParams(window.location.search);
+    const shiftDate = params.get('date');
+
+    if (!shiftDate) {
+      if (loadingEl) loadingEl.classList.add('hidden');
+      if (errorEl) {
+        errorEl.textContent = '[ERROR]: No shift date specified in URL query parameters.';
+        errorEl.classList.remove('hidden');
+      }
+      return;
+    }
+
+    // Update Header and Breadcrumbs to reflect extracted date using formatDate
+    const formattedShiftDate = formatDate(shiftDate);
+    if (headerDateEl) headerDateEl.textContent = formattedShiftDate;
+    
+    const breadcrumbLast = document.querySelector('#breadcrumbs-wrapper nav span:last-child');
+    if (breadcrumbLast) breadcrumbLast.textContent = formattedShiftDate;
+
+    // 2. Fetch Rides for Shift Date (Admin Authorized)
+    const { data: rides, error } = await supabase
+      .from('shifts')
+      .select('*')
+      .eq('shift_date', shiftDate)
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      if (loadingEl) loadingEl.classList.add('hidden');
+      if (errorEl) {
+        errorEl.textContent = `[ERROR]: ${error.message}`;
+        errorEl.classList.remove('hidden');
+      }
+      return;
+    }
+
+    if (!rides || rides.length === 0) {
+      if (loadingEl) loadingEl.classList.add('hidden');
+      if (errorEl) {
+        errorEl.textContent = `[NOTICE]: No shift records found for ${formattedShiftDate}.`;
+        errorEl.classList.remove('hidden');
+      }
+      return;
+    }
+
+    // 3. Populate Summary Metrics
+    const totalRides = rides.length;
+    const combinedHp = rides.reduce((sum, r) => sum + (r.rdw_power_hp || 0), 0);
+
+    const evCount = rides.filter((ride: any) => {
+      const fuelStr = ride.vehicle_fuel ? ride.vehicle_fuel.toLowerCase() : '';
+      return fuelStr.includes('elektr') || ride.rdw_cylinders === 0 || ride.rdw_cylinders === null;
+    }).length;
+    const iceCount = totalRides - evCount;
+
+    document.getElementById('summary-total-rides')!.textContent = totalRides.toString();
+    document.getElementById('summary-combined-hp')!.textContent = `${combinedHp} HP`;
+    document.getElementById('summary-ev-ice')!.textContent = `${evCount} EV / ${iceCount} ICE`;
+
+    // 4. Render Ride Cards
+    const container = document.getElementById('rides-container');
+    if (container) {
+      container.innerHTML = rides.map((ride, idx) => {
+        const hp = ride.rdw_power_hp ? `${ride.rdw_power_hp} HP` : 'N/A';
+        const cyl = ride.rdw_cylinders !== null && ride.rdw_cylinders !== undefined ? `${ride.rdw_cylinders} Cyl` : '0 / EV';
+        const cc = formatEngineCapacity(ride.rdw_capacity_cc);
+        const price = formatPrice(ride.rdw_catalog_price);
+
+        const pickupLocation = [ride.pickup_name, ride.pickup_address, ride.pickup_postal_city].filter(Boolean).join(', ');
+        const dropoffLocation = [ride.dropoff_name, ride.dropoff_address, ride.dropoff_postal_city].filter(Boolean).join(', ');
+
+        const fullVehicleTitle = formatVehicleTitle(ride.vehicle_build_year, ride.vehicle_make, ride.vehicle_model);
+
+        const mapsOrigin = encodeURIComponent([ride.pickup_address, ride.pickup_postal_city].filter(Boolean).join(', ') || ride.pickup_name || '');
+        const mapsDest = encodeURIComponent([ride.dropoff_address, ride.dropoff_postal_city].filter(Boolean).join(', ') || ride.dropoff_name || '');
+        const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${mapsOrigin}&destination=${mapsDest}`;
+
+        return `
+          <div class="p-6 rounded-2xl bg-slate-50/90 dark:bg-slate-900/70 border border-slate-300 dark:border-slate-800 shadow-md shadow-slate-200/70 dark:shadow-none space-y-6 font-mono">
+            <!-- Ride Header -->
+            <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-300 dark:border-slate-800 pb-4">
+              <div class="flex items-center space-x-3">
+                <span class="px-3 py-1 rounded bg-cyan-950/40 border border-cyan-500/30 text-cyan-600 dark:text-cyan-400 font-bold text-sm">
+                  ${ride.vehicle_license_plate}
+                </span>
+                <span class="text-slate-900 dark:text-slate-100 font-bold text-sm">
+                  ${fullVehicleTitle || 'Unknown Vehicle'}
+                </span>
+              </div>
+              <div class="flex items-center space-x-3">
+                <span class="text-xs text-slate-500 dark:text-slate-400">
+                  Ride #${idx + 1} &bull; Window: ${ride.pickup_window || 'N/A'}
+                </span>
+                <button 
+                  data-ride-id="${ride.id}"
+                  class="btn-delete-ride px-3 py-1 rounded border border-red-500/30 text-red-500 hover:bg-red-500/10 dark:hover:bg-red-500/20 font-bold text-xs transition-colors cursor-pointer flex items-center space-x-1"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                  </svg>
+                  <span>Delete Record</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Details Grid: Specs & Spatial -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+              
+              <!-- Vehicle & RDW Specs Card -->
+              <div class="p-4 rounded-xl bg-slate-100/60 dark:bg-slate-950/60 border border-slate-300 dark:border-slate-800/80 space-y-3">
+                <div class="text-cyan-600 dark:text-cyan-400 font-bold text-xs uppercase tracking-wider border-b border-slate-300 dark:border-slate-800 pb-1">
+                  // Vehicle &amp; RDW Specifications
+                </div>
+                <div class="grid grid-cols-2 gap-2 text-slate-700 dark:text-slate-300">
+                  <div><span class="text-slate-400 block">Vehicle:</span> ${fullVehicleTitle || 'N/A'}</div>
+                  <div><span class="text-slate-400 block">Fuel Type:</span> ${ride.vehicle_fuel || 'N/A'}</div>
+                  <div><span class="text-slate-400 block">Color:</span> ${ride.vehicle_color || 'N/A'}</div>
+                  <div><span class="text-slate-400 block">Horsepower:</span> ${hp}</div>
+                  <div><span class="text-slate-400 block">Cylinders:</span> ${cyl}</div>
+                  <div><span class="text-slate-400 block">Engine Capacity:</span> ${cc}</div>
+                  <div><span class="text-slate-400 block">Catalog Price:</span> ${price}</div>
+                </div>
+              </div>
+
+              <!-- Spatial Logistics & Route Card -->
+              <div class="p-4 rounded-xl bg-slate-100/60 dark:bg-slate-950/60 border border-slate-300 dark:border-slate-800/80 space-y-3 flex flex-col justify-between">
+                <div class="space-y-3">
+                  <div class="text-cyan-600 dark:text-cyan-400 font-bold text-xs uppercase tracking-wider border-b border-slate-300 dark:border-slate-800 pb-1">
+                    // Spatial Logistics Route
+                  </div>
+                  <div class="space-y-2 text-slate-700 dark:text-slate-300">
+                    <div>
+                      <span class="text-cyan-500 font-bold block">Pickup Point:</span>
+                      <span>${pickupLocation || 'N/A'}</span>
+                    </div>
+                    <div>
+                      <span class="text-emerald-500 font-bold block">Dropoff Point:</span>
+                      <span>${dropoffLocation || 'N/A'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="pt-2">
+                  <a 
+                    href="${googleMapsUrl}" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    class="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition-all shadow-md shadow-cyan-500/20"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <span>Open Route in Google Maps</span>
+                    <span>&rarr;</span>
+                  </a>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 5. Attach Deletion Event Listeners
+    const deleteButtons = document.querySelectorAll('.btn-delete-ride');
+    deleteButtons.forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const target = e.currentTarget as HTMLButtonElement;
+        const rideId = target.getAttribute('data-ride-id');
+        if (!rideId) return;
+
+        const confirmed = window.confirm("Are you sure you want to delete this ride?");
+        if (!confirmed) return;
+
+        target.disabled = true;
+        target.innerHTML = `<span>Deleting...</span>`;
+
+        const { error: deleteError } = await supabase
+          .from('shifts')
+          .delete()
+          .eq('id', rideId);
+
+        if (deleteError) {
+          alert(`Failed to delete record: ${deleteError.message}`);
+          target.disabled = false;
+          target.innerHTML = `<span>Delete Record</span>`;
+          return;
+        }
+
+        if (rides.length <= 1) {
+          window.location.href = '/dashboard';
+        } else {
+          window.location.reload();
+        }
+      });
+    });
+
+    loadingEl?.classList.add('hidden');
+    contentEl?.classList.remove('hidden');
+  }
+
+  loadShiftDetail();
+</script>

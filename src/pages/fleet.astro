@@ -1,0 +1,387 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+---
+
+<Layout description="Comprehensive searchable archive of all FleetPort vehicle records." title="Auto Archive | FleetPort Logistics">
+  <div class="max-w-7xl mx-auto py-8 sm:py-12 space-y-8 animate-fade-in-up">
+    
+    <!-- Breadcrumbs -->
+    <Breadcrumbs 
+      items={[
+        { label: 'Home', href: '/' },
+        { label: 'Dashboard', href: '/dashboard' },
+        { label: 'Auto Archive' }
+      ]} 
+    />
+
+    <!-- Header Section -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-300 dark:border-slate-800 pb-6">
+      <div class="space-y-1">
+        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-950/10 dark:bg-cyan-950/60 border border-cyan-500/30 font-mono text-xs text-cyan-600 dark:text-cyan-400">
+          <span class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></span>
+          <span>DATABASE ARCHIVE &bull; SEARCHABLE REPOSITORY</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-sans tracking-tight">
+          Auto Archive
+        </h1>
+      </div>
+
+      <a 
+        href="/dashboard"
+        class="inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-slate-100/80 dark:bg-slate-950 hover:bg-slate-200/80 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-800 font-mono text-xs font-semibold transition-colors w-fit shadow-sm"
+      >
+        <span>&larr; Back to Dashboard</span>
+      </a>
+    </div>
+
+    <!-- Search Controls, Filter & Sort -->
+    <div class="space-y-4 font-mono">
+      <div class="flex flex-col sm:flex-row gap-3">
+        <div class="relative flex-1">
+          <input 
+            type="text" 
+            id="fleet-search" 
+            placeholder="Search by brand, model, fuel type, or license plate..."
+            class="w-full px-5 py-4 rounded-xl bg-slate-100/80 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-cyan-500 shadow-sm text-sm transition-colors"
+          />
+          <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+        </div>
+
+        <select 
+          id="fleet-sort" 
+          class="px-4 py-4 rounded-xl bg-slate-100/80 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 font-mono text-xs focus:outline-none focus:border-cyan-500 shadow-sm transition-colors cursor-pointer"
+        >
+          <option value="date-desc">Date (Newest)</option>
+          <option value="date-asc">Date (Oldest)</option>
+          <option value="hp-desc">Power (High to Low)</option>
+          <option value="hp-asc">Power (Low to High)</option>
+          <option value="price-desc">Value (High to Low)</option>
+          <option value="price-asc">Value (Low to High)</option>
+        </select>
+      </div>
+
+      <!-- Quick Filter Tags (Dynamically Populated) -->
+      <div class="flex flex-wrap items-center gap-2 pt-1" id="quick-tags-container"></div>
+
+      <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 px-1">
+        <span id="result-count">Loading archive records...</span>
+        <span>Showing all logged vehicles</span>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="fleet-loading" class="py-12 text-center font-mono text-xs text-slate-500 dark:text-slate-400">
+      <div class="inline-flex items-center space-x-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-cyan-500 animate-ping"></span>
+        <span>QUERYING_FLEET_REPOSITORY...</span>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="fleet-error" class="hidden p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 font-mono text-xs"></div>
+
+    <!-- Fleet Grid Container -->
+    <div id="fleet-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 hidden"></div>
+
+  </div>
+</Layout>
+
+<script>
+  import { supabase } from '../lib/supabase';
+  import { getSession, checkIsAdmin } from '../lib/auth';
+  import { formatDate, formatPrice, formatEngineCapacity, formatVehicleTitle } from '../lib/formatters';
+
+  async function loadFleetArchive() {
+    const loadingEl = document.getElementById('fleet-loading');
+    const errorEl = document.getElementById('fleet-error');
+    const gridEl = document.getElementById('fleet-grid');
+    const searchInput = document.getElementById('fleet-search') as HTMLInputElement;
+    const sortSelect = document.getElementById('fleet-sort') as HTMLSelectElement;
+    const resultCount = document.getElementById('result-count');
+    const tagsContainer = document.getElementById('quick-tags-container');
+
+    // 1. Session & Role Check
+    const { session } = await getSession();
+    if (!session) {
+      window.location.href = '/login';
+      return;
+    }
+
+    const isAdmin = await checkIsAdmin(session.user);
+    const targetTable = isAdmin ? 'shifts' : 'portfolio_shifts';
+
+    // 2. Fetch Shifts from Supabase
+    const { data: shifts, error } = await supabase
+      .from(targetTable)
+      .select('*')
+      .order('shift_date', { ascending: false });
+
+    if (error) {
+      if (loadingEl) loadingEl.classList.add('hidden');
+      if (errorEl) {
+        errorEl.textContent = `[ERROR]: ${error.message}`;
+        errorEl.classList.remove('hidden');
+      }
+      return;
+    }
+
+    if (!shifts || shifts.length === 0) {
+      if (loadingEl) loadingEl.classList.add('hidden');
+      if (resultCount) resultCount.textContent = 'Showing 0 vehicles';
+      if (errorEl) {
+        errorEl.textContent = '[NOTICE]: No vehicles found in the archive.';
+        errorEl.classList.remove('hidden');
+      }
+      return;
+    }
+
+    // 3. Dynamically Generate Quick Filter Tags
+    const tagsSet = new Set<string>();
+
+    shifts.forEach(shift => {
+      if (shift.vehicle_fuel) {
+        const rawFuel = shift.vehicle_fuel.trim();
+        const lowerFuel = rawFuel.toLowerCase();
+        if (lowerFuel.includes('elektr')) {
+          tagsSet.add('Electric');
+        } else if (lowerFuel.includes('benzine') || lowerFuel.includes('petrol')) {
+          tagsSet.add('Petrol');
+        } else if (lowerFuel.includes('diesel')) {
+          tagsSet.add('Diesel');
+        } else if (lowerFuel.includes('hybrid') || lowerFuel.includes('hybride')) {
+          tagsSet.add('Hybrid');
+        } else {
+          tagsSet.add(rawFuel);
+        }
+      }
+
+      if (shift.rdw_power_hp && shift.rdw_power_hp > 200) {
+        tagsSet.add('High Performance');
+      }
+
+      if (shift.rdw_cylinders === 0 || (shift.vehicle_fuel && shift.vehicle_fuel.toLowerCase().includes('elektr'))) {
+        tagsSet.add('Zero Emission');
+      }
+
+      if (shift.rdw_capacity_cc && shift.rdw_capacity_cc >= 2500) {
+        tagsSet.add('Large Capacity');
+      }
+    });
+
+    const dynamicTags = Array.from(tagsSet);
+    if (tagsContainer && dynamicTags.length > 0) {
+      tagsContainer.innerHTML = `
+        <span class="text-xs text-slate-400 font-semibold mr-1">// Quick Tags:</span>
+        ${dynamicTags.map(tag => `
+          <button 
+            type="button" 
+            class="quick-tag-btn px-3 py-1 rounded-lg text-xs font-mono border border-slate-300 dark:border-slate-800 bg-slate-100/80 dark:bg-slate-900/60 text-slate-700 dark:text-slate-300 hover:border-cyan-500/50 transition-all cursor-pointer" 
+            data-tag="${tag}"
+          >${tag}</button>
+        `).join('')}
+      `;
+    }
+
+    // 4. Render Vehicle Cards
+    if (gridEl) {
+      gridEl.innerHTML = shifts.map(shift => {
+        const make = shift.vehicle_make || '';
+        const model = shift.vehicle_model || '';
+        const plate = shift.vehicle_license_plate || '';
+        const fuel = shift.vehicle_fuel || '';
+        const buildYear = shift.vehicle_build_year ? shift.vehicle_build_year.toString() : '';
+        const lowerFuel = fuel.toLowerCase();
+        
+        const extraKeywords: string[] = [];
+        if (lowerFuel.includes('elektr')) extraKeywords.push('electric', 'zero emission', 'ev');
+        if (lowerFuel.includes('benzine')) extraKeywords.push('petrol');
+        if (lowerFuel.includes('diesel')) extraKeywords.push('diesel');
+        if (lowerFuel.includes('hybrid')) extraKeywords.push('hybrid');
+        if ((shift.rdw_power_hp || 0) > 200) extraKeywords.push('high performance');
+        if ((shift.rdw_capacity_cc || 0) >= 2500) extraKeywords.push('large capacity');
+
+        const fullTitle = formatVehicleTitle(shift.vehicle_build_year, shift.vehicle_make, shift.vehicle_model);
+        const searchTag = `${buildYear} ${make} ${model} ${fullTitle} ${plate} ${fuel} ${extraKeywords.join(' ')}`.toLowerCase();
+
+        const hp = shift.rdw_power_hp ? `${shift.rdw_power_hp} HP` : 'N/A';
+        const cyl = shift.rdw_cylinders !== null && shift.rdw_cylinders !== undefined ? `${shift.rdw_cylinders} Cyl` : '0 / EV';
+        const cap = formatEngineCapacity(shift.rdw_capacity_cc);
+        const formattedPrice = formatPrice(shift.rdw_catalog_price);
+        const formattedShiftDate = formatDate(shift.shift_date);
+
+        return `
+          <div 
+            class="vehicle-card p-5 rounded-2xl bg-slate-50/90 dark:bg-slate-900/70 border border-slate-300 dark:border-slate-800 shadow-md shadow-slate-200/70 dark:shadow-none space-y-4 font-mono transition-all hover:border-cyan-500/40"
+            data-search="${searchTag}"
+            data-date="${shift.shift_date}"
+            data-hp="${shift.rdw_power_hp || 0}"
+            data-price="${shift.rdw_catalog_price || 0}"
+          >
+            <div class="flex items-center justify-between border-b border-slate-300 dark:border-slate-800 pb-3">
+              <span class="px-2.5 py-1 rounded bg-cyan-950/40 border border-cyan-500/30 text-cyan-600 dark:text-cyan-400 font-bold text-xs">
+                ${plate}
+              </span>
+              <span class="text-[11px] text-slate-500 dark:text-slate-400">
+                ${formattedShiftDate}
+              </span>
+            </div>
+
+            <div class="space-y-1">
+              <span class="text-xs text-slate-400 uppercase tracking-wider block">${make || 'Brand Unknown'}</span>
+              <h3 class="text-base font-bold text-slate-900 dark:text-slate-100 truncate">
+                ${fullTitle || 'Model Unknown'}
+              </h3>
+            </div>
+
+            <div class="grid grid-cols-4 gap-2 pt-2 border-t border-slate-300 dark:border-slate-800/80 text-[11px] text-slate-600 dark:text-slate-300">
+              <div>
+                <span class="text-slate-400 block text-[10px]">POWER</span>
+                <span class="font-semibold text-slate-800 dark:text-slate-200">${hp}</span>
+              </div>
+              <div>
+                <span class="text-slate-400 block text-[10px]">CYLINDERS</span>
+                <span class="font-semibold text-slate-800 dark:text-slate-200">${cyl}</span>
+              </div>
+              <div>
+                <span class="text-slate-400 block text-[10px]">CAPACITY</span>
+                <span class="font-semibold text-slate-800 dark:text-slate-200">${cap}</span>
+              </div>
+              <div>
+                <span class="text-slate-400 block text-[10px]">VALUE</span>
+                <span class="font-semibold text-slate-800 dark:text-slate-200 truncate block">${formattedPrice}</span>
+              </div>
+            </div>
+
+            <div class="pt-2 flex items-center justify-between text-xs">
+              ${isAdmin ? `
+                <a 
+                  href="/shift?date=${shift.shift_date}" 
+                  class="text-cyan-600 dark:text-cyan-400 hover:underline font-bold text-[11px] flex items-center space-x-1"
+                >
+                  <span>View Shift Date (${formattedShiftDate})</span>
+                  <span>&rarr;</span>
+                </a>
+              ` : `
+                <span 
+                  class="text-slate-400 font-semibold text-[11px] flex items-center space-x-1 cursor-not-allowed opacity-75"
+                >
+                  <span>View Shift Date (${formattedShiftDate})</span>
+                </span>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    if (resultCount) {
+      resultCount.textContent = `Showing ${shifts.length} vehicle${shifts.length === 1 ? '' : 's'}`;
+    }
+
+    loadingEl?.classList.add('hidden');
+    gridEl?.classList.remove('hidden');
+
+    // 5. Sorting Logic
+    const sortCards = () => {
+      if (!gridEl || !sortSelect) return;
+      const cards = Array.from(gridEl.querySelectorAll<HTMLElement>('.vehicle-card'));
+      const sortValue = sortSelect.value;
+
+      cards.sort((a, b) => {
+        const dateA = a.getAttribute('data-date') || '';
+        const dateB = b.getAttribute('data-date') || '';
+        const hpA = parseFloat(a.getAttribute('data-hp') || '0');
+        const hpB = parseFloat(b.getAttribute('data-hp') || '0');
+        const priceA = parseFloat(a.getAttribute('data-price') || '0');
+        const priceB = parseFloat(b.getAttribute('data-price') || '0');
+
+        switch (sortValue) {
+          case 'date-desc':
+            return dateB.localeCompare(dateA);
+          case 'date-asc':
+            return dateA.localeCompare(dateB);
+          case 'hp-desc':
+            return hpB - hpA;
+          case 'hp-asc':
+            return (hpA === 0 ? Infinity : hpA) - (hpB === 0 ? Infinity : hpB);
+          case 'price-desc':
+            return priceB - priceA;
+          case 'price-asc':
+            return (priceA === 0 ? Infinity : priceA) - (priceB === 0 ? Infinity : priceB);
+          default:
+            return 0;
+        }
+      });
+
+      cards.forEach(card => gridEl.appendChild(card));
+    };
+
+    if (sortSelect) {
+      sortSelect.addEventListener('change', sortCards);
+    }
+
+    // 6. Search Filtering Logic
+    const tagButtons = document.querySelectorAll<HTMLButtonElement>('.quick-tag-btn');
+
+    function updateActiveTagUI(activeKeyword: string) {
+      tagButtons.forEach(btn => {
+        const tagValue = (btn.getAttribute('data-tag') || '').toLowerCase();
+        if (activeKeyword && tagValue === activeKeyword.toLowerCase()) {
+          btn.classList.add('bg-cyan-500/20', 'text-cyan-600', 'dark:text-cyan-400', 'border-cyan-500', 'font-bold');
+          btn.classList.remove('bg-slate-100/80', 'dark:bg-slate-900/60', 'text-slate-700', 'dark:text-slate-300', 'border-slate-300', 'dark:border-slate-800');
+        } else {
+          btn.classList.remove('bg-cyan-500/20', 'text-cyan-600', 'dark:text-cyan-400', 'border-cyan-500', 'font-bold');
+          btn.classList.add('bg-slate-100/80', 'dark:bg-slate-900/60', 'text-slate-700', 'dark:text-slate-300', 'border-slate-300', 'dark:border-slate-800');
+        }
+      });
+    }
+
+    const filterGrid = () => {
+      const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+      const cards = document.querySelectorAll('.vehicle-card');
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const searchAttr = card.getAttribute('data-search') || '';
+        if (!query || searchAttr.includes(query)) {
+          card.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+
+      if (resultCount) {
+        resultCount.textContent = `Showing ${visibleCount} vehicle${visibleCount === 1 ? '' : 's'}`;
+      }
+
+      updateActiveTagUI(query);
+    };
+
+    if (searchInput) {
+      searchInput.addEventListener('input', filterGrid);
+    }
+
+    tagButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tag = btn.getAttribute('data-tag') || '';
+        const currentQuery = searchInput.value.trim();
+
+        if (currentQuery.toLowerCase() === tag.toLowerCase()) {
+          searchInput.value = '';
+        } else {
+          searchInput.value = tag;
+        }
+
+        filterGrid();
+      });
+    });
+  }
+
+  loadFleetArchive();
+</script>
