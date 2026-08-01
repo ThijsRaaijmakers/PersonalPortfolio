@@ -25,7 +25,7 @@ if (session) {
 ---
 
 <Layout description="Secure FleetPort logistics and shifts overview." title="Dashboard | FleetPort Logistics">
-  <div class="max-w-7xl mx-auto py-8 sm:py-12 space-y-8 animate-fade-in-up">
+  <div id="secure-enclave" class="max-w-7xl mx-auto py-8 sm:py-12 space-y-8 animate-fade-in-up opacity-0 pointer-events-none transition-opacity duration-300">
     
     <!-- Breadcrumbs -->
     <Breadcrumbs 
@@ -63,6 +63,15 @@ if (session) {
       </div>
       
       <div class="flex flex-wrap items-center gap-3">
+        <a 
+          href="/map" 
+          class="group px-4 py-2 rounded-lg bg-cyan-950/20 dark:bg-cyan-950/40 hover:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30 font-mono text-xs font-semibold transition-colors flex items-center space-x-2 shadow-sm"
+        >
+          <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+          </svg>
+          <span>Telemetry Map</span>
+        </a>
         <a 
           href="/fleet" 
           class="group px-4 py-2 rounded-lg bg-slate-100/80 dark:bg-slate-950 hover:bg-slate-200/80 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-800 font-mono text-xs font-semibold transition-colors flex items-center space-x-2 shadow-sm"
@@ -160,27 +169,36 @@ if (session) {
   import { supabase } from '../lib/supabase';
   import { formatDate, formatPrice, formatVehicleTitle } from '../lib/formatters';
 
+  const ENABLE_GUEST_VIEW = false;
+
   async function loadDashboard() {
-    // 1. Enforce Session Check
+    // 1. Enforce Session & Role Check
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      window.location.href = '/login';
-      return;
+    
+    let isAdmin = false;
+    if (session) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+      isAdmin = profile?.role === 'admin';
     }
+
+    if (!session || !isAdmin) {
+      if (!ENABLE_GUEST_VIEW) {
+        window.location.href = '/';
+        return;
+      }
+    }
+
+    // Uncloak UI after confirming admin session
+    document.getElementById('secure-enclave')?.classList.remove('opacity-0', 'pointer-events-none');
 
     const userIdentity = document.getElementById('user-identity');
-    if (userIdentity && session.user.email) {
+    if (userIdentity && session?.user?.email) {
       userIdentity.textContent = `// Identity: ${session.user.email}`;
     }
-
-    // 2. Query profiles table for role
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', session.user.id)
-      .single();
-
-    const isAdmin = profile?.role === 'admin';
 
     // Toggle Admin Badge & Navigation Links based on profiles role
     const adminBadge = document.getElementById('admin-badge');
@@ -197,10 +215,9 @@ if (session) {
       addShiftBtn.classList.toggle('hidden', !isAdmin);
     }
 
-    // 3. Fetch Shifts based on role (Admin = 'shifts', Standard User = 'portfolio_shifts')
-    const targetTable = isAdmin ? 'shifts' : 'portfolio_shifts';
+    // 3. Fetch Shifts from shifts table
     const { data: shifts, error } = await supabase
-      .from(targetTable)
+      .from('shifts')
       .select('*')
       .order('shift_date', { ascending: false });
 

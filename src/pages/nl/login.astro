@@ -238,6 +238,7 @@ import Layout from '../../layouts/Layout.astro';
 </Layout>
 
 <script>
+  import { supabase } from '../../lib/supabase';
   import { signIn, signUp, verifyEmailOtp, resendOtp } from '../../lib/auth';
 
   const signinForm = document.getElementById('signin-form') as HTMLFormElement | null;
@@ -279,7 +280,7 @@ import Layout from '../../layouts/Layout.astro';
     } else if (formattedMsg.toLowerCase().includes('invalid format') || formattedMsg.toLowerCase().includes('invalid email')) {
       formattedMsg = 'Ongeldig e-mailformaat';
     } else if (formattedMsg.toLowerCase().includes('token has expired') || formattedMsg.toLowerCase().includes('otp_expired')) {
-      formattedMsg = 'Verificatiecode is verlopen. Vraag een nieuwe aan.';
+      formattedMsg = 'Verificatiecode verlopen. Vraag een nieuwe aan.';
     }
 
     authError.textContent = `[FOUT]: ${formattedMsg}`;
@@ -288,7 +289,7 @@ import Layout from '../../layouts/Layout.astro';
 
   function showSuccess(msg: string) {
     if (!authSuccess) return;
-    const formattedMsg = msg ? msg.trim() : 'Bewerking succesvol voltooid.';
+    const formattedMsg = msg ? msg.trim() : 'Actie succesvol uitgevoerd.';
     authSuccess.textContent = `[SUCCES]: ${formattedMsg}`;
     authSuccess.classList.remove('hidden');
   }
@@ -341,7 +342,17 @@ import Layout from '../../layouts/Layout.astro';
     if (error) {
       showError(error.message);
     } else if (data.session) {
-      window.location.href = '/nl/dashboard';
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.session.user.id)
+        .single();
+
+      if (profile?.role === 'admin') {
+        window.location.href = '/nl/dashboard';
+      } else {
+        window.location.href = '/nl';
+      }
     }
   });
 
@@ -365,7 +376,7 @@ import Layout from '../../layouts/Layout.astro';
     if (error) {
       showError(error.message);
     } else if (data.session) {
-      window.location.href = '/nl/dashboard';
+      window.location.href = '/nl';
     } else {
       signupForm.classList.add('hidden');
       otpForm?.classList.remove('hidden');
@@ -392,7 +403,17 @@ import Layout from '../../layouts/Layout.astro';
     } else {
       showSuccess('E-mailadres succesvol geverifieerd! Doorsturen...');
       if (data.session) {
-        window.location.href = '/nl/dashboard';
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.session.user.id)
+          .single();
+
+        if (profile?.role === 'admin') {
+          window.location.href = '/nl/dashboard';
+        } else {
+          window.location.href = '/nl';
+        }
       } else {
         setTimeout(() => {
           showSignin();

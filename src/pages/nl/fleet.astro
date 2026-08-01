@@ -4,7 +4,7 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 ---
 
 <Layout description="Uitgebreid doorzoekbaar archief van alle FleetPort voertuigrecords." title="Auto Archief | FleetPort Logistics">
-  <div class="max-w-7xl mx-auto py-8 sm:py-12 space-y-8 animate-fade-in-up">
+  <div id="secure-enclave" class="max-w-7xl mx-auto py-8 sm:py-12 space-y-8 animate-fade-in-up opacity-0 pointer-events-none transition-opacity duration-300">
     
     <!-- Breadcrumbs -->
     <Breadcrumbs 
@@ -99,6 +99,8 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
   import { getSession, checkIsAdmin } from '../../lib/auth';
   import { formatDate, formatPrice, formatEngineCapacity, formatVehicleTitle } from '../../lib/formatters';
 
+  const ENABLE_GUEST_VIEW = false;
+
   async function loadFleetArchive() {
     const loadingEl = document.getElementById('fleet-loading');
     const errorEl = document.getElementById('fleet-error');
@@ -110,17 +112,21 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 
     // 1. Session & Role Check
     const { session } = await getSession();
-    if (!session) {
-      window.location.href = '/nl/login';
-      return;
+    const isAdmin = session ? await checkIsAdmin(session.user) : false;
+
+    if (!session || !isAdmin) {
+      if (!ENABLE_GUEST_VIEW) {
+        window.location.href = '/nl';
+        return;
+      }
     }
 
-    const isAdmin = await checkIsAdmin(session.user);
-    const targetTable = isAdmin ? 'shifts' : 'portfolio_shifts';
+    // Uncloak UI after confirming admin session
+    document.getElementById('secure-enclave')?.classList.remove('opacity-0', 'pointer-events-none');
 
-    // 2. Fetch Shifts from Supabase
+    // 2. Fetch Shifts from shifts table
     const { data: shifts, error } = await supabase
-      .from(targetTable)
+      .from('shifts')
       .select('*')
       .order('shift_date', { ascending: false });
 

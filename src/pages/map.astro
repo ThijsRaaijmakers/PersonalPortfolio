@@ -1,0 +1,346 @@
+---
+export const prerender = false;
+
+import Layout from '../layouts/Layout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+---
+
+<Layout title="Telemetry Map | FleetPort Logistics" description="Interactive tactical map visualization of all logged vehicle transport routes.">
+  <!-- Include Leaflet CDN in Head -->
+  <link 
+    rel="stylesheet" 
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+    crossorigin="" 
+  />
+
+  <div id="secure-enclave" class="max-w-7xl mx-auto py-8 sm:py-12 space-y-8 animate-fade-in-up opacity-0 pointer-events-none transition-opacity duration-300">
+    
+    <!-- Breadcrumbs -->
+    <Breadcrumbs 
+      items={[
+        { label: 'Home', href: '/' },
+        { label: 'Dashboard', href: '/dashboard' },
+        { label: 'Telemetry Map' }
+      ]} 
+    />
+
+    <!-- Header Section -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-300 dark:border-slate-800 pb-6">
+      <div class="space-y-1">
+        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-950/10 dark:bg-cyan-950/60 border border-cyan-500/30 font-mono text-xs text-cyan-600 dark:text-cyan-400">
+          <span class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></span>
+          <span>TACTICAL TELEMETRY MAP &bull; LOGISTICS ROUTES</span>
+        </div>
+        <div class="flex items-center space-x-3 pt-1">
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-sans tracking-tight">
+            Telemetry Map
+          </h1>
+          <span 
+            id="guest-badge" 
+            class="hidden px-2.5 py-0.5 rounded font-mono text-[10px] font-bold border uppercase tracking-wider bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30"
+          >
+            Guest (~1.5km Jittered Privacy)
+          </span>
+          <span 
+            id="admin-badge" 
+            class="hidden px-2.5 py-0.5 rounded font-mono text-[10px] font-bold border uppercase tracking-wider bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/30"
+          >
+            Admin (Exact Telemetry)
+          </span>
+        </div>
+      </div>
+
+      <a 
+        href="/dashboard"
+        class="group inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-slate-100/80 dark:bg-slate-950 hover:bg-slate-200/80 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-800 font-mono text-xs font-semibold transition-colors w-fit shadow-sm"
+      >
+        <svg class="w-4 h-4 text-cyan-500 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        <span>Back to Dashboard</span>
+      </a>
+    </div>
+
+    <!-- Error Banner (if any) -->
+    <div id="map-error-banner" class="hidden p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 font-mono text-xs"></div>
+
+    <!-- Map Container -->
+    <div class="space-y-3 font-mono">
+      <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 px-1">
+        <span id="route-count-display">Displaying 0 geocoded transport routes</span>
+        <span class="flex items-center space-x-3">
+          <span class="inline-flex items-center space-x-1"><span class="w-2.5 h-2.5 rounded-full bg-cyan-500 inline-block"></span><span>Pickup</span></span>
+          <span class="inline-flex items-center space-x-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span><span>Dropoff</span></span>
+        </span>
+      </div>
+
+      <div class="relative w-full h-[600px] sm:h-[700px] rounded-2xl bg-slate-900 border border-slate-300 dark:border-slate-800 shadow-2xl overflow-hidden">
+        <div id="telemetry-map" class="w-full h-full relative z-0"></div>
+
+        <!-- Telemetry Calculation Loading Overlay -->
+        <div 
+          id="routing-indicator" 
+          class="absolute bottom-6 left-6 z-[1000] px-4 py-2 rounded-lg bg-slate-950/80 backdrop-blur-sm border border-cyan-500/50 flex items-center space-x-3 shadow-lg shadow-cyan-500/20 transition-opacity duration-500"
+        >
+          <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+          <span id="route-counter" class="text-cyan-400 font-mono text-xs font-bold tracking-widest">
+            CALCULATING_TELEMETRY: 0/0
+          </span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</Layout>
+
+<!-- Leaflet Client Integration & Progressive Telemetry Map Renderer -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script>
+  import { supabase } from '../lib/supabase';
+
+  declare const L: any;
+
+  const ENABLE_GUEST_VIEW = false;
+
+  async function checkIsAdmin(): Promise<boolean> {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return false;
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+      return profile?.role === 'admin';
+    } catch {
+      return false;
+    }
+  }
+
+  async function renderMap(shifts: any[], isAdmin: boolean, mapEl: HTMLElement, indicatorEl: HTMLElement | null, counterEl: HTMLElement | null) {
+    const processedShifts = shifts.map((shift) => {
+      if (isAdmin) return shift;
+      const jitter = () => (Math.random() - 0.5) * 0.03;
+      return {
+        ...shift,
+        pickup_lat: shift.pickup_lat !== null ? shift.pickup_lat + jitter() : null,
+        pickup_lng: shift.pickup_lng !== null ? shift.pickup_lng + jitter() : null,
+        dropoff_lat: shift.dropoff_lat !== null ? shift.dropoff_lat + jitter() : null,
+        dropoff_lng: shift.dropoff_lng !== null ? shift.dropoff_lng + jitter() : null
+      };
+    });
+
+    // Initialize Leaflet Map
+    const map = L.map('telemetry-map', {
+      center: [52.1326, 5.2913],
+      zoom: 7.5,
+      zoomControl: true
+    });
+
+    // Adaptive Light/Dark Tile Layers
+    const lightTileUrl = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+    const darkTileUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+
+    const isDark = document.documentElement.classList.contains('dark');
+    const initialTileUrl = isDark ? darkTileUrl : lightTileUrl;
+
+    const tileLayer = L.tileLayer(initialTileUrl, {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 19
+    }).addTo(map);
+
+    // Watch theme changes with MutationObserver
+    const observer = new MutationObserver(() => {
+      const darkNow = document.documentElement.classList.contains('dark');
+      const targetUrl = darkNow ? darkTileUrl : lightTileUrl;
+      tileLayer.setUrl(targetUrl);
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+    // Immediate Rendering: Straight Dashed Lines + Markers
+    const bounds = L.latLngBounds([]);
+    const routeItems: Array<{
+      shift: any;
+      pickupPt: [number, number];
+      dropoffPt: [number, number];
+      initialLine: any;
+    }> = [];
+
+    processedShifts.forEach((shift) => {
+      const pLat = shift.pickup_lat;
+      const pLng = shift.pickup_lng;
+      const dLat = shift.dropoff_lat;
+      const dLng = shift.dropoff_lng;
+
+      if (typeof pLat === 'number' && typeof pLng === 'number' && typeof dLat === 'number' && typeof dLng === 'number') {
+        const pickupPt: [number, number] = [pLat, pLng];
+        const dropoffPt: [number, number] = [dLat, dLng];
+
+        bounds.extend(pickupPt);
+        bounds.extend(dropoffPt);
+
+        // Immediate low-opacity dashed straight line
+        const initialLine = L.polyline([pickupPt, dropoffPt], {
+          color: '#06b6d4',
+          weight: 2,
+          opacity: 0.25,
+          dashArray: '5, 10'
+        }).addTo(map);
+
+        // Pickup Circle Marker (Cyan)
+        const pickupMarker = L.circleMarker(pickupPt, {
+          radius: 4,
+          color: '#06b6d4',
+          fillColor: '#06b6d4',
+          fillOpacity: 0.8,
+          weight: 1
+        }).addTo(map);
+
+        pickupMarker.bindPopup(`
+          <div class="font-mono text-xs space-y-1 text-slate-900">
+            <div class="font-bold text-cyan-700">// PICKUP LOCATION</div>
+            <div><strong>City:</strong> ${shift.pickup_postal_city || 'N/A'}</div>
+            <div><strong>Vehicle:</strong> ${shift.vehicle_make || ''} ${shift.vehicle_model || ''}</div>
+            <div><strong>Date:</strong> ${shift.shift_date || ''}</div>
+          </div>
+        `);
+
+        // Dropoff Circle Marker (Emerald)
+        const dropoffMarker = L.circleMarker(dropoffPt, {
+          radius: 4,
+          color: '#10b981',
+          fillColor: '#10b981',
+          fillOpacity: 0.8,
+          weight: 1
+        }).addTo(map);
+
+        dropoffMarker.bindPopup(`
+          <div class="font-mono text-xs space-y-1 text-slate-900">
+            <div class="font-bold text-emerald-700">// DROPOFF LOCATION</div>
+            <div><strong>City:</strong> ${shift.dropoff_postal_city || 'N/A'}</div>
+            <div><strong>Vehicle:</strong> ${shift.vehicle_make || ''} ${shift.vehicle_model || ''}</div>
+            <div><strong>Date:</strong> ${shift.shift_date || ''}</div>
+          </div>
+        `);
+
+        routeItems.push({ shift, pickupPt, dropoffPt, initialLine });
+      }
+    });
+
+    if (routeItems.length > 0 && bounds.isValid()) {
+      map.fitBounds(bounds, { padding: [40, 40] });
+    }
+
+    // Rapid Telemetry Animation Queue from Stored Route Geometries (30ms Staggered Delay)
+    const totalRoutes = routeItems.length;
+    let routesProcessed = 0;
+
+    if (counterEl) {
+      counterEl.textContent = `CALCULATING_TELEMETRY: 0/${totalRoutes}`;
+    }
+
+    if (totalRoutes === 0 && indicatorEl) {
+      indicatorEl.classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    for (let i = 0; i < routeItems.length; i++) {
+      const item = routeItems[i];
+      const geom = item.shift.route_geometry;
+
+      if (isAdmin && Array.isArray(geom) && geom.length > 0) {
+        // Render solid cyan Polyline from stored route_geometry for admin
+        L.polyline(geom, {
+          color: '#06b6d4',
+          weight: 2.5,
+          opacity: 0.8,
+          smoothFactor: 1
+        }).addTo(map);
+
+        // Remove initial dashed straight line
+        map.removeLayer(item.initialLine);
+      }
+
+      routesProcessed++;
+      if (counterEl) {
+        counterEl.textContent = `CALCULATING_TELEMETRY: ${routesProcessed}/${totalRoutes}`;
+      }
+
+      if (i < routeItems.length - 1) {
+        await new Promise((r) => setTimeout(r, 30));
+      }
+    }
+
+    // Fade out indicator overlay after completing queue
+    if (indicatorEl) {
+      setTimeout(() => {
+        indicatorEl.classList.add('opacity-0', 'pointer-events-none');
+      }, 400);
+    }
+  }
+
+  async function initTelemetryMap() {
+    const mapEl = document.getElementById('telemetry-map');
+    const guestBadge = document.getElementById('guest-badge');
+    const adminBadge = document.getElementById('admin-badge');
+    const indicatorEl = document.getElementById('routing-indicator');
+    const counterEl = document.getElementById('route-counter');
+    const routeCountDisplay = document.getElementById('route-count-display');
+    const errorBanner = document.getElementById('map-error-banner');
+    
+    if (!mapEl || typeof L === 'undefined') return;
+
+    // 1. Client-Side Auth & Admin Check
+    const { data: { session } } = await supabase.auth.getSession();
+    const isAdmin = await checkIsAdmin();
+
+    if (!session || !isAdmin) {
+      if (!ENABLE_GUEST_VIEW) {
+        window.location.href = '/';
+        return;
+      }
+    }
+
+    // Uncloak UI after confirming admin session
+    document.getElementById('secure-enclave')?.classList.remove('opacity-0', 'pointer-events-none');
+
+    if (isAdmin) {
+      adminBadge?.classList.remove('hidden');
+    } else {
+      guestBadge?.classList.remove('hidden');
+    }
+
+    // 2. Client-Side Data Fetching under RLS
+    const { data: shifts, error } = await supabase
+      .from('shifts')
+      .select('*')
+      .not('pickup_lat', 'is', null)
+      .not('dropoff_lat', 'is', null)
+      .order('shift_date', { ascending: false });
+
+    if (error) {
+      if (errorBanner) {
+        errorBanner.textContent = `[DATABASE_QUERY_ERROR]: ${error.message}`;
+        errorBanner.classList.remove('hidden');
+      }
+      return;
+    }
+
+    const validShifts = shifts || [];
+    if (routeCountDisplay) {
+      routeCountDisplay.textContent = `Displaying ${validShifts.length} geocoded transport routes`;
+    }
+
+    // 3. Render Leaflet Map
+    await renderMap(validShifts, isAdmin, mapEl, indicatorEl, counterEl);
+  }
+
+  // Run initial map setup
+  if (document.readyState === 'complete') {
+    initTelemetryMap();
+  } else {
+    window.addEventListener('load', initTelemetryMap);
+  }
+</script>

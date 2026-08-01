@@ -246,26 +246,79 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
     });
   }
 
+  async function geocodeLocation(address: string, city: string): Promise<{ lat: number | null, lng: number | null }> {
+    const query = [address, city].filter(Boolean).join(', ');
+    if (!query) return { lat: null, lng: null };
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`, {
+        headers: { 'User-Agent': 'PersonalPortfolio-App/1.0' }
+      });
+      if (!res.ok) return { lat: null, lng: null };
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        return {
+          lat: parseFloat(data[0].lat),
+          lng: parseFloat(data[0].lon)
+        };
+      }
+    } catch {
+      // Return nulls if geocoding fails gracefully
+    }
+    return { lat: null, lng: null };
+  }
+
   if (saveBtn) {
     saveBtn.addEventListener('click', async () => {
       if (!preparedPayload) return;
 
       saveBtn.disabled = true;
-      saveBtn.innerHTML = `<span>Writing to Database...</span>`;
+      saveBtn.innerHTML = `<span>Geocoding &amp; Writing...</span>`;
 
       try {
         const { session } = await getSession();
         if (!session) throw new Error("User session expired. Please log in again.");
 
+        // Geocode pickup location
+        const pickupCoords = await geocodeLocation(preparedPayload.pickup_address, preparedPayload.pickup_postal_city);
+        
+        // Respect Nominatim rate limits (1 sec delay)
+        await new Promise((r) => setTimeout(r, 1000));
+
+        // Geocode dropoff location
+        const dropoffCoords = await geocodeLocation(preparedPayload.dropoff_address, preparedPayload.dropoff_postal_city);
+
+        // Fetch OSRM driving route geometry
+        let routeGeometry: [number, number][] | null = null;
+        if (pickupCoords.lat !== null && pickupCoords.lng !== null && dropoffCoords.lat !== null && dropoffCoords.lng !== null) {
+          try {
+            const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${pickupCoords.lng},${pickupCoords.lat};${dropoffCoords.lng},${dropoffCoords.lat}?overview=simplified&geometries=geojson`;
+            const osrmRes = await fetch(osrmUrl);
+            if (osrmRes.ok) {
+              const osrmData = await osrmRes.json();
+              if (osrmData.routes && osrmData.routes.length > 0 && osrmData.routes[0].geometry?.coordinates) {
+                // Flip [lng, lat] to [lat, lng] for Leaflet compatibility
+                routeGeometry = osrmData.routes[0].geometry.coordinates.map((coord: [number, number]) => [coord[1], coord[0]]);
+              }
+            }
+          } catch {
+            // Fail gracefully to null route_geometry
+          }
+        }
+
         const payload = {
           ...preparedPayload,
+          pickup_lat: pickupCoords.lat,
+          pickup_lng: pickupCoords.lng,
+          dropoff_lat: dropoffCoords.lat,
+          dropoff_lng: dropoffCoords.lng,
+          route_geometry: routeGeometry,
           user_id: session.user.id
         };
 
         const { error } = await supabase.from('shifts').insert([payload]);
         if (error) throw error;
 
-        showMsg(statusSuccess, 'Shift successfully logged to Supabase database!', false);
+        showMsg(statusSuccess, 'Shift successfully geocoded and logged to Supabase database!', false);
         setTimeout(() => {
           window.location.href = '/dashboard';
         }, 1200);

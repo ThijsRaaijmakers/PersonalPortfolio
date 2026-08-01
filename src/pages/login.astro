@@ -238,6 +238,7 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <script>
+  import { supabase } from '../lib/supabase';
   import { signIn, signUp, verifyEmailOtp, resendOtp } from '../lib/auth';
 
   const signinForm = document.getElementById('signin-form') as HTMLFormElement | null;
@@ -341,7 +342,17 @@ import Layout from '../layouts/Layout.astro';
     if (error) {
       showError(error.message);
     } else if (data.session) {
-      window.location.href = '/dashboard';
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.session.user.id)
+        .single();
+
+      if (profile?.role === 'admin') {
+        window.location.href = '/dashboard';
+      } else {
+        window.location.href = '/';
+      }
     }
   });
 
@@ -385,7 +396,7 @@ import Layout from '../layouts/Layout.astro';
       }
       return;
     } else if (data.session) {
-      window.location.href = '/dashboard';
+      window.location.href = '/';
     } else {
       signupForm.classList.add('hidden');
       otpForm?.classList.remove('hidden');
@@ -412,7 +423,17 @@ import Layout from '../layouts/Layout.astro';
     } else {
       showSuccess('Email verified successfully! Redirecting...');
       if (data.session) {
-        window.location.href = '/dashboard';
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.session.user.id)
+          .single();
+
+        if (profile?.role === 'admin') {
+          window.location.href = '/dashboard';
+        } else {
+          window.location.href = '/';
+        }
       } else {
         setTimeout(() => {
           showSignin();

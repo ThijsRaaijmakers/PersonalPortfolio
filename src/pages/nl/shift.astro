@@ -4,6 +4,14 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 ---
 
 <Layout description="Dienst details logboek en voertuig telemetrie." title="Dienst Details | FleetPort Tracker">
+  <!-- Include Leaflet CDN in Head -->
+  <link 
+    rel="stylesheet" 
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+    crossorigin="" 
+  />
+
   <div class="max-w-6xl mx-auto py-8 sm:py-12 space-y-8 animate-fade-in-up">
     
     <!-- Breadcrumbs Wrapper -->
@@ -96,6 +104,9 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
         </div>
       </div>
 
+      <!-- Daily Operations Telemetry Map Container -->
+      <div class="w-full h-[400px] rounded-2xl bg-slate-900 border border-slate-300 dark:border-slate-800 shadow-xl overflow-hidden relative z-0 mb-8" id="daily-map"></div>
+
       <!-- Rides List -->
       <div class="space-y-6">
         <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100 font-mono flex items-center space-x-2">
@@ -110,10 +121,15 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
   </div>
 </Layout>
 
+<!-- Leaflet Client Integration -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
 <script>
   import { supabase } from '../../lib/supabase';
   import { getSession, checkIsAdmin } from '../../lib/auth';
   import { formatDate, formatPrice, formatEngineCapacity, formatVehicleTitle } from '../../lib/formatters';
+
+  declare const L: any;
 
   async function loadShiftDetail() {
     const loadingEl = document.getElementById('shift-loading');
@@ -337,6 +353,97 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 
     loadingEl?.classList.add('hidden');
     contentEl?.classList.remove('hidden');
+
+    // 6. Initialize Daily Operations Telemetry Map
+    const mapEl = document.getElementById('daily-map');
+    if (mapEl && typeof L !== 'undefined' && rides && rides.length > 0) {
+      const map = L.map('daily-map', {
+        center: [52.1326, 5.2913],
+        zoom: 7.5,
+        zoomControl: true
+      });
+
+      const lightTileUrl = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+      const darkTileUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+
+      const isDark = document.documentElement.classList.contains('dark');
+      const initialTileUrl = isDark ? darkTileUrl : lightTileUrl;
+
+      const tileLayer = L.tileLayer(initialTileUrl, {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 19
+      }).addTo(map);
+
+      const observer = new MutationObserver(() => {
+        const darkNow = document.documentElement.classList.contains('dark');
+        tileLayer.setUrl(darkNow ? darkTileUrl : lightTileUrl);
+      });
+      observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+      const bounds = L.latLngBounds([]);
+
+      rides.forEach((shift) => {
+        // Draw precalculated route geometry if present
+        if (Array.isArray(shift.route_geometry) && shift.route_geometry.length > 0) {
+          L.polyline(shift.route_geometry, {
+            color: '#06b6d4',
+            weight: 3,
+            opacity: 0.8
+          }).addTo(map);
+        }
+
+        // Add Pickup & Dropoff Circle Markers and Extend Bounds
+        const pLat = shift.pickup_lat;
+        const pLng = shift.pickup_lng;
+        const dLat = shift.dropoff_lat;
+        const dLng = shift.dropoff_lng;
+
+        if (typeof pLat === 'number' && typeof pLng === 'number') {
+          const pickupPt: [number, number] = [pLat, pLng];
+          bounds.extend(pickupPt);
+          const pMarker = L.circleMarker(pickupPt, {
+            radius: 4,
+            color: '#06b6d4',
+            fillColor: '#06b6d4',
+            fillOpacity: 0.8,
+            weight: 1
+          }).addTo(map);
+
+          pMarker.bindPopup(`
+            <div class="font-mono text-xs space-y-1 text-slate-900">
+              <div class="font-bold text-cyan-700">// OPHAALLOCATIE</div>
+              <div><strong>Adres:</strong> ${shift.pickup_address || shift.pickup_postal_city || 'N/V'}</div>
+              <div><strong>Voertuig:</strong> ${shift.vehicle_make || ''} ${shift.vehicle_model || ''}</div>
+            </div>
+          `);
+        }
+
+        if (typeof dLat === 'number' && typeof dLng === 'number') {
+          const dropoffPt: [number, number] = [dLat, dLng];
+          bounds.extend(dropoffPt);
+          const dMarker = L.circleMarker(dropoffPt, {
+            radius: 4,
+            color: '#10b981',
+            fillColor: '#10b981',
+            fillOpacity: 0.8,
+            weight: 1
+          }).addTo(map);
+
+          dMarker.bindPopup(`
+            <div class="font-mono text-xs space-y-1 text-slate-900">
+              <div class="font-bold text-emerald-700">// AFLEVERLOCATIE</div>
+              <div><strong>Adres:</strong> ${shift.dropoff_address || shift.dropoff_postal_city || 'N/V'}</div>
+              <div><strong>Voertuig:</strong> ${shift.vehicle_make || ''} ${shift.vehicle_model || ''}</div>
+            </div>
+          `);
+        }
+      });
+
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [40, 40] });
+      }
+    }
   }
 
   loadShiftDetail();
