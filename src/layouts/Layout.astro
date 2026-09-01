@@ -170,6 +170,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'http://localhost
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return;
 
+        // Check account-scoped device memory
+        if (localStorage.getItem(`passkey_device_${session.user.id}`) === 'true') return;
+
         // 3. Query profiles table for definitive passkey registration status
         const { data: profile } = await supabase
           .from('profiles')
@@ -180,7 +183,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'http://localhost
         // If they already have a passkey in the DB, silently save to localStorage and abort
         if (profile?.has_passkey) {
           try {
-            localStorage.setItem('fleetport_has_passkey', 'true');
+            localStorage.setItem(`passkey_device_${session.user.id}`, 'true');
           } catch {}
           return;
         }

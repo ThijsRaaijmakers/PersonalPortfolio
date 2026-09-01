@@ -274,7 +274,11 @@ import Layout from '../../layouts/Layout.astro';
         return;
       }
       document.getElementById('login-enclave')?.classList.remove('opacity-0', 'pointer-events-none');
-      if (typeof localStorage !== 'undefined' && localStorage.getItem('fleetport_has_passkey') === 'true') {
+      const hasPasskeyOnDevice = typeof localStorage !== 'undefined' && (
+        Object.keys(localStorage).some(k => k.startsWith('passkey_device_') && localStorage.getItem(k) === 'true') ||
+        localStorage.getItem('fleetport_has_passkey') === 'true'
+      );
+      if (hasPasskeyOnDevice) {
         document.getElementById('passkey-login-btn')?.classList.remove('hidden');
         document.getElementById('passkey-divider')?.classList.remove('hidden');
       }
@@ -386,7 +390,7 @@ import Layout from '../../layouts/Layout.astro';
           showError(error.message);
         } else if (data?.session) {
           try {
-            localStorage.setItem('fleetport_has_passkey', 'true');
+            localStorage.setItem(`passkey_device_${data.session.user.id}`, 'true');
           } catch {}
           const { data: profile } = await supabase
             .from('profiles')
