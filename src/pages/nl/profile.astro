@@ -394,6 +394,9 @@ import Layout from '../../layouts/Layout.astro';
           showMsg(passkeyError, error.message || 'Fout bij het registreren van biometrische passkey.', true);
         } else {
           try {
+            if (currentUserId) {
+              await supabase.from('profiles').update({ has_passkey: true }).eq('id', currentUserId);
+            }
             localStorage.setItem('fleetport_has_passkey', 'true');
           } catch {}
           showMsg(passkeySuccess, 'Biometrische passkey succesvol geregistreerd! U kunt deze nu gebruiken om in te loggen.', false);

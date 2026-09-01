@@ -164,30 +164,50 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'http://localhost
         if (!nudge || !dismissBtn) return;
 
         // 1. Check user preferences
-        if (localStorage.getItem('fleetport_has_passkey') === 'true' || localStorage.getItem('passkey_nudge_dismissed') === 'true') return;
+        if (localStorage.getItem('passkey_nudge_dismissed') === 'true') return;
 
         // 2. Ensure user is logged in
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return;
 
-        // 3. Check for hardware biometric scanner
+        // 3. Query profiles table for definitive passkey registration status
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('has_passkey')
+          .eq('id', session.user.id)
+          .single();
+
+        // If they already have a passkey in the DB, silently save to localStorage and abort
+        if (profile?.has_passkey) {
+          try {
+            localStorage.setItem('fleetport_has_passkey', 'true');
+          } catch {}
+          return;
+        }
+
+        // 4. Check for hardware biometric scanner
         if (window.PublicKeyCredential && typeof window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable === 'function') {
           const isAvailable = await window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
           if (isAvailable) {
             // Delay the nudge slightly so it doesn't collide with the page load
             setTimeout(() => {
               nudge.classList.remove('translate-y-[-150%]', 'opacity-0');
+
+              // Auto-dismiss after 8 seconds
+              setTimeout(() => {
+                nudge.classList.add('translate-y-[-150%]', 'opacity-0');
+              }, 8000);
             }, 1500);
           }
         }
 
-        // 4. Handle Dismissal
+        // 5. Handle Dismissal
         dismissBtn.addEventListener('click', () => {
           try {
             localStorage.setItem('passkey_nudge_dismissed', 'true');
           } catch {}
           nudge.classList.add('translate-y-[-150%]', 'opacity-0');
-        });
+        }, { once: true });
       }
 
       document.addEventListener('astro:page-load', () => {
