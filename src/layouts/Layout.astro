@@ -59,6 +59,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'http://localhost
     <meta name="title" content={title} />
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
 
     <!-- PWA Web App Manifest & OS Share Target -->
     <link rel="manifest" href="/manifest.json" />
