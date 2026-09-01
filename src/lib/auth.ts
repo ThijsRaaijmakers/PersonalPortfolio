@@ -126,5 +126,12 @@ export async function checkIsAdmin(user?: any): Promise<boolean> {
   }
 }
 
+export async function registerPasskey() {
+  const { data, error } = await (supabase.auth as any).registerPasskey();
+  return { data, error };
+}
 
-
+export async function signInWithPasskey() {
+  const { data, error } = await (supabase.auth as any).signInWithPasskey();
+  return { data, error };
+}

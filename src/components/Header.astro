@@ -42,7 +42,7 @@ const navItems = [
             return (
               <a
                 href={item.href}
-                class={`px-3 py-1.5 rounded-md font-mono text-xs transition-all duration-200 ${
+                class={`cipher-hover px-3 py-1.5 rounded-md font-mono text-xs transition-all duration-200 ${
                   isActive
                     ? "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30 shadow-sm shadow-cyan-500/10"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900/60 border border-transparent"
@@ -69,7 +69,7 @@ const navItems = [
         <!-- Auth Container (Desktop) -->
         <div id="auth-container" class="relative">
           <!-- Logged Out State -->
-          <a id="login-link" href={isNl ? '/nl/login' : '/login'} class="px-2.5 py-1 rounded-md font-mono text-xs transition-all duration-200 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900/60 border border-transparent">
+          <a id="login-link" href={isNl ? '/nl/login' : '/login'} class="cipher-hover px-2.5 py-1 rounded-md font-mono text-xs transition-all duration-200 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900/60 border border-transparent">
             {isNl ? 'Inloggen' : 'Login'}
           </a>
 

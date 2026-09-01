@@ -37,6 +37,11 @@ const targetUrl = `${targetPath}${search}`;
       if (targetBase) {
         toggle.href = `${targetBase}${search}`;
       }
+      toggle.onclick = () => {
+        const isTargetNl = targetBase?.startsWith('/nl');
+        const targetLocale = isTargetNl ? 'nl' : 'en';
+        document.cookie = `preferred_locale=${targetLocale}; path=/; max-age=31536000; SameSite=Lax`;
+      };
     });
   }
 

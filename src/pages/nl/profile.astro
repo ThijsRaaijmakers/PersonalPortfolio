@@ -192,18 +192,57 @@ import Layout from '../../layouts/Layout.astro';
         </div>
       </div>
 
+      <!-- Card 3: Biometrische Beveiliging (WebAuthn Passkey) -->
+      <div class="md:col-span-2 p-6 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-xl space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/60 pb-3">
+          <div class="flex items-center space-x-2">
+            <svg class="w-5 h-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004.07 9m5.936 8.79a11.968 11.968 0 01-2.006 2.21" />
+            </svg>
+            <h2 class="text-base font-bold text-slate-900 dark:text-slate-100 font-mono">
+              Biometrische Beveiliging &amp; Passkeys
+            </h2>
+          </div>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950/10 dark:bg-cyan-950/80 border border-cyan-500/30 text-cyan-600 dark:text-cyan-400 font-semibold">
+            WEBAUTHN FIDO2
+          </span>
+        </div>
+
+        <!-- Passkey Meldingen -->
+        <p id="passkey-error" class="hidden p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 font-mono text-xs leading-relaxed"></p>
+        <p id="passkey-success" class="hidden p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-mono text-xs leading-relaxed"></p>
+
+        <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-sans max-w-2xl">
+          Registreer een fysieke beveiligingssleutel, Touch ID, Face ID of Windows Hello passkey om snel en veilig in te loggen zonder wachtwoord.
+        </p>
+
+        <div class="pt-2 max-w-sm">
+          <button
+            id="register-passkey-btn"
+            type="button"
+            class="w-full py-3 rounded-lg bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-white text-white dark:text-slate-900 font-bold font-mono text-sm transition-all shadow-lg flex items-center justify-center space-x-2 cursor-pointer"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004.07 9m5.936 8.79a11.968 11.968 0 01-2.006 2.21" />
+            </svg>
+            <span>Biometrische Passkey Registreren</span>
+          </button>
+        </div>
+      </div>
+
     </div>
 
   </div>
 </Layout>
 
 <script>
-  import { getUser, updateProfileName, updatePassword } from '../../lib/auth';
+  import { getUser, updateProfileName, updatePassword, registerPasskey } from '../../lib/auth';
   import { supabase } from '../../lib/supabase';
 
   function setupProfile() {
     const profileForm = document.getElementById('profile-form') as HTMLFormElement | null;
     const passwordForm = document.getElementById('password-form') as HTMLFormElement | null;
+    const registerPasskeyBtn = document.getElementById('register-passkey-btn') as HTMLButtonElement | null;
 
     const profileEmailInput = document.getElementById('profile-email') as HTMLInputElement | null;
     const fullNameInput = document.getElementById('full-name') as HTMLInputElement | null;
@@ -212,6 +251,8 @@ import Layout from '../../layouts/Layout.astro';
     const profileSuccess = document.getElementById('profile-success');
     const passwordError = document.getElementById('password-error');
     const passwordSuccess = document.getElementById('password-success');
+    const passkeyError = document.getElementById('passkey-error');
+    const passkeySuccess = document.getElementById('passkey-success');
 
     let currentUserId = '';
 
@@ -334,6 +375,39 @@ import Layout from '../../layouts/Layout.astro';
       } else {
         showMsg(passwordSuccess, 'Beveiligingssleutel succesvol bijgewerkt.', false);
         passwordForm.reset();
+      }
+    });
+
+    registerPasskeyBtn?.addEventListener('click', async () => {
+      hideMsg(passkeyError);
+      hideMsg(passkeySuccess);
+
+      if (registerPasskeyBtn) {
+        registerPasskeyBtn.disabled = true;
+        registerPasskeyBtn.classList.add('opacity-50', 'cursor-wait');
+        registerPasskeyBtn.innerHTML = `<span class="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span><span>Passkey Registreren...</span>`;
+      }
+
+      try {
+        const { data, error } = await registerPasskey();
+        if (error) {
+          showMsg(passkeyError, error.message || 'Fout bij het registreren van biometrische passkey.', true);
+        } else {
+          showMsg(passkeySuccess, 'Biometrische passkey succesvol geregistreerd! U kunt deze nu gebruiken om in te loggen.', false);
+        }
+      } catch (err: any) {
+        showMsg(passkeyError, err.message || 'Passkey-registratie geannuleerd of niet ondersteund.', true);
+      } finally {
+        if (registerPasskeyBtn) {
+          registerPasskeyBtn.disabled = false;
+          registerPasskeyBtn.classList.remove('opacity-50', 'cursor-wait');
+          registerPasskeyBtn.innerHTML = `
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004.07 9m5.936 8.79a11.968 11.968 0 01-2.006 2.21" />
+            </svg>
+            <span>Biometrische Passkey Registreren</span>
+          `;
+        }
       }
     });
   }

@@ -60,6 +60,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'http://localhost
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
 
+    <!-- PWA Web App Manifest & OS Share Target -->
+    <link rel="manifest" href="/manifest.json" />
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={Astro.url} />
@@ -83,5 +86,62 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'http://localhost
     </main>
 
     <Footer />
+
+    <!-- Cipher-Text Hover Animation Script -->
+    <script>
+      const CIPHER_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*<>/[]{}~';
+
+      function initCipherHover() {
+        const elements = document.querySelectorAll<HTMLElement>('.cipher-hover');
+
+        elements.forEach((el) => {
+          if (el.dataset.cipherInit === 'true') return;
+          el.dataset.cipherInit = 'true';
+
+          if (!el.dataset.original) {
+            el.dataset.original = el.textContent?.trim() || '';
+          }
+
+          let intervalId: ReturnType<typeof setInterval> | null = null;
+
+          el.addEventListener('mouseenter', () => {
+            const originalText = el.dataset.original || el.textContent?.trim() || '';
+            if (!originalText) return;
+
+            if (intervalId) clearInterval(intervalId);
+
+            let iteration = 0;
+            const totalSteps = 10; // ~300ms total (10 steps * 30ms)
+
+            intervalId = setInterval(() => {
+              const resolvedLength = Math.floor((iteration / totalSteps) * originalText.length);
+
+              el.textContent = originalText
+                .split('')
+                .map((char, index) => {
+                  if (index < resolvedLength) {
+                    return originalText[index];
+                  }
+                  if (char === ' ' || char === '\n') {
+                    return char;
+                  }
+                  return CIPHER_CHARS[Math.floor(Math.random() * CIPHER_CHARS.length)];
+                })
+                .join('');
+
+              iteration++;
+
+              if (iteration > totalSteps) {
+                if (intervalId) clearInterval(intervalId);
+                el.textContent = originalText;
+                intervalId = null;
+              }
+            }, 30);
+          });
+        });
+      }
+
+      document.addEventListener('astro:page-load', initCipherHover);
+    </script>
   </body>
 </html>

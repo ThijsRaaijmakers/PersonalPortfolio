@@ -33,8 +33,26 @@ import Layout from '../../layouts/Layout.astro';
       <!-- Success Message Container -->
       <p id="auth-success" class="hidden p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-mono text-xs leading-relaxed"></p>
 
-      <!-- Sign In Form -->
-      <form id="signin-form" class="space-y-5 font-mono text-xs">
+      <!-- Inlogformulier -->
+      <form id="signin-form" class="space-y-4 font-mono text-xs">
+        <!-- Biometrische Passkey Inlogknop -->
+        <button
+          id="passkey-login-btn"
+          type="button"
+          class="w-full py-3 rounded-lg bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-bold font-mono text-sm transition-all shadow-lg flex items-center justify-center space-x-2 border border-slate-700 dark:border-slate-300 hover:-translate-y-0.5 cursor-pointer"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004.07 9m5.936 8.79a11.968 11.968 0 01-2.006 2.21" />
+          </svg>
+          <span>Inloggen met Passkey</span>
+        </button>
+
+        <div class="flex items-center space-x-2 text-slate-400 dark:text-slate-500 my-4 text-xs font-mono">
+          <hr class="flex-1 border-slate-200 dark:border-slate-800" />
+          <span>OF</span>
+          <hr class="flex-1 border-slate-200 dark:border-slate-800" />
+        </div>
+
         <div class="space-y-2">
           <label for="signin-email" class="block text-slate-700 dark:text-slate-300 font-medium">
             &gt; E-mailadres
@@ -241,7 +259,7 @@ import Layout from '../../layouts/Layout.astro';
 
 <script>
   import { supabase } from '../../lib/supabase';
-  import { signIn, signUp, verifyEmailOtp, resendOtp } from '../../lib/auth';
+  import { signIn, signUp, verifyEmailOtp, resendOtp, signInWithPasskey } from '../../lib/auth';
 
   const initLogin = async () => {
     const checkSession = async () => {
@@ -264,6 +282,7 @@ import Layout from '../../layouts/Layout.astro';
     const otpForm = document.getElementById('otp-form') as HTMLFormElement | null;
     const termsCheckbox = document.getElementById('terms-checkbox') as HTMLInputElement | null;
     const resendOtpBtn = document.getElementById('resend-otp-btn') as HTMLButtonElement | null;
+    const passkeyLoginBtn = document.getElementById('passkey-login-btn') as HTMLButtonElement | null;
 
     const toSignup = document.getElementById('to-signup');
     const toSignin = document.getElementById('to-signin');
@@ -346,6 +365,50 @@ import Layout from '../../layouts/Layout.astro';
 
     toSignin?.addEventListener('click', showSignin);
     toSigninFromOtp?.addEventListener('click', showSignin);
+
+    passkeyLoginBtn?.addEventListener('click', async () => {
+      clearMessages();
+
+      if (passkeyLoginBtn) {
+        passkeyLoginBtn.disabled = true;
+        passkeyLoginBtn.classList.add('opacity-50', 'cursor-wait');
+        passkeyLoginBtn.innerHTML = `<span class="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span><span>Passkey Verifiëren...</span>`;
+      }
+
+      try {
+        const { data, error } = await signInWithPasskey();
+
+        if (error) {
+          showError(error.message);
+        } else if (data?.session) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', data.session.user.id)
+            .single();
+
+          if (profile?.role === 'admin') {
+            window.location.href = '/nl/dashboard';
+          } else {
+            window.location.href = '/nl';
+          }
+          return;
+        }
+      } catch (err: any) {
+        showError(err.message || 'Passkey-authenticatie geannuleerd of mislukt.');
+      } finally {
+        if (passkeyLoginBtn) {
+          passkeyLoginBtn.disabled = false;
+          passkeyLoginBtn.classList.remove('opacity-50', 'cursor-wait');
+          passkeyLoginBtn.innerHTML = `
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004.07 9m5.936 8.79a11.968 11.968 0 01-2.006 2.21" />
+            </svg>
+            <span>Inloggen met Passkey</span>
+          `;
+        }
+      }
+    });
 
     signinForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
