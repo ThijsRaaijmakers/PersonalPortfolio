@@ -1,6 +1,7 @@
 ---
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import { ClientRouter } from 'astro:transitions';
 import '../styles/global.css';
 
 interface Props {
@@ -26,6 +27,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'http://localhost
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
 
+    <ClientRouter />
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -33,18 +36,22 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'http://localhost
 
     <!-- FOUC Prevention Theme Script (Strict Dark Mode Default) -->
     <script is:inline>
-      const theme = (() => {
-        if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
-          return localStorage.getItem('theme');
+      function applyTheme() {
+        const theme = (() => {
+          if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+            return localStorage.getItem('theme');
+          }
+          return 'dark'; // Strict dark mode default
+        })();
+        if (theme === 'light') {
+          document.documentElement.classList.remove('dark');
+        } else {
+          document.documentElement.classList.add('dark');
         }
-        return 'dark'; // Strict dark mode default
-      })();
-      if (theme === 'light') {
-        document.documentElement.classList.remove('dark');
-      } else {
-        document.documentElement.classList.add('dark');
+        window.localStorage.setItem('theme', theme);
       }
-      window.localStorage.setItem('theme', theme);
+      applyTheme();
+      document.addEventListener('astro:after-swap', applyTheme);
     </script>
 
     <!-- Primary Meta Tags -->

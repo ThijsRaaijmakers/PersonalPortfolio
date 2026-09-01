@@ -10,6 +10,16 @@ export function parseFleetPortEmail(htmlString: string): Partial<FleetPortShift>
     doc = parseHTML(htmlString).document;
   }
 
+  const decodeEntities = (str: string) => {
+    if (!str) return '';
+    return str
+      .replace(/&#039;/g, "'")
+      .replace(/&amp;/g, "&")
+      .replace(/&quot;/g, '"')
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">");
+  };
+
   // Helper to extract text from the <td> immediately following a <b> or <strong> tag
   const getTextAfterNode = (searchString: string, context: any = doc): string | null => {
     const bTags = Array.from(context.querySelectorAll('b, strong')) as any[];
@@ -56,6 +66,21 @@ export function parseFleetPortEmail(htmlString: string): Partial<FleetPortShift>
   const laadTable = getTableByHeader('Laadgegevens voertuig');
   const losTable = getTableByHeader('Losgegevens voertuig');
 
+  const rawPickupAddress = laadTable ? getTextAfterNode('Adres:', laadTable) : null;
+  const rawPickupPostalCity = laadTable ? getTextAfterNode('Postcode / Plaats:', laadTable) : null;
+  const rawDropoffAddress = losTable ? getTextAfterNode('Adres:', losTable) : null;
+  const rawDropoffPostalCity = losTable ? getTextAfterNode('Postcode / Plaats:', losTable) : null;
+
+  const pickup_address = rawPickupAddress ? decodeEntities(rawPickupAddress) : null;
+  const pickup_postal_city = rawPickupPostalCity 
+    ? decodeEntities(rawPickupPostalCity).replace(/^[A-Z0-9]{6}\s+/i, '') 
+    : null;
+
+  const dropoff_address = rawDropoffAddress ? decodeEntities(rawDropoffAddress) : null;
+  const dropoff_postal_city = rawDropoffPostalCity 
+    ? decodeEntities(rawDropoffPostalCity).replace(/^[A-Z0-9]{6}\s+/i, '') 
+    : null;
+
   return {
     shift_date,
     departure_time,
@@ -68,11 +93,11 @@ export function parseFleetPortEmail(htmlString: string): Partial<FleetPortShift>
     vehicle_color: getTextAfterNode('Kleur:'),
     
     pickup_name: laadTable ? getTextAfterNode('Naam:', laadTable) : null,
-    pickup_address: laadTable ? getTextAfterNode('Adres:', laadTable) : null,
-    pickup_postal_city: laadTable ? getTextAfterNode('Postcode / Plaats:', laadTable) : null,
+    pickup_address,
+    pickup_postal_city,
     
     dropoff_name: losTable ? getTextAfterNode('Naam:', losTable) : null,
-    dropoff_address: losTable ? getTextAfterNode('Adres:', losTable) : null,
-    dropoff_postal_city: losTable ? getTextAfterNode('Postcode / Plaats:', losTable) : null,
+    dropoff_address,
+    dropoff_postal_city,
   };
 }

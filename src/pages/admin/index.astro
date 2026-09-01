@@ -295,13 +295,13 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
             : null;
 
           return `
-            <div class="animate-fade-in-up p-4 sm:p-5 hover:bg-slate-100/50 dark:hover:bg-slate-900/40 transition-colors space-y-2 border-b border-slate-300 dark:border-slate-800/60 last:border-b-0" style="animation-delay: ${idx * 50}ms; animation-fill-mode: both;">
+            <div class="animate-fade-in-up px-4 sm:px-5 py-2.5 hover:bg-slate-100/50 dark:hover:bg-slate-900/40 transition-colors space-y-1 border-b border-slate-300 dark:border-slate-800/60 last:border-b-0" style="animation-delay: ${idx * 50}ms; animation-fill-mode: both;">
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div class="flex items-center space-x-3">
-                  <span class="px-2.5 py-1 rounded-md text-[11px] font-mono font-semibold border ${badgeClasses}">
+                  <span class="px-2.5 py-0.5 rounded-md text-[10px] font-mono font-semibold border ${badgeClasses}">
                     ${log.event_type}
                   </span>
-                  <span class="text-xs font-mono text-slate-500 dark:text-slate-400">
+                  <span class="text-[11px] font-mono text-slate-500 dark:text-slate-400">
                     ${formattedDate}
                   </span>
                 </div>
@@ -310,14 +310,14 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
                 </span>
               </div>
               
-              <p class="text-xs sm:text-sm font-sans font-medium text-slate-900 dark:text-slate-100">
+              <p class="text-xs font-sans font-medium text-slate-900 dark:text-slate-100">
                 ${log.description}
               </p>
 
               ${metadataStr ? `
-                <div class="mt-2 p-3 rounded-lg bg-slate-100/80 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800/80 font-mono text-[11px] text-slate-700 dark:text-slate-300 overflow-x-auto">
-                  <span class="text-cyan-600 dark:text-cyan-400 font-semibold block mb-1">// METADATA:</span>
-                  <pre class="text-[11px] leading-relaxed whitespace-pre-wrap">${metadataStr}</pre>
+                <div class="mt-1.5 p-2 rounded-lg bg-slate-100/80 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800/80 font-mono text-[10px] text-slate-700 dark:text-slate-300 overflow-x-auto">
+                  <span class="text-cyan-600 dark:text-cyan-400 font-semibold block mb-0.5">// METADATA:</span>
+                  <pre class="text-[10px] leading-relaxed whitespace-pre-wrap">${metadataStr}</pre>
                 </div>
               ` : ''}
             </div>
@@ -331,5 +331,5 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
     adminContent?.classList.remove('hidden');
   }
 
-  initAdminPanel();
+  document.addEventListener('astro:page-load', initAdminPanel);
 </script>

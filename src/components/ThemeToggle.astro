@@ -24,7 +24,12 @@
     localStorage.setItem("theme", isDark ? "dark" : "light");
   };
 
-  document.querySelectorAll(".theme-toggle-btn").forEach((btn) => {
-    btn.addEventListener("click", handleToggleClick);
-  });
+  const setupThemeToggle = () => {
+    document.querySelectorAll(".theme-toggle-btn").forEach((btn) => {
+      btn.removeEventListener("click", handleToggleClick);
+      btn.addEventListener("click", handleToggleClick);
+    });
+  };
+
+  document.addEventListener("astro:page-load", setupThemeToggle);
 </script>

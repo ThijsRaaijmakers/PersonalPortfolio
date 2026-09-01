@@ -123,15 +123,15 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 
   let preparedPayload: any = null;
 
-  const parseBtn = document.getElementById('parse-btn') as HTMLButtonElement;
-  const saveBtn = document.getElementById('save-btn') as HTMLButtonElement;
-  const rawEmailInput = document.getElementById('raw-email') as HTMLTextAreaElement;
-  const previewArea = document.getElementById('preview-area');
-  const statusError = document.getElementById('status-error');
-  const statusSuccess = document.getElementById('status-success');
+  async function initAddShift() {
+    const parseBtn = document.getElementById('parse-btn') as HTMLButtonElement;
+    const saveBtn = document.getElementById('save-btn') as HTMLButtonElement;
+    const rawEmailInput = document.getElementById('raw-email') as HTMLTextAreaElement;
+    const previewArea = document.getElementById('preview-area');
+    const statusError = document.getElementById('status-error');
+    const statusSuccess = document.getElementById('status-success');
 
-  // Enforce Admin Access on Client Mount
-  async function verifyAccess() {
+    // Enforce Admin Access on Client Mount
     const { session } = await getSession();
     if (!session) {
       window.location.href = '/login';
@@ -141,193 +141,199 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
     const isAdmin = await checkIsAdmin(session.user);
     if (!isAdmin) {
       window.location.href = '/dashboard';
+      return;
     }
-  }
-  verifyAccess();
 
-  function showMsg(el: HTMLElement | null, msg: string, isError = true) {
-    if (!el) return;
-    el.textContent = msg;
-    el.classList.remove('hidden');
-    if (isError && statusSuccess) statusSuccess.classList.add('hidden');
-    if (!isError && statusError) statusError.classList.add('hidden');
-  }
-
-  if (parseBtn) {
-    parseBtn.addEventListener('click', async () => {
-      const htmlData = rawEmailInput.value;
-      if (!htmlData || !htmlData.trim()) {
-        showMsg(statusError, 'Please paste raw email content before parsing.');
-        return;
-      }
-
-      parseBtn.disabled = true;
-      parseBtn.innerHTML = `<span>Processing RDW Data...</span>`;
-      statusError?.classList.add('hidden');
-      statusSuccess?.classList.add('hidden');
-
-      try {
-        // 1. Execute Regex/DOM Parser
-        const parsedData = parseFleetPortEmail(htmlData);
-        
-        if (!parsedData.vehicle_license_plate) {
-          throw new Error("Could not detect a license plate in the provided text.");
-        }
-
-        // 2. Fetch RDW Enrichment Data
-        const rdwData = await fetchVehicleSpecs(parsedData.vehicle_license_plate);
-
-        // Fallback logic for "Niet bekend" vehicle names
-        const toTitleCase = (str: string) => str.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.substring(1)).join(' ');
-        
-        let finalMake = parsedData.vehicle_make || '';
-        let finalModel = parsedData.vehicle_model || '';
-        const combinedName = `${finalMake} ${finalModel}`.toLowerCase();
-        
-        if (combinedName.includes('niet bekend') || !finalMake.trim()) {
-          if (rdwData?.rdw_make) finalMake = toTitleCase(rdwData.rdw_make);
-          if (rdwData?.rdw_model && combinedName.includes('niet bekend')) finalModel = toTitleCase(rdwData.rdw_model);
-        }
-
-        const { rdw_make, rdw_model, ...cleanRdwData } = rdwData || {};
-
-        let finalHp = cleanRdwData.rdw_power_hp;
-        const pkMatch = finalModel.match(/(\d+)\s*pk/i);
-        const kwMatch = finalModel.match(/(\d+)\s*kw/i);
-        
-        if (pkMatch) {
-          finalHp = parseInt(pkMatch[1], 10);
-        } else if (kwMatch) {
-          finalHp = Math.round(parseInt(kwMatch[1], 10) * 1.362);
-        }
-        
-        cleanRdwData.rdw_power_hp = finalHp;
-
-        // 3. Merge Payload
-        preparedPayload = {
-          ...parsedData,
-          ...cleanRdwData,
-          vehicle_make: finalMake,
-          vehicle_model: finalModel
-        };
-
-        // 4. Populate DOM Preview
-        document.getElementById('prev-date')!.textContent = preparedPayload.shift_date || 'N/A';
-        document.getElementById('prev-time')!.textContent = `Dep: ${preparedPayload.departure_time || 'N/A'} | Win:${preparedPayload.pickup_window || 'N/A'}`;
-        document.getElementById('prev-plate')!.textContent = preparedPayload.vehicle_license_plate;
-        const fullVehicleName = formatVehicleTitle(
-          preparedPayload.vehicle_build_year,
-          preparedPayload.vehicle_make,
-          preparedPayload.vehicle_model
-        );
-
-        document.getElementById('prev-model')!.textContent = fullVehicleName || 'N/A';
-        document.getElementById('prev-pickup')!.textContent = preparedPayload.pickup_postal_city || 'N/A';
-        document.getElementById('prev-dropoff')!.textContent = preparedPayload.dropoff_postal_city || 'N/A';
-        
-        const hp = preparedPayload.rdw_power_hp ? `${preparedPayload.rdw_power_hp} HP` : 'N/A';
-        const cyl = preparedPayload.rdw_cylinders ? `${preparedPayload.rdw_cylinders} Cyl` : 'EV/Unknown';
-        const cap = formatEngineCapacity(preparedPayload.rdw_capacity_cc);
-        document.getElementById('prev-engine')!.textContent = `${hp} | ${cyl} | ${cap}`;
-
-        // 5. Unlock UI
-        previewArea?.classList.remove('opacity-50', 'pointer-events-none');
-        saveBtn.disabled = false;
-        showMsg(statusSuccess, 'Payload successfully extracted and enriched.', false);
-
-      } catch (err: any) {
-        showMsg(statusError, err.message || 'Failed to parse email content.');
-        previewArea?.classList.add('opacity-50', 'pointer-events-none');
-        saveBtn.disabled = true;
-      } finally {
-        parseBtn.disabled = false;
-        parseBtn.innerHTML = `<span>Execute Parsing Engine</span><span>&rarr;</span>`;
-      }
-    });
-  }
-
-  async function geocodeLocation(address: string, city: string): Promise<{ lat: number | null, lng: number | null }> {
-    const query = [address, city].filter(Boolean).join(', ');
-    if (!query) return { lat: null, lng: null };
-    try {
-      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`, {
-        headers: { 'User-Agent': 'PersonalPortfolio-App/1.0' }
-      });
-      if (!res.ok) return { lat: null, lng: null };
-      const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
-        return {
-          lat: parseFloat(data[0].lat),
-          lng: parseFloat(data[0].lon)
-        };
-      }
-    } catch {
-      // Return nulls if geocoding fails gracefully
+    function showMsg(el: HTMLElement | null, msg: string, isError = true) {
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.remove('hidden');
+      if (isError && statusSuccess) statusSuccess.classList.add('hidden');
+      if (!isError && statusError) statusError.classList.add('hidden');
     }
-    return { lat: null, lng: null };
-  }
 
-  if (saveBtn) {
-    saveBtn.addEventListener('click', async () => {
-      if (!preparedPayload) return;
+    if (parseBtn) {
+      parseBtn.addEventListener('click', async () => {
+        const htmlData = rawEmailInput.value;
+        if (!htmlData || !htmlData.trim()) {
+          showMsg(statusError, 'Please paste raw email content before parsing.');
+          return;
+        }
 
-      saveBtn.disabled = true;
-      saveBtn.innerHTML = `<span>Geocoding &amp; Writing...</span>`;
+        parseBtn.disabled = true;
+        parseBtn.classList.add('opacity-50', 'cursor-wait');
+        parseBtn.innerHTML = `<span class="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></span><span>Processing RDW Data...</span>`;
+        statusError?.classList.add('hidden');
+        statusSuccess?.classList.add('hidden');
 
-      try {
-        const { session } = await getSession();
-        if (!session) throw new Error("User session expired. Please log in again.");
-
-        // Geocode pickup location
-        const pickupCoords = await geocodeLocation(preparedPayload.pickup_address, preparedPayload.pickup_postal_city);
-        
-        // Respect Nominatim rate limits (1 sec delay)
-        await new Promise((r) => setTimeout(r, 1000));
-
-        // Geocode dropoff location
-        const dropoffCoords = await geocodeLocation(preparedPayload.dropoff_address, preparedPayload.dropoff_postal_city);
-
-        // Fetch OSRM driving route geometry
-        let routeGeometry: [number, number][] | null = null;
-        if (pickupCoords.lat !== null && pickupCoords.lng !== null && dropoffCoords.lat !== null && dropoffCoords.lng !== null) {
-          try {
-            const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${pickupCoords.lng},${pickupCoords.lat};${dropoffCoords.lng},${dropoffCoords.lat}?overview=simplified&geometries=geojson`;
-            const osrmRes = await fetch(osrmUrl);
-            if (osrmRes.ok) {
-              const osrmData = await osrmRes.json();
-              if (osrmData.routes && osrmData.routes.length > 0 && osrmData.routes[0].geometry?.coordinates) {
-                // Flip [lng, lat] to [lat, lng] for Leaflet compatibility
-                routeGeometry = osrmData.routes[0].geometry.coordinates.map((coord: [number, number]) => [coord[1], coord[0]]);
-              }
-            }
-          } catch {
-            // Fail gracefully to null route_geometry
+        try {
+          // 1. Execute Regex/DOM Parser
+          const parsedData = parseFleetPortEmail(htmlData);
+          
+          if (!parsedData.vehicle_license_plate) {
+            throw new Error("Could not detect a license plate in the provided text.");
           }
+
+          // 2. Fetch RDW Enrichment Data
+          const rdwData = await fetchVehicleSpecs(parsedData.vehicle_license_plate);
+
+          // Fallback logic for "Niet bekend" vehicle names
+          const toTitleCase = (str: string) => str.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.substring(1)).join(' ');
+          
+          let finalMake = parsedData.vehicle_make || '';
+          let finalModel = parsedData.vehicle_model || '';
+          const combinedName = `${finalMake} ${finalModel}`.toLowerCase();
+          
+          if (combinedName.includes('niet bekend') || !finalMake.trim()) {
+            if (rdwData?.rdw_make) finalMake = toTitleCase(rdwData.rdw_make);
+            if (rdwData?.rdw_model && combinedName.includes('niet bekend')) finalModel = toTitleCase(rdwData.rdw_model);
+          }
+
+          const { rdw_make, rdw_model, ...cleanRdwData } = rdwData || {};
+
+          let finalHp = cleanRdwData.rdw_power_hp;
+          const pkMatch = finalModel.match(/(\d+)\s*pk/i);
+          const kwMatch = finalModel.match(/(\d+)\s*kw/i);
+          
+          if (pkMatch) {
+            finalHp = parseInt(pkMatch[1], 10);
+          } else if (kwMatch) {
+            finalHp = Math.round(parseInt(kwMatch[1], 10) * 1.362);
+          }
+          
+          cleanRdwData.rdw_power_hp = finalHp;
+
+          // 3. Merge Payload
+          preparedPayload = {
+            ...parsedData,
+            ...cleanRdwData,
+            vehicle_make: finalMake,
+            vehicle_model: finalModel
+          };
+
+          // 4. Populate DOM Preview
+          document.getElementById('prev-date')!.textContent = preparedPayload.shift_date || 'N/A';
+          document.getElementById('prev-time')!.textContent = `Dep: ${preparedPayload.departure_time || 'N/A'} | Win:${preparedPayload.pickup_window || 'N/A'}`;
+          document.getElementById('prev-plate')!.textContent = preparedPayload.vehicle_license_plate;
+          const fullVehicleName = formatVehicleTitle(
+            preparedPayload.vehicle_build_year,
+            preparedPayload.vehicle_make,
+            preparedPayload.vehicle_model
+          );
+
+          document.getElementById('prev-model')!.textContent = fullVehicleName || 'N/A';
+          document.getElementById('prev-pickup')!.textContent = preparedPayload.pickup_postal_city || 'N/A';
+          document.getElementById('prev-dropoff')!.textContent = preparedPayload.dropoff_postal_city || 'N/A';
+          
+          const hp = preparedPayload.rdw_power_hp ? `${preparedPayload.rdw_power_hp} HP` : 'N/A';
+          const cyl = preparedPayload.rdw_cylinders ? `${preparedPayload.rdw_cylinders} Cyl` : 'EV/Unknown';
+          const cap = formatEngineCapacity(preparedPayload.rdw_capacity_cc);
+          document.getElementById('prev-engine')!.textContent = `${hp} | ${cyl} | ${cap}`;
+
+          // 5. Unlock UI
+          previewArea?.classList.remove('opacity-50', 'pointer-events-none');
+          saveBtn.disabled = false;
+          showMsg(statusSuccess, 'Payload successfully extracted and enriched.', false);
+
+        } catch (err: any) {
+          showMsg(statusError, err.message || 'Failed to parse email content.');
+          previewArea?.classList.add('opacity-50', 'pointer-events-none');
+          saveBtn.disabled = true;
+        } finally {
+          parseBtn.disabled = false;
+          parseBtn.classList.remove('opacity-50', 'cursor-wait');
+          parseBtn.innerHTML = `<span>Execute Parsing Engine</span><span>&rarr;</span>`;
         }
+      });
+    }
 
-        const payload = {
-          ...preparedPayload,
-          pickup_lat: pickupCoords.lat,
-          pickup_lng: pickupCoords.lng,
-          dropoff_lat: dropoffCoords.lat,
-          dropoff_lng: dropoffCoords.lng,
-          route_geometry: routeGeometry,
-          user_id: session.user.id
-        };
-
-        const { error } = await supabase.from('shifts').insert([payload]);
-        if (error) throw error;
-
-        showMsg(statusSuccess, 'Shift successfully geocoded and logged to Supabase database!', false);
-        setTimeout(() => {
-          window.location.href = '/dashboard';
-        }, 1200);
-
-      } catch (err: any) {
-        showMsg(statusError, `Database Insert Error: ${err.message}`);
-        saveBtn.disabled = false;
-        saveBtn.innerHTML = `<span>Confirm &amp; Write to Database</span><span>&rarr;</span>`;
+    async function geocodeLocation(address: string, city: string): Promise<{ lat: number | null, lng: number | null }> {
+      const query = [address, city].filter(Boolean).join(', ');
+      if (!query) return { lat: null, lng: null };
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`, {
+          headers: { 'User-Agent': 'PersonalPortfolio-App/1.0' }
+        });
+        if (!res.ok) return { lat: null, lng: null };
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          return {
+            lat: parseFloat(data[0].lat),
+            lng: parseFloat(data[0].lon)
+          };
+        }
+      } catch {
+        // Return nulls if geocoding fails gracefully
       }
-    });
+      return { lat: null, lng: null };
+    }
+
+    if (saveBtn) {
+      saveBtn.addEventListener('click', async () => {
+        if (!preparedPayload) return;
+
+        saveBtn.disabled = true;
+        saveBtn.classList.add('opacity-50', 'cursor-wait');
+        saveBtn.innerHTML = `<span class="w-4 h-4 border-2 border-white dark:border-slate-900 border-t-transparent rounded-full animate-spin"></span><span>Geocoding &amp; Writing...</span>`;
+
+        try {
+          const { session } = await getSession();
+          if (!session) throw new Error("User session expired. Please log in again.");
+
+          // Geocode pickup location
+          const pickupCoords = await geocodeLocation(preparedPayload.pickup_address, preparedPayload.pickup_postal_city);
+          
+          // Respect Nominatim rate limits (1 sec delay)
+          await new Promise((r) => setTimeout(r, 1000));
+
+          // Geocode dropoff location
+          const dropoffCoords = await geocodeLocation(preparedPayload.dropoff_address, preparedPayload.dropoff_postal_city);
+
+          // Fetch OSRM driving route geometry
+          let routeGeometry: [number, number][] | null = null;
+          if (pickupCoords.lat !== null && pickupCoords.lng !== null && dropoffCoords.lat !== null && dropoffCoords.lng !== null) {
+            try {
+              const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${pickupCoords.lng},${pickupCoords.lat};${dropoffCoords.lng},${dropoffCoords.lat}?overview=simplified&geometries=geojson`;
+              const osrmRes = await fetch(osrmUrl);
+              if (osrmRes.ok) {
+                const osrmData = await osrmRes.json();
+                if (osrmData.routes && osrmData.routes.length > 0 && osrmData.routes[0].geometry?.coordinates) {
+                  // Flip [lng, lat] to [lat, lng] for Leaflet compatibility
+                  routeGeometry = osrmData.routes[0].geometry.coordinates.map((coord: [number, number]) => [coord[1], coord[0]]);
+                }
+              }
+            } catch {
+              // Fail gracefully to null route_geometry
+            }
+          }
+
+          const payload = {
+            ...preparedPayload,
+            pickup_lat: pickupCoords.lat,
+            pickup_lng: pickupCoords.lng,
+            dropoff_lat: dropoffCoords.lat,
+            dropoff_lng: dropoffCoords.lng,
+            route_geometry: routeGeometry,
+            user_id: session.user.id
+          };
+
+          const { error } = await supabase.from('shifts').insert([payload]);
+          if (error) throw error;
+
+          showMsg(statusSuccess, 'Shift successfully geocoded and logged to Supabase database!', false);
+          setTimeout(() => {
+            window.location.href = '/dashboard';
+          }, 1200);
+
+        } catch (err: any) {
+          showMsg(statusError, `Database Insert Error: ${err.message}`);
+          saveBtn.disabled = false;
+          saveBtn.classList.remove('opacity-50', 'cursor-wait');
+          saveBtn.innerHTML = `<span>Confirm &amp; Write to Database</span><span>&rarr;</span>`;
+        }
+      });
+    }
   }
+
+  document.addEventListener('astro:page-load', initAddShift);
 </script>

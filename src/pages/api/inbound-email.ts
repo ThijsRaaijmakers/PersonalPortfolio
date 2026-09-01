@@ -140,10 +140,61 @@ export const POST: APIRoute = async ({ request }) => {
       user_id: process.env.ADMIN_USER_ID || import.meta.env.ADMIN_USER_ID
     };
 
+    // 7b. Perform Nominatim Geocoding & OSRM Route Calculation
+    async function geocodeLocation(address: string | null | undefined, city: string | null | undefined): Promise<{ lat: number | null, lng: number | null }> {
+      const query = [address, city].filter(Boolean).join(', ');
+      if (!query) return { lat: null, lng: null };
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`, {
+          headers: { 'User-Agent': 'PersonalPortfolio-App/1.0' }
+        });
+        if (!res.ok) return { lat: null, lng: null };
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          return {
+            lat: parseFloat(data[0].lat),
+            lng: parseFloat(data[0].lon)
+          };
+        }
+      } catch {
+        // Return nulls if geocoding fails gracefully
+      }
+      return { lat: null, lng: null };
+    }
+
+    const pickupCoords = await geocodeLocation(preparedPayload.pickup_address, preparedPayload.pickup_postal_city);
+    await new Promise((r) => setTimeout(r, 1000));
+    const dropoffCoords = await geocodeLocation(preparedPayload.dropoff_address, preparedPayload.dropoff_postal_city);
+
+    let routeGeometry: [number, number][] | null = null;
+    if (pickupCoords.lat !== null && pickupCoords.lng !== null && dropoffCoords.lat !== null && dropoffCoords.lng !== null) {
+      try {
+        const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${pickupCoords.lng},${pickupCoords.lat};${dropoffCoords.lng},${dropoffCoords.lat}?overview=simplified&geometries=geojson`;
+        const osrmRes = await fetch(osrmUrl);
+        if (osrmRes.ok) {
+          const osrmData = await osrmRes.json();
+          if (osrmData.routes && osrmData.routes.length > 0 && osrmData.routes[0].geometry?.coordinates) {
+            routeGeometry = osrmData.routes[0].geometry.coordinates.map((coord: [number, number]) => [coord[1], coord[0]]);
+          }
+        }
+      } catch {
+        // Fail gracefully to null route_geometry
+      }
+    }
+
+    const finalPayload = {
+      ...preparedPayload,
+      pickup_lat: pickupCoords.lat,
+      pickup_lng: pickupCoords.lng,
+      dropoff_lat: dropoffCoords.lat,
+      dropoff_lng: dropoffCoords.lng,
+      route_geometry: routeGeometry,
+    };
+
     // 8. Upsert into Supabase
     const { error: insertError } = await supabaseAdmin
       .from('shifts')
-      .upsert([preparedPayload], {
+      .upsert([finalPayload], {
         onConflict: 'user_id,shift_date,vehicle_license_plate,pickup_name',
         ignoreDuplicates: true,
       });

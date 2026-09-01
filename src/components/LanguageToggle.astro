@@ -1,20 +1,24 @@
 ---
 const pathname = Astro.url.pathname;
+const search = Astro.url.search || '';
 const isNl = pathname.startsWith('/nl');
 
 // Compute target URL cleanly
-let targetUrl = '/';
+let targetPath = '/';
 if (isNl) {
   const stripped = pathname.replace(/^\/nl/, '');
-  targetUrl = stripped === '' ? '/' : stripped;
+  targetPath = stripped === '' ? '/' : stripped;
 } else {
-  targetUrl = `/nl${pathname === '/' ? '' : pathname}`;
+  targetPath = `/nl${pathname === '/' ? '' : pathname}`;
 }
+const targetUrl = `${targetPath}${search}`;
 ---
 
 <div class="inline-flex items-center font-mono text-xs font-semibold">
   <a 
     href={targetUrl} 
+    data-lang-toggle
+    data-target-path={targetPath}
     class="text-slate-500 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors px-2 py-1 rounded hover:bg-slate-200/50 dark:hover:bg-slate-800/50 border border-transparent hover:border-slate-300 dark:hover:border-slate-700"
     aria-label={isNl ? "Switch to English" : "Schakel over naar Nederlands"}
   >
@@ -23,3 +27,18 @@ if (isNl) {
     <span class={isNl ? "text-cyan-600 dark:text-cyan-400 font-bold" : "text-slate-400 dark:text-slate-500 font-normal"}>NL</span>
   </a>
 </div>
+
+<script>
+  function updateLanguageToggles() {
+    const search = window.location.search || '';
+    const toggles = document.querySelectorAll<HTMLAnchorElement>('[data-lang-toggle]');
+    toggles.forEach(toggle => {
+      const targetBase = toggle.getAttribute('data-target-path');
+      if (targetBase) {
+        toggle.href = `${targetBase}${search}`;
+      }
+    });
+  }
+
+  document.addEventListener('astro:page-load', updateLanguageToggles);
+</script>

@@ -77,19 +77,126 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
       </div>
     </div>
 
-    <!-- Loading State -->
-    <div id="fleet-loading" class="py-12 text-center font-mono text-xs text-slate-500 dark:text-slate-400">
-      <div class="inline-flex items-center space-x-2">
-        <span class="w-2.5 h-2.5 rounded-full bg-cyan-500 animate-ping"></span>
-        <span>QUERYING_FLEET_REPOSITORY...</span>
-      </div>
-    </div>
-
     <!-- Error State -->
     <div id="fleet-error" class="hidden p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 font-mono text-xs"></div>
 
-    <!-- Fleet Grid Container -->
-    <div id="fleet-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-h-[700px] overflow-y-auto pr-2 overflow-x-hidden [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full hidden"></div>
+    <!-- Fleet Grid Container with Skeleton Placeholders -->
+    <div id="fleet-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-h-[700px] overflow-y-auto pr-2 overflow-x-hidden [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full">
+      <div class="p-5 rounded-2xl bg-slate-50/90 dark:bg-slate-900/70 border border-slate-300 dark:border-slate-800 shadow-md space-y-4 animate-pulse font-mono">
+        <div class="flex items-center justify-between border-b border-slate-300 dark:border-slate-800 pb-3">
+          <div class="h-5 bg-slate-200 dark:bg-slate-800 rounded w-20"></div>
+          <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-24"></div>
+        </div>
+        <div class="space-y-2">
+          <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-16"></div>
+          <div class="h-5 bg-slate-200 dark:bg-slate-800 rounded w-3/4"></div>
+        </div>
+        <div class="grid grid-cols-4 gap-2 pt-2 border-t border-slate-300 dark:border-slate-800/80">
+          <div class="space-y-1"><div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded w-10"></div><div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-12"></div></div>
+          <div class="space-y-1"><div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded w-10"></div><div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-12"></div></div>
+          <div class="space-y-1"><div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded w-10"></div><div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-12"></div></div>
+          <div class="space-y-1"><div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded w-10"></div><div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-12"></div></div>
+        </div>
+        <div class="pt-2">
+          <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/2"></div>
+        </div>
+      </div>
+      <div class="p-5 rounded-2xl bg-slate-50/90 dark:bg-slate-900/70 border border-slate-300 dark:border-slate-800 shadow-md space-y-4 animate-pulse font-mono">
+        <div class="flex items-center justify-between border-b border-slate-300 dark:border-slate-800 pb-3">
+          <div class="h-5 bg-slate-200 dark:bg-slate-800 rounded w-20"></div>
+          <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-24"></div>
+        </div>
+        <div class="space-y-2">
+          <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-16"></div>
+          <div class="h-5 bg-slate-200 dark:bg-slate-800 rounded w-3/4"></div>
+        </div>
+        <div class="grid grid-cols-4 gap-2 pt-2 border-t border-slate-300 dark:border-slate-800/80">
+          <div class="space-y-1"><div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded w-10"></div><div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-12"></div></div>
+          <div class="space-y-1"><div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded w-10"></div><div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-12"></div></div>
+          <div class="space-y-1"><div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded w-10"></div><div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-12"></div></div>
+          <div class="space-y-1"><div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded w-10"></div><div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-12"></div></div>
+        </div>
+        <div class="pt-2">
+          <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/2"></div>
+        </div>
+      </div>
+      <div class="p-5 rounded-2xl bg-slate-50/90 dark:bg-slate-900/70 border border-slate-300 dark:border-slate-800 shadow-md space-y-4 animate-pulse font-mono">
+        <div class="flex items-center justify-between border-b border-slate-300 dark:border-slate-800 pb-3">
+          <div class="h-5 bg-slate-200 dark:bg-slate-800 rounded w-20"></div>
+          <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-24"></div>
+        </div>
+        <div class="space-y-2">
+          <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-16"></div>
+          <div class="h-5 bg-slate-200 dark:bg-slate-800 rounded w-3/4"></div>
+        </div>
+        <div class="grid grid-cols-4 gap-2 pt-2 border-t border-slate-300 dark:border-slate-800/80">
+          <div class="space-y-1"><div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded w-10"></div><div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-12"></div></div>
+          <div class="space-y-1"><div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded w-10"></div><div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-12"></div></div>
+          <div class="space-y-1"><div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded w-10"></div><div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-12"></div></div>
+          <div class="space-y-1"><div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded w-10"></div><div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-12"></div></div>
+        </div>
+        <div class="pt-2">
+          <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/2"></div>
+        </div>
+      </div>
+      <div class="p-5 rounded-2xl bg-slate-50/90 dark:bg-slate-900/70 border border-slate-300 dark:border-slate-800 shadow-md space-y-4 animate-pulse font-mono">
+        <div class="flex items-center justify-between border-b border-slate-300 dark:border-slate-800 pb-3">
+          <div class="h-5 bg-slate-200 dark:bg-slate-800 rounded w-20"></div>
+          <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-24"></div>
+        </div>
+        <div class="space-y-2">
+          <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-16"></div>
+          <div class="h-5 bg-slate-200 dark:bg-slate-800 rounded w-3/4"></div>
+        </div>
+        <div class="grid grid-cols-4 gap-2 pt-2 border-t border-slate-300 dark:border-slate-800/80">
+          <div class="space-y-1"><div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded w-10"></div><div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-12"></div></div>
+          <div class="space-y-1"><div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded w-10"></div><div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-12"></div></div>
+          <div class="space-y-1"><div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded w-10"></div><div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-12"></div></div>
+          <div class="space-y-1"><div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded w-10"></div><div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-12"></div></div>
+        </div>
+        <div class="pt-2">
+          <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/2"></div>
+        </div>
+      </div>
+      <div class="p-5 rounded-2xl bg-slate-50/90 dark:bg-slate-900/70 border border-slate-300 dark:border-slate-800 shadow-md space-y-4 animate-pulse font-mono">
+        <div class="flex items-center justify-between border-b border-slate-300 dark:border-slate-800 pb-3">
+          <div class="h-5 bg-slate-200 dark:bg-slate-800 rounded w-20"></div>
+          <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-24"></div>
+        </div>
+        <div class="space-y-2">
+          <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-16"></div>
+          <div class="h-5 bg-slate-200 dark:bg-slate-800 rounded w-3/4"></div>
+        </div>
+        <div class="grid grid-cols-4 gap-2 pt-2 border-t border-slate-300 dark:border-slate-800/80">
+          <div class="space-y-1"><div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded w-10"></div><div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-12"></div></div>
+          <div class="space-y-1"><div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded w-10"></div><div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-12"></div></div>
+          <div class="space-y-1"><div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded w-10"></div><div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-12"></div></div>
+          <div class="space-y-1"><div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded w-10"></div><div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-12"></div></div>
+        </div>
+        <div class="pt-2">
+          <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/2"></div>
+        </div>
+      </div>
+      <div class="p-5 rounded-2xl bg-slate-50/90 dark:bg-slate-900/70 border border-slate-300 dark:border-slate-800 shadow-md space-y-4 animate-pulse font-mono">
+        <div class="flex items-center justify-between border-b border-slate-300 dark:border-slate-800 pb-3">
+          <div class="h-5 bg-slate-200 dark:bg-slate-800 rounded w-20"></div>
+          <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-24"></div>
+        </div>
+        <div class="space-y-2">
+          <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-16"></div>
+          <div class="h-5 bg-slate-200 dark:bg-slate-800 rounded w-3/4"></div>
+        </div>
+        <div class="grid grid-cols-4 gap-2 pt-2 border-t border-slate-300 dark:border-slate-800/80">
+          <div class="space-y-1"><div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded w-10"></div><div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-12"></div></div>
+          <div class="space-y-1"><div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded w-10"></div><div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-12"></div></div>
+          <div class="space-y-1"><div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded w-10"></div><div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-12"></div></div>
+          <div class="space-y-1"><div class="h-2.5 bg-slate-200 dark:bg-slate-800 rounded w-10"></div><div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-12"></div></div>
+        </div>
+        <div class="pt-2">
+          <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/2"></div>
+        </div>
+      </div>
+    </div>
 
   </div>
 </Layout>
@@ -395,5 +502,5 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
     });
   }
 
-  loadFleetArchive();
+  document.addEventListener('astro:page-load', loadFleetArchive);
 </script>

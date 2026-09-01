@@ -139,17 +139,16 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
       zoomControl: true
     });
 
-    // Adaptive Light/Dark Tile Layers
-    const lightTileUrl = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-    const darkTileUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+    // Adaptive Light/Dark Tile Layers (Esri ArcGIS Canvas)
+    const lightTileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
+    const darkTileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
 
     const isDark = document.documentElement.classList.contains('dark');
     const initialTileUrl = isDark ? darkTileUrl : lightTileUrl;
 
     const tileLayer = L.tileLayer(initialTileUrl, {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: 'abcd',
-      maxZoom: 19
+      attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+      maxZoom: 16
     }).addTo(map);
 
     // Watch theme changes with MutationObserver
@@ -337,10 +336,6 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
     await renderMap(validShifts, isAdmin, mapEl, indicatorEl, counterEl);
   }
 
-  // Run initial map setup
-  if (document.readyState === 'complete') {
-    initTelemetryMap();
-  } else {
-    window.addEventListener('load', initTelemetryMap);
-  }
+  // Run initial map setup on page load and route transitions
+  document.addEventListener('astro:page-load', initTelemetryMap);
 </script>

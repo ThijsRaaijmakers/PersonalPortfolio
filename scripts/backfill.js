@@ -2,7 +2,6 @@ import { createClient } from '@supabase/supabase-js';
 import 'dotenv/config';
 
 const supabaseUrl = process.env.PUBLIC_SUPABASE_URL;
-// We use the Service Role Key to bypass RLS for administrative script execution
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
@@ -11,41 +10,34 @@ if (!supabaseUrl || !supabaseKey) {
 }
 
 const supabase = createClient(supabaseUrl, supabaseKey);
-
-// Utility to comply with Nominatim's strict 1 request/second rate limit
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function geocode(address, city) {
   if (!address && !city) return null;
-  
-  // Clean up any weird comma placements
-  const query = encodeURIComponent(`${address || ''}, ${city || ''}`.replace(/^, | ,/g, '').trim());
+  // Strip out Dutch postal codes (e.g., "5215MX ") to help Nominatim
+  const cleanCity = (city || '').replace(/^[A-Z0-9]{6}\s+/i, '').trim();
+  const query = encodeURIComponent(`${address || ''}, ${cleanCity}`.replace(/^, | ,/g, '').trim());
   
   try {
     const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`, {
-      headers: {
-        'User-Agent': 'FleetPort-Geocoding-Script/1.0 (thijsraaijmakers.me)'
-      }
+      headers: { 'User-Agent': 'FleetPort-Geocoding-Script/1.1 (thijsraaijmakers.me)' }
     });
-    
     const data = await response.json();
     if (data && data.length > 0) {
       return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
     }
-  } catch (error) {
-    console.error(`\nGeocoding failed for [${query}]:`, error.message);
-  }
+  } catch (error) {}
   return null;
 }
 
 async function run() {
   console.log("Querying FleetPort repository for unmapped shift records...");
   
-  // Fetch shifts where pickup_lat is currently empty
+  // THE FIX: Fetch shifts missing EITHER the pickup OR the dropoff
   const { data: shifts, error } = await supabase
     .from('shifts')
-    .select('id, pickup_address, pickup_postal_city, dropoff_address, dropoff_postal_city')
-    .is('pickup_lat', null);
+    .select('*')
+    .or('pickup_lat.is.null,dropoff_lat.is.null');
 
   if (error) {
     console.error("Error fetching shifts:", error);
@@ -58,32 +50,44 @@ async function run() {
     const shift = shifts[i];
     process.stdout.write(`Mapping record ${i + 1}/${shifts.length} [ID: ${shift.id}]... `);
 
-    const pickupCoords = await geocode(shift.pickup_address, shift.pickup_postal_city);
-    await delay(1500); // 1.5s delay to ensure compliance
+    let pickupLat = shift.pickup_lat;
+    let pickupLng = shift.pickup_lng;
+    
+    // Only geocode if missing
+    if (!pickupLat) {
+      const coords = await geocode(shift.pickup_address, shift.pickup_postal_city);
+      pickupLat = coords?.lat || null;
+      pickupLng = coords?.lng || null;
+      await delay(1500); 
+    }
 
-    const dropoffCoords = await geocode(shift.dropoff_address, shift.dropoff_postal_city);
-    await delay(1500); // 1.5s delay to ensure compliance
-
-    const updatePayload = {
-      pickup_lat: pickupCoords?.lat || null,
-      pickup_lng: pickupCoords?.lng || null,
-      dropoff_lat: dropoffCoords?.lat || null,
-      dropoff_lng: dropoffCoords?.lng || null,
-    };
+    let dropoffLat = shift.dropoff_lat;
+    let dropoffLng = shift.dropoff_lng;
+    
+    // Only geocode if missing
+    if (!dropoffLat) {
+      const coords = await geocode(shift.dropoff_address, shift.dropoff_postal_city);
+      dropoffLat = coords?.lat || null;
+      dropoffLng = coords?.lng || null;
+      await delay(1500); 
+    }
 
     const { error: updateError } = await supabase
       .from('shifts')
-      .update(updatePayload)
+      .update({
+        pickup_lat: pickupLat,
+        pickup_lng: pickupLng,
+        dropoff_lat: dropoffLat,
+        dropoff_lng: dropoffLng,
+      })
       .eq('id', shift.id);
 
     if (updateError) {
       console.log(`[FAILED]`);
-      console.error(updateError);
     } else {
       console.log(`[OK]`);
     }
   }
-
   console.log("\nGeospatial backfill sequence complete.");
 }
 

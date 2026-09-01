@@ -6,7 +6,8 @@ import Layout from '../layouts/Layout.astro';
   title="Terminal Access | Login"
   description="Secure authentication login portal for administration and management."
 >
-  <div class="max-w-md w-full mx-auto py-8 sm:py-12 animate-fade-in-up">
+  <div id="login-enclave" class="opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="max-w-md w-full mx-auto py-8 sm:py-12 animate-fade-in-up">
     
     <!-- Login Header -->
     <div class="space-y-3 text-center mb-6 sm:mb-8">
@@ -234,6 +235,7 @@ import Layout from '../layouts/Layout.astro';
 
     </div>
 
+    </div>
   </div>
 </Layout>
 
@@ -241,188 +243,135 @@ import Layout from '../layouts/Layout.astro';
   import { supabase } from '../lib/supabase';
   import { signIn, signUp, verifyEmailOtp, resendOtp } from '../lib/auth';
 
-  const signinForm = document.getElementById('signin-form') as HTMLFormElement | null;
-  const signupForm = document.getElementById('signup-form') as HTMLFormElement | null;
-  const otpForm = document.getElementById('otp-form') as HTMLFormElement | null;
-  const termsCheckbox = document.getElementById('terms-checkbox') as HTMLInputElement | null;
-  const resendOtpBtn = document.getElementById('resend-otp-btn') as HTMLButtonElement | null;
-
-  const toSignup = document.getElementById('to-signup');
-  const toSignin = document.getElementById('to-signin');
-  const toSigninFromOtp = document.getElementById('to-signin-from-otp');
-
-  const authError = document.getElementById('auth-error');
-  const authSuccess = document.getElementById('auth-success');
-
-  let retainedEmail = '';
-  let countdownTimer: ReturnType<typeof setInterval> | null = null;
-
-  const EYE_NORMAL = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>`;
-  const EYE_SLASHED = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908a10.025 10.025 0 013.122-.863c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21M3 3l18 18"></path>`;
-
-  function clearMessages() {
-    if (authError) {
-      authError.textContent = '';
-      authError.classList.add('hidden');
-    }
-    if (authSuccess) {
-      authSuccess.textContent = '';
-      authSuccess.classList.add('hidden');
-    }
-  }
-
-  function showError(msg: string) {
-    if (!authError) return;
-    let formattedMsg = msg ? msg.trim() : 'An unexpected error occurred. Please try again.';
-
-    if (formattedMsg.toLowerCase().includes('already registered') || formattedMsg.toLowerCase().includes('user_already_exists')) {
-      formattedMsg = 'Email already registered';
-    } else if (formattedMsg.toLowerCase().includes('invalid format') || formattedMsg.toLowerCase().includes('invalid email')) {
-      formattedMsg = 'Invalid email address format';
-    } else if (formattedMsg.toLowerCase().includes('token has expired') || formattedMsg.toLowerCase().includes('otp_expired')) {
-      formattedMsg = 'Verification code expired. Please request a new one.';
-    }
-
-    authError.textContent = `[ERROR]: ${formattedMsg}`;
-    authError.classList.remove('hidden');
-  }
-
-  function showSuccess(msg: string) {
-    if (!authSuccess) return;
-    const formattedMsg = msg ? msg.trim() : 'Operation completed successfully.';
-    authSuccess.textContent = `[SUCCESS]: ${formattedMsg}`;
-    authSuccess.classList.remove('hidden');
-  }
-
-  document.querySelectorAll('.toggle-password').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const targetId = btn.getAttribute('data-target');
-      if (!targetId) return;
-      const input = document.getElementById(targetId) as HTMLInputElement | null;
-      const svg = btn.querySelector('.password-eye-svg');
-      if (!input || !svg) return;
-
-      if (input.type === 'password') {
-        input.type = 'text';
-        svg.innerHTML = EYE_SLASHED;
-      } else {
-        input.type = 'password';
-        svg.innerHTML = EYE_NORMAL;
+  const initLogin = async () => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+        window.location.href = profile?.role === 'admin' ? '/dashboard' : '/';
+        return;
       }
+      document.getElementById('login-enclave')?.classList.remove('opacity-0', 'pointer-events-none');
+    };
+    await checkSession();
+
+    const signinForm = document.getElementById('signin-form') as HTMLFormElement | null;
+    const signupForm = document.getElementById('signup-form') as HTMLFormElement | null;
+    const otpForm = document.getElementById('otp-form') as HTMLFormElement | null;
+    const termsCheckbox = document.getElementById('terms-checkbox') as HTMLInputElement | null;
+    const resendOtpBtn = document.getElementById('resend-otp-btn') as HTMLButtonElement | null;
+
+    const toSignup = document.getElementById('to-signup');
+    const toSignin = document.getElementById('to-signin');
+    const toSigninFromOtp = document.getElementById('to-signin-from-otp');
+
+    const authError = document.getElementById('auth-error');
+    const authSuccess = document.getElementById('auth-success');
+
+    let retainedEmail = '';
+    let countdownTimer: ReturnType<typeof setInterval> | null = null;
+
+    const EYE_NORMAL = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>`;
+    const EYE_SLASHED = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908a10.025 10.025 0 013.122-.863c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21M3 3l18 18"></path>`;
+
+    function clearMessages() {
+      if (authError) {
+        authError.textContent = '';
+        authError.classList.add('hidden');
+      }
+      if (authSuccess) {
+        authSuccess.textContent = '';
+        authSuccess.classList.add('hidden');
+      }
+    }
+
+    function showError(msg: string) {
+      if (!authError) return;
+      let formattedMsg = msg ? msg.trim() : 'An unexpected error occurred. Please try again.';
+
+      if (formattedMsg.toLowerCase().includes('already registered') || formattedMsg.toLowerCase().includes('user_already_exists')) {
+        formattedMsg = 'Email already registered';
+      } else if (formattedMsg.toLowerCase().includes('invalid format') || formattedMsg.toLowerCase().includes('invalid email')) {
+        formattedMsg = 'Invalid email address format';
+      } else if (formattedMsg.toLowerCase().includes('token has expired') || formattedMsg.toLowerCase().includes('otp_expired')) {
+        formattedMsg = 'Verification code expired. Please request a new one.';
+      }
+
+      authError.textContent = `[ERROR]: ${formattedMsg}`;
+      authError.classList.remove('hidden');
+    }
+
+    function showSuccess(msg: string) {
+      if (!authSuccess) return;
+      const formattedMsg = msg ? msg.trim() : 'Operation completed successfully.';
+      authSuccess.textContent = `[SUCCESS]: ${formattedMsg}`;
+      authSuccess.classList.remove('hidden');
+    }
+
+    document.querySelectorAll('.toggle-password').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        if (!targetId) return;
+        const input = document.getElementById(targetId) as HTMLInputElement | null;
+        const svg = btn.querySelector('.password-eye-svg');
+        if (!input || !svg) return;
+
+        if (input.type === 'password') {
+          input.type = 'text';
+          svg.innerHTML = EYE_SLASHED;
+        } else {
+          input.type = 'password';
+          svg.innerHTML = EYE_NORMAL;
+        }
+      });
     });
-  });
 
-  toSignup?.addEventListener('click', () => {
-    clearMessages();
-    signinForm?.classList.add('hidden');
-    otpForm?.classList.add('hidden');
-    signupForm?.classList.remove('hidden');
-  });
+    toSignup?.addEventListener('click', () => {
+      clearMessages();
+      signinForm?.classList.add('hidden');
+      otpForm?.classList.add('hidden');
+      signupForm?.classList.remove('hidden');
+    });
 
-  const showSignin = () => {
-    clearMessages();
-    signupForm?.classList.add('hidden');
-    otpForm?.classList.add('hidden');
-    signinForm?.classList.remove('hidden');
-  };
+    const showSignin = () => {
+      clearMessages();
+      signupForm?.classList.add('hidden');
+      otpForm?.classList.add('hidden');
+      signinForm?.classList.remove('hidden');
+    };
 
-  toSignin?.addEventListener('click', showSignin);
-  toSigninFromOtp?.addEventListener('click', showSignin);
+    toSignin?.addEventListener('click', showSignin);
+    toSigninFromOtp?.addEventListener('click', showSignin);
 
-  signinForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    clearMessages();
+    signinForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearMessages();
 
-    const formData = new FormData(signinForm);
-    const email = (formData.get('email') as string)?.trim();
-    const password = formData.get('password') as string;
-
-    const { data, error } = await signIn(email, password);
-
-    if (error) {
-      showError(error.message);
-    } else if (data.session) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', data.session.user.id)
-        .single();
-
-      if (profile?.role === 'admin') {
-        window.location.href = '/dashboard';
-      } else {
-        window.location.href = '/';
-      }
-    }
-  });
-
-  signupForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    clearMessages();
-
-    if (termsCheckbox && !termsCheckbox.checked) {
-      showError('You must agree to the Terms of Service and Privacy Policy to proceed.');
-      return;
-    }
-
-    const submitBtn = signupForm.querySelector('button[type="submit"]') as HTMLButtonElement | null;
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
-      submitBtn.innerHTML = `<span>Creating Account...</span>`;
-    }
-
-    const formData = new FormData(signupForm);
-    const email = (formData.get('email') as string)?.trim();
-    const password = formData.get('password') as string;
-
-    retainedEmail = email;
-
-    const { data, error } = await signUp(email, password);
-
-    if (error) {
-      showError(error.message);
+      const submitBtn = signinForm.querySelector('button[type="submit"]') as HTMLButtonElement | null;
       if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-        submitBtn.innerHTML = `<span>Create Account</span><span>&rarr;</span>`;
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-50', 'cursor-wait');
+        submitBtn.innerHTML = `<span class="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></span><span>Authenticating...</span>`;
       }
-    } else if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
-      showError('An account with this email address already exists. Please sign in instead.');
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-        submitBtn.innerHTML = `<span>Create Account</span><span>&rarr;</span>`;
-      }
-      return;
-    } else if (data.session) {
-      window.location.href = '/';
-    } else {
-      signupForm.classList.add('hidden');
-      otpForm?.classList.remove('hidden');
-      showSuccess('Check your email for the 6-digit code');
-    }
-  });
 
-  otpForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    clearMessages();
+      const formData = new FormData(signinForm);
+      const email = (formData.get('email') as string)?.trim();
+      const password = formData.get('password') as string;
 
-    const formData = new FormData(otpForm);
-    const token = (formData.get('token') as string)?.trim();
+      const { data, error } = await signIn(email, password);
 
-    if (!retainedEmail) {
-      showError('No pending email verification found. Please sign up or sign in again.');
-      return;
-    }
-
-    const { data, error } = await verifyEmailOtp(retainedEmail, token);
-
-    if (error) {
-      showError(error.message);
-    } else {
-      showSuccess('Email verified successfully! Redirecting...');
-      if (data.session) {
+      if (error) {
+        showError(error.message);
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove('opacity-50', 'cursor-wait');
+          submitBtn.innerHTML = `<span>Sign In &amp; Authenticate</span><span>&rarr;</span>`;
+        }
+      } else if (data.session) {
         const { data: profile } = await supabase
           .from('profiles')
           .select('role')
@@ -434,48 +383,149 @@ import Layout from '../layouts/Layout.astro';
         } else {
           window.location.href = '/';
         }
-      } else {
-        setTimeout(() => {
-          showSignin();
-          showSuccess('Verification completed. You may now sign in.');
-        }, 1500);
       }
-    }
-  });
+    });
 
-  resendOtpBtn?.addEventListener('click', async () => {
-    clearMessages();
+    signupForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearMessages();
 
-    if (!retainedEmail) {
-      showError('No email address found to resend verification code.');
-      return;
-    }
-
-    const { error } = await resendOtp(retainedEmail);
-    if (error) {
-      showError(error.message);
-      return;
-    }
-
-    showSuccess(`A new verification code has been sent to ${retainedEmail}.`);
-
-    let remaining = 60;
-    resendOtpBtn.disabled = true;
-    resendOtpBtn.classList.add('opacity-50', 'cursor-not-allowed');
-    resendOtpBtn.textContent = `Resend in ${remaining}s`;
-
-    if (countdownTimer) clearInterval(countdownTimer);
-
-    countdownTimer = setInterval(() => {
-      remaining -= 1;
-      if (remaining > 0) {
-        resendOtpBtn.textContent = `Resend in ${remaining}s`;
-      } else {
-        if (countdownTimer) clearInterval(countdownTimer);
-        resendOtpBtn.disabled = false;
-        resendOtpBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-        resendOtpBtn.textContent = 'Resend Code';
+      if (termsCheckbox && !termsCheckbox.checked) {
+        showError('You must agree to the Terms of Service and Privacy Policy to proceed.');
+        return;
       }
-    }, 1000);
-  });
+
+      const submitBtn = signupForm.querySelector('button[type="submit"]') as HTMLButtonElement | null;
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-50', 'cursor-wait');
+        submitBtn.innerHTML = `<span class="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></span><span>Creating Account...</span>`;
+      }
+
+      const formData = new FormData(signupForm);
+      const email = (formData.get('email') as string)?.trim();
+      const password = formData.get('password') as string;
+
+      retainedEmail = email;
+
+      const { data, error } = await signUp(email, password);
+
+      if (error) {
+        showError(error.message);
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove('opacity-50', 'cursor-wait');
+          submitBtn.innerHTML = `<span>Create Account</span><span>&rarr;</span>`;
+        }
+      } else if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+        showError('An account with this email address already exists. Please sign in instead.');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove('opacity-50', 'cursor-wait');
+          submitBtn.innerHTML = `<span>Create Account</span><span>&rarr;</span>`;
+        }
+        return;
+      } else if (data.session) {
+        window.location.href = '/';
+      } else {
+        signupForm.classList.add('hidden');
+        otpForm?.classList.remove('hidden');
+        showSuccess('Check your email for the 6-digit code');
+      }
+    });
+
+    otpForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearMessages();
+
+      const submitBtn = otpForm.querySelector('button[type="submit"]') as HTMLButtonElement | null;
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-50', 'cursor-wait');
+        submitBtn.innerHTML = `<span class="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></span><span>Verifying OTP...</span>`;
+      }
+
+      const formData = new FormData(otpForm);
+      const token = (formData.get('token') as string)?.trim();
+
+      if (!retainedEmail) {
+        showError('No pending email verification found. Please sign up or sign in again.');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove('opacity-50', 'cursor-wait');
+          submitBtn.innerHTML = `<span>Verify OTP Code</span><span>&rarr;</span>`;
+        }
+        return;
+      }
+
+      const { data, error } = await verifyEmailOtp(retainedEmail, token);
+
+      if (error) {
+        showError(error.message);
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove('opacity-50', 'cursor-wait');
+          submitBtn.innerHTML = `<span>Verify OTP Code</span><span>&rarr;</span>`;
+        }
+      } else {
+        showSuccess('Email verified successfully! Redirecting...');
+        if (data.session) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', data.session.user.id)
+            .single();
+
+          if (profile?.role === 'admin') {
+            window.location.href = '/dashboard';
+          } else {
+            window.location.href = '/';
+          }
+        } else {
+          setTimeout(() => {
+            showSignin();
+            showSuccess('Verification completed. You may now sign in.');
+          }, 1500);
+        }
+      }
+    });
+
+    resendOtpBtn?.addEventListener('click', async () => {
+      clearMessages();
+
+      if (!retainedEmail) {
+        showError('No email address found to resend verification code.');
+        return;
+      }
+
+      const { error } = await resendOtp(retainedEmail);
+      if (error) {
+        showError(error.message);
+        return;
+      }
+
+      showSuccess(`A new verification code has been sent to ${retainedEmail}.`);
+
+      let remaining = 60;
+      resendOtpBtn.disabled = true;
+      resendOtpBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      resendOtpBtn.textContent = `Resend in ${remaining}s`;
+
+      if (countdownTimer) clearInterval(countdownTimer);
+
+      countdownTimer = setInterval(() => {
+        remaining -= 1;
+        if (remaining > 0) {
+          resendOtpBtn.textContent = `Resend in ${remaining}s`;
+        } else {
+          if (countdownTimer) clearInterval(countdownTimer);
+          resendOtpBtn.disabled = false;
+          resendOtpBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+          resendOtpBtn.textContent = 'Resend Code';
+        }
+      }, 1000);
+    });
+  };
+
+  document.addEventListener('astro:page-load', initLogin);
 </script>
