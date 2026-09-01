@@ -66,6 +66,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'http://localhost
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Thijs Raaijmakers" />
     <meta property="og:url" content={Astro.url} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -77,6 +78,16 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'http://localhost
     <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={new URL(image, Astro.url)} />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Thijs Raaijmakers",
+        "url": "https://thijsraaijmakers.me/"
+      }
+    </script>
   </head>
   
   <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-cyan-500/30 transition-colors duration-500 ease-in-out overflow-x-hidden">
