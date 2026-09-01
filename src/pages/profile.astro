@@ -254,6 +254,13 @@ import Layout from '../layouts/Layout.astro';
     const passkeyError = document.getElementById('passkey-error');
     const passkeySuccess = document.getElementById('passkey-success');
 
+    // Prevent duplicate registration if passkey is already active on this device
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('fleetport_has_passkey') === 'true' && registerPasskeyBtn) {
+      registerPasskeyBtn.disabled = true;
+      registerPasskeyBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      registerPasskeyBtn.innerHTML = `<span>Passkey Active on this Device</span>`;
+    }
+
     let currentUserId = '';
 
     const EYE_NORMAL = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>`;
@@ -388,11 +395,13 @@ import Layout from '../layouts/Layout.astro';
         registerPasskeyBtn.innerHTML = `<span class="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span><span>Registering Passkey...</span>`;
       }
 
+      let registrationSuccess = false;
       try {
         const { data, error } = await registerPasskey();
         if (error) {
           showMsg(passkeyError, error.message || 'Failed to register biometric passkey.', true);
         } else {
+          registrationSuccess = true;
           try {
             if (currentUserId) {
               await supabase.from('profiles').update({ has_passkey: true }).eq('id', currentUserId);
@@ -405,14 +414,21 @@ import Layout from '../layouts/Layout.astro';
         showMsg(passkeyError, err.message || 'Passkey registration cancelled or unsupported.', true);
       } finally {
         if (registerPasskeyBtn) {
-          registerPasskeyBtn.disabled = false;
-          registerPasskeyBtn.classList.remove('opacity-50', 'cursor-wait');
-          registerPasskeyBtn.innerHTML = `
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004.07 9m5.936 8.79a11.968 11.968 0 01-2.006 2.21" />
-            </svg>
-            <span>Register Biometric Passkey</span>
-          `;
+          registerPasskeyBtn.classList.remove('cursor-wait');
+          if (registrationSuccess || localStorage.getItem('fleetport_has_passkey') === 'true') {
+            registerPasskeyBtn.disabled = true;
+            registerPasskeyBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            registerPasskeyBtn.innerHTML = `<span>Passkey Active on this Device</span>`;
+          } else {
+            registerPasskeyBtn.disabled = false;
+            registerPasskeyBtn.classList.remove('opacity-50');
+            registerPasskeyBtn.innerHTML = `
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004.07 9m5.936 8.79a11.968 11.968 0 01-2.006 2.21" />
+              </svg>
+              <span>Register Biometric Passkey</span>
+            `;
+          }
         }
       }
     });
