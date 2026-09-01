@@ -35,11 +35,11 @@ import Layout from '../layouts/Layout.astro';
 
       <!-- Sign In Form -->
       <form id="signin-form" class="space-y-4 font-mono text-xs">
-        <!-- Biometric Passkey Login Button -->
+        <!-- Biometric Passkey Login Button (Conditional UI) -->
         <button
           id="passkey-login-btn"
           type="button"
-          class="w-full py-3 rounded-lg bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-bold font-mono text-sm transition-all shadow-lg flex items-center justify-center space-x-2 border border-slate-700 dark:border-slate-300 hover:-translate-y-0.5 cursor-pointer"
+          class="hidden w-full py-3 rounded-lg bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-bold font-mono text-sm transition-all shadow-lg flex items-center justify-center space-x-2 border border-slate-700 dark:border-slate-300 hover:-translate-y-0.5 cursor-pointer"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004.07 9m5.936 8.79a11.968 11.968 0 01-2.006 2.21" />
@@ -47,7 +47,7 @@ import Layout from '../layouts/Layout.astro';
           <span>Sign in with Passkey</span>
         </button>
 
-        <div class="flex items-center space-x-2 text-slate-400 dark:text-slate-500 my-4 text-xs font-mono">
+        <div id="passkey-divider" class="hidden flex items-center space-x-2 text-slate-400 dark:text-slate-500 my-4 text-xs font-mono">
           <hr class="flex-1 border-slate-200 dark:border-slate-800" />
           <span>OR</span>
           <hr class="flex-1 border-slate-200 dark:border-slate-800" />
@@ -63,7 +63,7 @@ import Layout from '../layouts/Layout.astro';
             name="email" 
             required
             pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-            autocomplete="username"
+            autocomplete="username webauthn"
             placeholder="admin@example.com"
             class="w-full px-4 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition-colors"
           />
@@ -274,6 +274,10 @@ import Layout from '../layouts/Layout.astro';
         return;
       }
       document.getElementById('login-enclave')?.classList.remove('opacity-0', 'pointer-events-none');
+      if (typeof localStorage !== 'undefined' && localStorage.getItem('fleetport_has_passkey') === 'true') {
+        document.getElementById('passkey-login-btn')?.classList.remove('hidden');
+        document.getElementById('passkey-divider')?.classList.remove('hidden');
+      }
     };
     await checkSession();
 
@@ -381,6 +385,9 @@ import Layout from '../layouts/Layout.astro';
         if (error) {
           showError(error.message);
         } else if (data?.session) {
+          try {
+            localStorage.setItem('fleetport_has_passkey', 'true');
+          } catch {}
           const { data: profile } = await supabase
             .from('profiles')
             .select('role')

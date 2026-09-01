@@ -193,7 +193,7 @@ import Layout from '../../layouts/Layout.astro';
       </div>
 
       <!-- Card 3: Biometrische Beveiliging (WebAuthn Passkey) -->
-      <div class="md:col-span-2 p-6 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-xl space-y-5">
+      <div id="biometric-settings" class="md:col-span-2 p-6 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-xl space-y-5 scroll-mt-24">
         <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/60 pb-3">
           <div class="flex items-center space-x-2">
             <svg class="w-5 h-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -393,6 +393,9 @@ import Layout from '../../layouts/Layout.astro';
         if (error) {
           showMsg(passkeyError, error.message || 'Fout bij het registreren van biometrische passkey.', true);
         } else {
+          try {
+            localStorage.setItem('fleetport_has_passkey', 'true');
+          } catch {}
           showMsg(passkeySuccess, 'Biometrische passkey succesvol geregistreerd! U kunt deze nu gebruiken om in te loggen.', false);
         }
       } catch (err: any) {

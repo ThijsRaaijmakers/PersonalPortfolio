@@ -79,6 +79,21 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'http://localhost
   </head>
   
   <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-cyan-500/30 transition-colors duration-500 ease-in-out overflow-x-hidden">
+    <!-- Progressive Enrollment Passkey Nudge Toast -->
+    <div id="passkey-nudge" class="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] w-[90%] max-w-sm p-4 rounded-2xl bg-slate-900/95 backdrop-blur border border-cyan-500/50 shadow-2xl shadow-cyan-500/20 translate-y-[-150%] opacity-0 transition-all duration-500 font-mono text-xs flex items-start space-x-3">
+      <div class="mt-0.5 text-cyan-400">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004.07 9M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/></svg>
+      </div>
+      <div class="flex-1 space-y-1.5">
+        <p class="font-bold text-slate-100">{Astro.url.pathname.startsWith('/nl') ? 'Verbeter je beveiliging' : 'Upgrade your security'}</p>
+        <p class="text-slate-400 text-[11px] leading-relaxed">{Astro.url.pathname.startsWith('/nl') ? 'Je apparaat ondersteunt biometrisch inloggen. Stel een Passkey in voor snelle toegang zonder wachtwoord.' : 'Your device supports biometric login. Set up a Passkey for instant, passwordless access.'}</p>
+        <div class="pt-1 flex space-x-3 font-semibold">
+          <a href={Astro.url.pathname.startsWith('/nl') ? '/nl/profile#biometric-settings' : '/profile#biometric-settings'} class="text-cyan-400 hover:text-cyan-300 transition-colors">{Astro.url.pathname.startsWith('/nl') ? 'Nu instellen →' : 'Set up now →'}</a>
+          <button id="dismiss-nudge-btn" class="text-slate-500 hover:text-slate-300 transition-colors cursor-pointer">{Astro.url.pathname.startsWith('/nl') ? 'Sluiten' : 'Dismiss'}</button>
+        </div>
+      </div>
+    </div>
+
     <Header />
     
     <main class="flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
@@ -87,8 +102,10 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'http://localhost
 
     <Footer />
 
-    <!-- Cipher-Text Hover Animation Script -->
+    <!-- Global Layout Client Scripts -->
     <script>
+      import { supabase } from '../lib/supabase';
+
       const CIPHER_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*<>/[]{}~';
 
       function initCipherHover() {
@@ -141,7 +158,42 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'http://localhost
         });
       }
 
-      document.addEventListener('astro:page-load', initCipherHover);
+      async function evaluatePasskeyNudge() {
+        const nudge = document.getElementById('passkey-nudge');
+        const dismissBtn = document.getElementById('dismiss-nudge-btn');
+        if (!nudge || !dismissBtn) return;
+
+        // 1. Check user preferences
+        if (localStorage.getItem('fleetport_has_passkey') === 'true' || localStorage.getItem('passkey_nudge_dismissed') === 'true') return;
+
+        // 2. Ensure user is logged in
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+
+        // 3. Check for hardware biometric scanner
+        if (window.PublicKeyCredential && typeof window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable === 'function') {
+          const isAvailable = await window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+          if (isAvailable) {
+            // Delay the nudge slightly so it doesn't collide with the page load
+            setTimeout(() => {
+              nudge.classList.remove('translate-y-[-150%]', 'opacity-0');
+            }, 1500);
+          }
+        }
+
+        // 4. Handle Dismissal
+        dismissBtn.addEventListener('click', () => {
+          try {
+            localStorage.setItem('passkey_nudge_dismissed', 'true');
+          } catch {}
+          nudge.classList.add('translate-y-[-150%]', 'opacity-0');
+        });
+      }
+
+      document.addEventListener('astro:page-load', () => {
+        initCipherHover();
+        evaluatePasskeyNudge();
+      });
     </script>
   </body>
 </html>
