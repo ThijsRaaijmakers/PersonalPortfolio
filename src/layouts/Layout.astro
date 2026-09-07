@@ -1,6 +1,7 @@
 ---
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import RadahnEasterEgg from '../components/RadahnEasterEgg.astro';
 import { ClientRouter } from 'astro:transitions';
 import '../styles/global.css';
 
@@ -85,6 +86,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'http://localhost
         "@context": "https://schema.org",
         "@type": "WebSite",
         "name": "Thijs Raaijmakers",
+        "alternateName": "Thijs",
         "url": "https://thijsraaijmakers.me/"
       }
     </script>
@@ -229,6 +231,38 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'http://localhost
         initCipherHover();
         evaluatePasskeyNudge();
       });
+    </script>
+
+    <RadahnEasterEgg />
+
+    <!-- Inside src/layouts/Layout.astro script section -->
+    <script is:inline>
+      (() => {
+        if (window.__festival_listener) return;
+        window.__festival_listener = true;
+
+        const trigger = 'festival';
+        let inputBuffer = '';
+        let bufferTimeout;
+
+        document.addEventListener('keydown', (e) => {
+          // Only track single characters
+          if (e.key.length !== 1) return;
+
+          inputBuffer += e.key.toLowerCase();
+          
+          // Clear the buffer if user stops typing for 2 seconds
+          clearTimeout(bufferTimeout);
+          bufferTimeout = setTimeout(() => inputBuffer = '', 2000);
+
+          if (inputBuffer.includes(trigger)) {
+            inputBuffer = ''; // Clear buffer for reuse
+            // Dispatch custom event to activate the component
+            const event = new CustomEvent('activate-radahn');
+            document.dispatchEvent(event);
+          }
+        });
+      })();
     </script>
   </body>
 </html>
