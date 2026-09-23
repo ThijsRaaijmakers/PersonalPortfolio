@@ -3,6 +3,7 @@ export const prerender = false;
 
 import Layout from '../../layouts/Layout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import WorkspaceNav from '../../components/WorkspaceNav.astro';
 ---
 
 <Layout description="Centralized Admin Control Panel for user directory and security logs." title="Admin Control Panel | FleetPort Logistics">
@@ -16,6 +17,9 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
         { label: 'Admin Control Panel' }
       ]} 
     />
+
+    <!-- Administrative Workspace Navigation -->
+    <WorkspaceNav activeTab="admin" />
 
     <!-- Loading State Container (Visible by default) -->
     <div id="loading-container" class="p-12 text-center rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl space-y-4 font-mono">

@@ -1,0 +1,59 @@
+---
+export interface Props {
+  activeTab: 'fleetport' | 'trading' | 'admin';
+}
+
+const { activeTab } = Astro.props;
+
+const isNl = Astro.url.pathname.startsWith('/nl/') || Astro.url.pathname === '/nl';
+const prefix = isNl ? '/nl' : '';
+
+const tabs = [
+  {
+    id: 'fleetport',
+    label: isNl ? 'FleetPort Logistiek' : 'FleetPort Logistics',
+    href: `${prefix}/dashboard`,
+    icon: 'M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2',
+  },
+  {
+    id: 'trading',
+    label: isNl ? 'Kwantitatieve Trading Desk' : 'Quant Trading Desk',
+    href: `${prefix}/trading`,
+    icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6',
+  },
+  {
+    id: 'admin',
+    label: isNl ? 'Beveiligingsaudit' : 'Security Audit',
+    href: `${prefix}/admin`,
+    icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+  },
+];
+---
+
+<nav aria-label="Administrative Workspace Switcher" class="flex items-center">
+  <div class="inline-flex p-1 sm:p-1.5 rounded-xl sm:rounded-2xl bg-slate-100/90 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 shadow-sm font-mono text-xs gap-1 sm:gap-1.5 w-full sm:w-auto overflow-x-auto">
+    {tabs.map((tab) => {
+      const isActive = activeTab === tab.id;
+      return (
+        <a
+          href={tab.href}
+          class={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-lg sm:rounded-xl border transition-all duration-200 whitespace-nowrap select-none ${
+            isActive
+              ? 'bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border-cyan-500/40 font-bold shadow-sm shadow-cyan-500/10'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 border-transparent font-medium'
+          }`}
+        >
+          {isActive ? (
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 dark:bg-cyan-400 animate-pulse"></span>
+          ) : (
+            <svg class="w-3.5 h-3.5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={tab.icon} />
+            </svg>
+          )}
+          <span>{tab.label}</span>
+        </a>
+      );
+    })}
+  </div>
+</nav>
+
