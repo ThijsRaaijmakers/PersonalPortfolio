@@ -1,0 +1,60 @@
+---
+// src/components/RadahnEasterEgg.astro
+---
+<div id="radahn-festival-overlay" transition:persist class="fixed inset-0 bg-black/95 z-[999] flex flex-col items-center justify-center translate-y-full opacity-0 pointer-events-none transition-all duration-700 ease-in-out">
+  <button id="close-radahn" class="absolute top-8 right-8 text-cyan-400 hover:text-emerald-400 text-6xl font-bold font-mono transition-colors">&times;</button>
+  
+  <div class="relative h-[80vh] aspect-[9/16] max-w-[90vw] mx-auto bg-black rounded-3xl border-4 border-cyan-500 shadow-[0_0_60px_-10px_rgba(6,182,212,0.6)] overflow-hidden">
+    <video id="radahn-video" class="w-full h-full object-cover" loop preload="auto" playsinline src="/assets/radahn_festival_meme.mp4"></video>
+  
+    <div class="absolute inset-0 bg-purple-900/10 mix-blend-color pointer-events-none"></div>
+  </div>
+  
+  <p class="text-3xl text-emerald-300 font-bold mt-12 font-mono">THE RADAHN FESTIVALLLL</p>
+</div>
+
+<script>
+  const overlay = document.getElementById('radahn-festival-overlay');
+  const video = document.getElementById('radahn-video') as HTMLVideoElement | null;
+  const closeBtn = document.getElementById('close-radahn');
+
+  function hideMeme() {
+    const el = document.getElementById('radahn-festival-overlay') || overlay;
+    const vid = (document.getElementById('radahn-video') as HTMLVideoElement | null) || video;
+    el?.classList.add('translate-y-full', 'opacity-0', 'pointer-events-none');
+    if (vid) {
+      vid.pause();
+      vid.currentTime = 0;
+    }
+  }
+
+  function showMeme() {
+    const el = document.getElementById('radahn-festival-overlay') || overlay;
+    const vid = (document.getElementById('radahn-video') as HTMLVideoElement | null) || video;
+    el?.classList.remove('translate-y-full', 'opacity-0', 'pointer-events-none');
+    // Browsers require interaction before video with audio can play.
+    // The 'festival' keystroke sequence satisfies this.
+    vid?.play().catch(error => {
+      console.warn("Autoplay failed, user interaction required first.", error);
+    });
+  }
+
+  // Listen for global activation event
+  document.addEventListener('activate-radahn', showMeme);
+
+  // Handle closing
+  if (closeBtn) {
+    closeBtn.addEventListener('click', hideMeme);
+  }
+  document.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement)?.closest('#close-radahn')) {
+      hideMeme();
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    const el = document.getElementById('radahn-festival-overlay') || overlay;
+    if (e.key === 'Escape' && el && !el.classList.contains('pointer-events-none')) {
+      hideMeme();
+    }
+  });
+</script>
