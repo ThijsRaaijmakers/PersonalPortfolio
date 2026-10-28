@@ -1,6 +1,6 @@
 ---
 export interface Props {
-  activeTab: 'fleetport' | 'trading' | 'admin';
+  activeTab: 'fleetport' | 'trading' | 'admin' | 'quant-satellite';
 }
 
 const { activeTab } = Astro.props;
@@ -20,6 +20,12 @@ const tabs = [
     label: isNl ? 'Kwantitatieve Trading Desk' : 'Quant Trading Desk',
     href: `${prefix}/trading`,
     icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6',
+  },
+  {
+    id: 'quant-satellite',
+    label: 'Quant Satellite v2.5',
+    href: '/quant-satellite',
+    icon: 'M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z',
   },
   {
     id: 'admin',

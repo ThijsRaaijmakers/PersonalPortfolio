@@ -1,0 +1,1767 @@
+---
+export const prerender = false;
+
+import Layout from '../layouts/Layout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import WorkspaceNav from '../components/WorkspaceNav.astro';
+import { supabase } from '../lib/supabase';
+
+// Server-side profile check for admin clearance
+const { data: { session } } = await supabase.auth.getSession();
+let userEmail = '';
+
+if (session) {
+  userEmail = session.user.email || '';
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', session.user.id)
+    .single();
+
+  if (profile?.role !== 'admin') {
+    return Astro.redirect('/');
+  }
+}
+---
+
+<Layout 
+  description="Autonomous Quant Satellite v2.5 Telemetry Dashboard and Tokyo VPS Command & Control Enclave." 
+  title="Quant Satellite v2.5 | Autonomous Telemetry & C2 Console"
+>
+  <div id="secure-enclave" class="max-w-7xl mx-auto py-8 sm:py-12 space-y-8 animate-fade-in-up opacity-0 pointer-events-none transition-opacity duration-300">
+    
+    <!-- Breadcrumbs -->
+    <Breadcrumbs 
+      items={[
+        { label: 'Home', href: '/' },
+        { label: 'Dashboard', href: '/dashboard' },
+        { label: 'Quant Satellite v2.5' }
+      ]} 
+    />
+
+    <!-- Administrative Workspace Navigation -->
+    <WorkspaceNav activeTab="quant-satellite" />
+
+    <!-- Top Bar / Header Section -->
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-slate-300 dark:border-slate-800 pb-6 min-w-0">
+      <div class="space-y-1.5 min-w-0">
+        <div class="flex items-center space-x-2.5 flex-wrap gap-y-1">
+          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-950/10 dark:bg-cyan-950/60 border border-cyan-500/30 font-mono text-xs text-cyan-600 dark:text-cyan-400">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>QUANT SATELLITE v2.5 &bull; TOKYO VPS C2</span>
+          </div>
+
+          <span 
+            id="admin-badge" 
+            class="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30 font-mono text-[10px] font-bold tracking-wider uppercase shadow-sm shadow-cyan-500/10"
+          >
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+            <span>ADMIN CLEARANCE</span>
+          </span>
+
+          <span 
+            id="sync-status-badge"
+            class="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded bg-slate-200/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700 font-mono text-[10px]"
+          >
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            <span id="sync-timer-label">LIVE 15s SYNC</span>
+          </span>
+        </div>
+
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-sans tracking-tight">
+          Quant Satellite v2.5 Telemetry & C2 Cockpit
+        </h1>
+        <p id="user-identity" class="text-xs font-mono text-slate-500 dark:text-slate-400">
+          {userEmail ? `// Identity: ${userEmail} (Clearance Level: QUANT_ADMIN)` : '// Identity: Authenticating...'}
+        </p>
+      </div>
+      
+      <!-- Right Action Controls -->
+      <div class="flex flex-wrap items-center gap-3">
+        <button 
+          id="refresh-btn" 
+          class="px-4 py-2 rounded-lg bg-cyan-950/20 dark:bg-cyan-950/50 hover:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 border border-cyan-500/40 font-mono text-xs font-bold transition-all flex items-center space-x-2 shadow-sm cursor-pointer"
+        >
+          <svg id="refresh-icon" class="w-3.5 h-3.5 text-cyan-500 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <span id="refresh-label">Sync Telemetry</span>
+        </button>
+
+        <a 
+          href="/trading" 
+          class="px-4 py-2 rounded-lg bg-slate-100/80 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-800 font-mono text-xs font-semibold transition-colors flex items-center space-x-2 shadow-sm"
+        >
+          <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+          </svg>
+          <span>Trading Desk (Core)</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SECTION 1: TOP STATUS & N=2.000 PROGRESS   -->
+    <!-- ========================================== -->
+    <div class="rounded-2xl p-5 sm:p-6 bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl space-y-4">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <!-- Runtime State Pill -->
+        <div class="flex items-center space-x-3 flex-wrap gap-y-2">
+          <div class="text-xs font-mono text-slate-500 dark:text-slate-400">
+            // RUNTIME STATE:
+          </div>
+          <div 
+            id="runtime-state-pill" 
+            class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-xl font-mono text-xs font-bold border transition-all duration-300 bg-slate-200/80 dark:bg-slate-800 text-slate-400 border-slate-300 dark:border-slate-700"
+          >
+            <span id="runtime-state-dot" class="w-2 h-2 rounded-full bg-slate-400"></span>
+            <span id="runtime-state-label">INITIALIZING...</span>
+          </div>
+
+          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 font-mono text-xs text-slate-700 dark:text-slate-300">
+            <span class="text-slate-500">Bar Index:</span>
+            <span id="bar-index-label" class="font-bold text-cyan-600 dark:text-cyan-400">#-- / 2,000</span>
+          </div>
+
+          <div class="text-[11px] font-mono text-slate-500">
+            <span id="latest-timestamp-label">Timestamp: --</span>
+          </div>
+        </div>
+
+        <!-- Estimated Days Remaining -->
+        <div class="text-right">
+          <div id="est-days-label" class="text-xs font-mono font-bold text-cyan-600 dark:text-cyan-400">
+            Estimating Go/No-Go Window...
+          </div>
+          <div class="text-[10px] font-mono text-slate-500">
+            Based on 288 master bars/day (5-min intervals)
+          </div>
+        </div>
+      </div>
+
+      <!-- N=2000 Progress Bar -->
+      <div class="space-y-1.5">
+        <div class="flex items-center justify-between text-xs font-mono">
+          <span class="text-slate-600 dark:text-slate-400 flex items-center space-x-1.5">
+            <span>N=2,000 Go/No-Go Statistical Validation Sample</span>
+            <span class="text-[10px] text-slate-500">(Target: 2,000 Out-of-Sample Bars)</span>
+          </span>
+          <span id="progress-pct-label" class="font-bold text-cyan-600 dark:text-cyan-400">
+            0.0% (0 / 2,000 Bars)
+          </span>
+        </div>
+
+        <div class="w-full bg-slate-200 dark:bg-slate-950 rounded-full h-3.5 border border-slate-300 dark:border-slate-800 p-0.5 overflow-hidden">
+          <div 
+            id="progress-bar-fill" 
+            class="h-full rounded-full bg-gradient-to-r from-cyan-500 via-emerald-400 to-cyan-400 transition-all duration-700 shadow-sm shadow-cyan-500/20"
+            style="width: 0%"
+          ></div>
+        </div>
+
+        <!-- Milestone Markers -->
+        <div class="flex justify-between text-[10px] font-mono text-slate-500 px-0.5">
+          <span>0 (Deploy)</span>
+          <span>500 (25%)</span>
+          <span>1,000 (Mid Checkpoint)</span>
+          <span>1,500 (75%)</span>
+          <span class="font-bold text-emerald-500">2,000 (Go/No-Go Decision Gate)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SECTION 2: 6 KPI TELEMETRY CARDS          -->
+    <!-- ========================================== -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">
+      
+      <!-- Card 1: Mark-to-Market NAV -->
+      <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl flex flex-col justify-between space-y-4">
+        <div>
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// MARK-TO-MARKET NAV</span>
+            <span id="nav-badge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30">
+              SATELLITE MTM
+            </span>
+          </div>
+          <div id="nav-usd-val" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-mono tracking-tight">
+            $0.00
+          </div>
+        </div>
+
+        <div class="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 font-mono text-xs">
+          <div class="flex justify-between items-center text-slate-600 dark:text-slate-400">
+            <span>Wallet Balance (USDC/USDT):</span>
+            <span id="wallet-balance-val" class="font-bold text-slate-900 dark:text-slate-200">$0.00</span>
+          </div>
+          <div class="flex justify-between items-center text-slate-600 dark:text-slate-400">
+            <span>Unrealized PnL:</span>
+            <span id="unrealized-pnl-val" class="font-bold text-slate-500">$0.00</span>
+          </div>
+          <div class="flex justify-between items-center text-[11px] text-slate-500">
+            <span>Realized PnL: <span id="realized-pnl-val" class="text-slate-400 font-bold">$0.00</span></span>
+            <span>Fees: <span id="total-fees-val" class="text-slate-400 font-bold">$0.00</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Drawdown & Tail Risk -->
+      <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl flex flex-col justify-between space-y-4">
+        <div>
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// DRAWDOWN & TAIL RISK</span>
+            <span id="dd-badge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
+              NOMINAL
+            </span>
+          </div>
+          <div id="drawdown-pct-val" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-mono tracking-tight">
+            0.00%
+          </div>
+        </div>
+
+        <div class="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 font-mono text-xs">
+          <div class="flex justify-between items-center text-slate-600 dark:text-slate-400">
+            <span>Ulcer Index (Quadratic Penalty):</span>
+            <span id="ulcer-index-val" class="font-bold text-slate-900 dark:text-slate-200">0.00</span>
+          </div>
+          <div class="flex justify-between items-center text-slate-600 dark:text-slate-400">
+            <span>Z-Stress Standard Score:</span>
+            <span id="z-stress-val" class="font-bold text-slate-900 dark:text-slate-200">0.00</span>
+          </div>
+          <div class="flex justify-between items-center text-[11px] text-slate-500">
+            <span>Circuit Stop Level:</span>
+            <span class="text-rose-400 font-bold">-4.00% Daily Stop</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Dual-Nullspace Neutrality -->
+      <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl flex flex-col justify-between space-y-4">
+        <div>
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// DUAL-NULLSPACE NEUTRALITY</span>
+            <span id="beta-badge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
+              SAFE (&le; 0.035)
+            </span>
+          </div>
+          <div class="flex items-baseline space-x-2">
+            <div id="tail-beta-val" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-mono tracking-tight">
+              0.000
+            </div>
+            <span class="text-xs font-mono text-slate-500">Realized Tail &beta;</span>
+          </div>
+        </div>
+
+        <div class="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 font-mono text-xs">
+          <div class="flex justify-between items-center text-slate-600 dark:text-slate-400">
+            <span>Net Dollar Exposure:</span>
+            <span id="net-exposure-val" class="font-bold text-slate-900 dark:text-slate-200">$0.00</span>
+          </div>
+          <div class="flex justify-between items-center text-slate-600 dark:text-slate-400">
+            <span>Gross Leverage:</span>
+            <span id="gross-leverage-val" class="font-bold text-slate-900 dark:text-slate-200">0.00x</span>
+          </div>
+          <div class="flex justify-between items-center text-[11px] text-slate-500">
+            <span>Projection Model:</span>
+            <span class="text-cyan-400 font-bold">Orthogonal Nullspace</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4: Layer-1 Regime & CSD Gate -->
+      <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl flex flex-col justify-between space-y-4">
+        <div>
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// L1 REGIME & CSD GATE</span>
+            <span id="csd-badge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
+              GATE OPEN
+            </span>
+          </div>
+          <div class="flex items-baseline space-x-2">
+            <div id="regime-gate-val" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-mono tracking-tight">
+              1.00x
+            </div>
+            <span class="text-xs font-mono text-slate-500">Global Allocation Multiplier</span>
+          </div>
+        </div>
+
+        <div class="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 font-mono text-xs">
+          <div class="flex justify-between items-center text-slate-600 dark:text-slate-400">
+            <span>Spectral Divergence (G_csd):</span>
+            <span id="g-csd-val" class="font-bold text-slate-900 dark:text-slate-200">0.000</span>
+          </div>
+          <div class="flex justify-between items-center text-slate-600 dark:text-slate-400">
+            <span>Concordance (&rho;_H12):</span>
+            <span id="rho-h12-val" class="font-bold text-slate-900 dark:text-slate-200">0.000</span>
+          </div>
+          <div class="flex justify-between items-center text-[11px] text-slate-500">
+            <span>Regime Classification:</span>
+            <span id="csd-regime-label" class="text-cyan-400 font-bold">STANDBY</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5: Execution Quality -->
+      <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl flex flex-col justify-between space-y-4">
+        <div>
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// EXECUTION QUALITY</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30">
+              POST-ONLY GTX
+            </span>
+          </div>
+          <div class="flex items-baseline space-x-2">
+            <div id="maker-taker-val" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-mono tracking-tight">
+              0.00x
+            </div>
+            <span class="text-xs font-mono text-slate-500">Maker/Taker Ratio</span>
+          </div>
+        </div>
+
+        <div class="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 font-mono text-xs">
+          <div class="flex justify-between items-center text-slate-600 dark:text-slate-400">
+            <span>Maker Executions (Rebate):</span>
+            <span id="maker-fills-val" class="font-bold text-emerald-500">0</span>
+          </div>
+          <div class="flex justify-between items-center text-slate-600 dark:text-slate-400">
+            <span>Taker Executions:</span>
+            <span id="taker-fills-val" class="font-bold text-slate-400">0</span>
+          </div>
+          <div class="flex justify-between items-center text-[11px] text-slate-500">
+            <span>GTX Slippage Rejects:</span>
+            <span id="gtx-rejects-val" class="text-slate-400 font-bold">0 (Protected)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 6: Core-Satellite Split Calculator -->
+      <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl flex flex-col justify-between space-y-3">
+        <div>
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// CORE-SATELLITE 90/10</span>
+            <span id="band-status-badge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
+              OPTIMAL [7.0%, 13.5%]
+            </span>
+          </div>
+          <div class="flex items-baseline justify-between">
+            <span class="text-xs font-mono text-slate-400">Satellite Weight:</span>
+            <span id="calc-sat-pct" class="text-xl font-extrabold text-cyan-600 dark:text-cyan-400 font-mono">10.0%</span>
+          </div>
+        </div>
+
+        <!-- Interactive Calculator Inputs -->
+        <div class="space-y-2 font-mono text-xs">
+          <div class="flex items-center justify-between gap-2">
+            <label for="core-balance-input" class="text-[11px] text-slate-500">Alpaca Core ($):</label>
+            <input 
+              type="number" 
+              id="core-balance-input" 
+              value="100000" 
+              min="0" 
+              step="1000"
+              class="w-28 px-2 py-1 rounded bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-right font-mono text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-cyan-500"
+            />
+          </div>
+          <div class="flex items-center justify-between gap-2">
+            <label for="salary-deposit-input" class="text-[11px] text-slate-500">Monthly Deposit C_new ($):</label>
+            <input 
+              type="number" 
+              id="salary-deposit-input" 
+              value="1500" 
+              min="0" 
+              step="100"
+              class="w-28 px-2 py-1 rounded bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-right font-mono text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-cyan-500"
+            />
+          </div>
+        </div>
+
+        <!-- Split Output -->
+        <div class="pt-2 border-t border-slate-200 dark:border-slate-800/80 font-mono text-[11px] space-y-1">
+          <div class="flex justify-between text-slate-600 dark:text-slate-400">
+            <span>Deposit to Core (90%):</span>
+            <span id="calc-deposit-core" class="font-bold text-slate-200">+$1,350.00</span>
+          </div>
+          <div class="flex justify-between text-slate-600 dark:text-slate-400">
+            <span>Deposit to Satellite (10%):</span>
+            <span id="calc-deposit-sat" class="font-bold text-cyan-400">+$150.00</span>
+          </div>
+          <div class="flex justify-between text-slate-500 pt-0.5 text-[10px]">
+            <span>Combined Total NAV:</span>
+            <span id="calc-total-nav" class="font-bold text-slate-400">$100,000.00</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- SECTION 3: SVG TELEMETRY CURVES & 6-ASSET EXPOSURE TABLE      -->
+    <!-- ============================================================== -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- Left (7 cols): Responsive SVG Telemetry Chart -->
+      <div class="lg:col-span-7 p-5 sm:p-6 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl space-y-4 flex flex-col justify-between">
+        <div>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
+            <div class="space-y-0.5">
+              <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// MULTI-BAR TELEMETRY (LAST 500 BARS)</span>
+              <div class="text-sm font-bold text-slate-800 dark:text-slate-200 font-sans">
+                NAV ($) &amp; Realized Tail &beta; Orthogonality Curve
+              </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="flex items-center space-x-3 text-xs font-mono">
+              <div class="flex items-center space-x-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+                <span class="text-slate-400">NAV ($)</span>
+              </div>
+              <div class="flex items-center space-x-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                <span class="text-slate-400">Tail &beta;</span>
+              </div>
+              <div class="flex items-center space-x-1 text-[10px] text-rose-400">
+                <span class="w-2 h-0.5 bg-rose-400"></span>
+                <span>&le; 0.035 Stop</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SVG Container -->
+        <div class="relative w-full h-72 sm:h-80 bg-slate-100/50 dark:bg-slate-950/60 rounded-xl border border-slate-200 dark:border-slate-800/80 p-2 overflow-hidden select-none">
+          
+          <!-- Empty State -->
+          <div id="chart-empty-state" class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center space-y-2 z-10 hidden">
+            <svg class="w-8 h-8 text-slate-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+            <div class="text-xs font-mono text-slate-400">
+              // NO SATELLITE TELEMETRY LOGGED YET
+            </div>
+            <p class="text-[11px] font-mono text-slate-500 max-w-sm">
+              Tokyo VPS Agent streams Master Bars every 5 minutes. Live data will populate automatically.
+            </p>
+          </div>
+
+          <!-- The SVG Element -->
+          <svg 
+            id="telemetry-chart-svg" 
+            viewBox="0 0 900 300" 
+            class="w-full h-full cursor-crosshair"
+            preserveAspectRatio="none"
+          >
+            <defs>
+              <linearGradient id="nav-area-gradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.25" />
+                <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.0" />
+              </linearGradient>
+            </defs>
+
+            <!-- Grid Lines & Labels -->
+            <g id="chart-grid-lines" stroke="#334155" stroke-width="0.5" opacity="0.3"></g>
+            <g id="chart-y-labels" fill="#64748b" font-size="9" font-family="monospace"></g>
+
+            <!-- 0.035 Beta Reference Line -->
+            <line 
+              id="chart-beta-threshold-line" 
+              x1="50" y1="150" x2="880" y2="150" 
+              stroke="#f43f5e" 
+              stroke-width="1" 
+              stroke-dasharray="4,4" 
+              opacity="0.7"
+            />
+            <text 
+              id="chart-beta-threshold-label" 
+              x="875" y="145" 
+              fill="#f43f5e" 
+              font-size="8" 
+              font-family="monospace" 
+              text-anchor="end"
+            >
+              &beta; STOP: 0.035
+            </text>
+
+            <!-- Area Fill & Curves -->
+            <path id="chart-nav-area" d="" fill="url(#nav-area-gradient)" />
+            <path id="chart-nav-path" d="" fill="none" stroke="#22d3ee" stroke-width="2" stroke-linecap="round" />
+            <path id="chart-beta-path" d="" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round" />
+
+            <!-- Interactive Crosshair & Tooltip Group -->
+            <g id="chart-crosshair-group" opacity="0">
+              <line id="crosshair-v" x1="0" y1="20" x2="0" y2="280" stroke="#06b6d4" stroke-width="1" stroke-dasharray="2,2" />
+              <circle id="crosshair-nav-dot" cx="0" cy="0" r="4" fill="#22d3ee" stroke="#0f172a" stroke-width="2" />
+              <circle id="crosshair-beta-dot" cx="0" cy="0" r="3.5" fill="#fbbf24" stroke="#0f172a" stroke-width="2" />
+            </g>
+          </svg>
+
+          <!-- Floating Tooltip Box -->
+          <div 
+            id="chart-floating-tooltip" 
+            class="absolute top-3 left-3 pointer-events-none p-2.5 rounded-lg bg-slate-950/90 border border-slate-700 shadow-xl font-mono text-[11px] space-y-1 hidden z-20 backdrop-blur-sm"
+          >
+            <div id="tip-bar-time" class="text-slate-400 text-[10px] border-b border-slate-800 pb-1">--</div>
+            <div class="flex items-center justify-between space-x-3 text-cyan-400">
+              <span>NAV:</span>
+              <span id="tip-nav-val" class="font-bold">--</span>
+            </div>
+            <div class="flex items-center justify-between space-x-3 text-amber-400">
+              <span>Tail &beta;:</span>
+              <span id="tip-beta-val" class="font-bold">--</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 pt-1">
+          <span>// Left Axis: NAV ($)</span>
+          <span>// Right Axis: Tail &beta;</span>
+          <span>Tokyo VPS 5-Min Master Bars</span>
+        </div>
+      </div>
+
+      <!-- Right (5 cols): 6-Asset Basket Exposure Table -->
+      <div class="lg:col-span-5 p-5 sm:p-6 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl space-y-4 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+            <div class="space-y-0.5">
+              <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// 6-ASSET SATELLITE BASKET</span>
+              <div class="text-sm font-bold text-slate-800 dark:text-slate-200 font-sans">
+                Real-Time Holdings &amp; Exposure
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30">
+              DIRICHLET 6
+            </span>
+          </div>
+
+          <!-- Table Container -->
+          <div class="overflow-x-auto mt-3">
+            <table class="w-full font-mono text-xs text-left">
+              <thead>
+                <tr class="text-[10px] text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-800/80">
+                  <th class="py-2 pr-2">Asset</th>
+                  <th class="py-2 px-2 text-right">Lots</th>
+                  <th class="py-2 px-2 text-right">Notional</th>
+                  <th class="py-2 px-2 text-right">Weight</th>
+                  <th class="py-2 pl-2 text-right">Entry</th>
+                </tr>
+              </thead>
+              <tbody id="basket-table-body" class="divide-y divide-slate-200 dark:divide-slate-800/50">
+                <!-- Dynamically populated or skeleton rows -->
+                <tr class="text-slate-500">
+                  <td class="py-2 pr-2 font-bold text-slate-300">BTCUSDC</td>
+                  <td class="py-2 px-2 text-right">--</td>
+                  <td class="py-2 px-2 text-right">$0.00</td>
+                  <td class="py-2 px-2 text-right">0.0%</td>
+                  <td class="py-2 pl-2 text-right">$0.00</td>
+                </tr>
+                <tr class="text-slate-500">
+                  <td class="py-2 pr-2 font-bold text-slate-300">ETHUSDC</td>
+                  <td class="py-2 px-2 text-right">--</td>
+                  <td class="py-2 px-2 text-right">$0.00</td>
+                  <td class="py-2 px-2 text-right">0.0%</td>
+                  <td class="py-2 pl-2 text-right">$0.00</td>
+                </tr>
+                <tr class="text-slate-500">
+                  <td class="py-2 pr-2 font-bold text-slate-300">SOLUSDC</td>
+                  <td class="py-2 px-2 text-right">--</td>
+                  <td class="py-2 px-2 text-right">$0.00</td>
+                  <td class="py-2 px-2 text-right">0.0%</td>
+                  <td class="py-2 pl-2 text-right">$0.00</td>
+                </tr>
+                <tr class="text-slate-500">
+                  <td class="py-2 pr-2 font-bold text-slate-300">SUIUSDT</td>
+                  <td class="py-2 px-2 text-right">--</td>
+                  <td class="py-2 px-2 text-right">$0.00</td>
+                  <td class="py-2 px-2 text-right">0.0%</td>
+                  <td class="py-2 pl-2 text-right">$0.00</td>
+                </tr>
+                <tr class="text-slate-500">
+                  <td class="py-2 pr-2 font-bold text-slate-300">XRPUSDC</td>
+                  <td class="py-2 px-2 text-right">--</td>
+                  <td class="py-2 px-2 text-right">$0.00</td>
+                  <td class="py-2 px-2 text-right">0.0%</td>
+                  <td class="py-2 pl-2 text-right">$0.00</td>
+                </tr>
+                <tr class="text-slate-500">
+                  <td class="py-2 pr-2 font-bold text-slate-300">DOGEUSDC</td>
+                  <td class="py-2 px-2 text-right">--</td>
+                  <td class="py-2 px-2 text-right">$0.00</td>
+                  <td class="py-2 px-2 text-right">0.0%</td>
+                  <td class="py-2 pl-2 text-right">$0.00</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="text-[11px] font-mono text-slate-500 pt-2 border-t border-slate-200 dark:border-slate-800">
+          // 6-Asset Orthogonal Core Basket • Auto-Hedging Active
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- SECTION 4: ADMIN COMMAND & CONTROL (C2) ENCLAVE               -->
+    <!-- ============================================================== -->
+    <div class="rounded-2xl p-5 sm:p-6 bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl space-y-6">
+      
+      <!-- C2 Section Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
+        <div class="space-y-1">
+          <div class="flex items-center space-x-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+            <span class="text-xs font-mono font-bold text-cyan-600 dark:text-cyan-400 tracking-wider uppercase">
+              // ADMIN COMMAND &amp; CONTROL (C2) CONSOLE
+            </span>
+          </div>
+          <p class="text-xs font-mono text-slate-500">
+            Cryptographically signed HMAC-SHA256 state transitions dispatched directly to Tokyo VPS Agent.
+          </p>
+        </div>
+
+        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-slate-200/80 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-mono text-[10px] text-slate-600 dark:text-slate-400">
+          <span>CHANNEL: TOKYO-VPS-01</span>
+          <span class="text-emerald-500">&bull; ONLINE</span>
+        </div>
+      </div>
+
+      <!-- Action Inputs & Buttons -->
+      <div class="space-y-4">
+        
+        <!-- Input Row -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
+          <div class="md:col-span-2 space-y-1.5">
+            <label for="c2-reason-input" class="text-slate-600 dark:text-slate-400 flex items-center justify-between">
+              <span>Reason / Audit Note (Required for Compliance Log):</span>
+              <span id="reason-char-count" class="text-[10px] text-slate-500">0 / 250</span>
+            </label>
+            <input 
+              type="text" 
+              id="c2-reason-input" 
+              placeholder="e.g., Scheduled monthly capital sync or volatility circuit re-alignment" 
+              maxlength="250"
+              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+            />
+          </div>
+
+          <div class="space-y-1.5">
+            <label for="c2-target-nav-input" class="text-slate-600 dark:text-slate-400">
+              New Target NAV ($) (Optional Sync):
+            </label>
+            <input 
+              type="number" 
+              id="c2-target-nav-input" 
+              placeholder="e.g., 12500.00" 
+              min="0"
+              step="0.01"
+              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+            />
+          </div>
+        </div>
+
+        <!-- 4 Action Buttons -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          
+          <!-- Button 1: Resume Running -->
+          <button 
+            type="button" 
+            data-target-state="STATE_RUNNING"
+            data-state-label="Resume Running"
+            data-state-color="emerald"
+            class="c2-action-btn group px-4 py-3 rounded-xl border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-mono text-xs font-bold transition-all flex items-center justify-center space-x-2 shadow-sm cursor-pointer"
+          >
+            <svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
+            </svg>
+            <span>Resume Running</span>
+          </button>
+
+          <!-- Button 2: Pause & Maintain Hedge -->
+          <button 
+            type="button" 
+            data-target-state="STATE_PAUSE_MAINTAIN"
+            data-state-label="Pause & Maintain Hedge"
+            data-state-color="amber"
+            class="c2-action-btn group px-4 py-3 rounded-xl border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 font-mono text-xs font-bold transition-all flex items-center justify-center space-x-2 shadow-sm cursor-pointer"
+          >
+            <svg class="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>
+            <span>Pause &amp; Maintain</span>
+          </button>
+
+          <!-- Button 3: Graceful Unwind to 100% Cash -->
+          <button 
+            type="button" 
+            data-target-state="STATE_GRACEFUL_UNWIND_FLAT"
+            data-state-label="Graceful Unwind to Flat"
+            data-state-color="cyan"
+            class="c2-action-btn group px-4 py-3 rounded-xl border border-cyan-500/40 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 font-mono text-xs font-bold transition-all flex items-center justify-center space-x-2 shadow-sm cursor-pointer"
+          >
+            <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+            </svg>
+            <span>Graceful Unwind (Flat)</span>
+          </button>
+
+          <!-- Button 4: Emergency IOC Halt -->
+          <button 
+            type="button" 
+            data-target-state="STATE_EMERGENCY_HALT"
+            data-state-label="Emergency IOC Halt"
+            data-state-color="rose"
+            class="c2-action-btn group px-4 py-3 rounded-xl border border-rose-500/50 bg-rose-500/15 hover:bg-rose-500/25 text-rose-600 dark:text-rose-400 font-mono text-xs font-extrabold transition-all flex items-center justify-center space-x-2 shadow-md cursor-pointer"
+          >
+            <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <span>EMERGENCY IOC HALT</span>
+          </button>
+
+        </div>
+      </div>
+
+      <!-- Feedback / Alert Banner -->
+      <div id="c2-feedback-banner" class="hidden p-3.5 rounded-xl font-mono text-xs flex items-center justify-between">
+        <span id="c2-feedback-msg">--</span>
+        <button id="c2-feedback-close" class="text-slate-400 hover:text-slate-200 cursor-pointer ml-3">&times;</button>
+      </div>
+
+      <!-- Recent Commands Table / Audit Feed -->
+      <div class="space-y-3 pt-2 border-t border-slate-200 dark:border-slate-800">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">
+            // RECENT C2 DISPATCH QUEUE (LAST 10 COMMANDS)
+          </span>
+          <span class="text-[10px] font-mono text-slate-500">
+            Tokyo VPS Queue Status
+          </span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full font-mono text-xs text-left">
+            <thead>
+              <tr class="text-[10px] text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
+                <th class="py-2 pr-3">Command ID</th>
+                <th class="py-2 px-3">Issued Time</th>
+                <th class="py-2 px-3">Target State</th>
+                <th class="py-2 px-3">Reason / Audit</th>
+                <th class="py-2 px-3 text-right">Target NAV</th>
+                <th class="py-2 px-3 text-center">VPS Status</th>
+                <th class="py-2 pl-3 text-right">HMAC Signature</th>
+              </tr>
+            </thead>
+            <tbody id="commands-table-body" class="divide-y divide-slate-200 dark:divide-slate-800/60">
+              <tr class="text-slate-500">
+                <td colspan="7" class="py-4 text-center text-xs">
+                  Loading recent C2 commands...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- CONFIRMATION MODAL                                             -->
+  <!-- ============================================================== -->
+  <div 
+    id="c2-modal" 
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden animate-fade-in"
+  >
+    <div class="w-full max-w-lg p-6 rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl space-y-5 font-mono">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center space-x-2 text-rose-400">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+          <span class="font-bold text-sm">// CONFIRM C2 STATE DISPATCH</span>
+        </div>
+        <button id="modal-close-btn" class="text-slate-400 hover:text-slate-200 cursor-pointer">&times;</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <p class="text-slate-300">
+          You are about to issue a cryptographically signed C2 state transition to the Tokyo VPS:
+        </p>
+
+        <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="text-slate-500">Target State:</span>
+            <span id="modal-target-state-badge" class="px-2 py-0.5 rounded font-bold text-xs">--</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-500">Target NAV ($):</span>
+            <span id="modal-target-nav" class="font-bold text-slate-200">Unchanged</span>
+          </div>
+          <div class="space-y-1">
+            <span class="text-slate-500">Reason / Audit Note:</span>
+            <div id="modal-reason" class="text-slate-300 italic bg-slate-900/80 p-2 rounded border border-slate-800/80 break-words">--</div>
+          </div>
+        </div>
+
+        <p class="text-[11px] text-amber-400/90 leading-relaxed">
+          &bull; The canonical payload will be HMAC-SHA256 signed with the server C2 secret.<br/>
+          &bull; This event is permanently written to the admin audit log.
+        </p>
+      </div>
+
+      <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-800">
+        <button 
+          id="modal-cancel-btn" 
+          type="button" 
+          class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold cursor-pointer transition-colors"
+        >
+          Abort Dispatch
+        </button>
+
+        <button 
+          id="modal-confirm-btn" 
+          type="button" 
+          class="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-lg shadow-rose-600/30 flex items-center space-x-2 cursor-pointer transition-all"
+        >
+          <span id="modal-confirm-spinner" class="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin hidden"></span>
+          <span id="modal-confirm-label">Confirm &amp; Transmit</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</Layout>
+
+<script>
+  import { supabase } from '../lib/supabase';
+
+  let pollingInterval: any = null;
+  let cachedTelemetryHistory: any[] = [];
+  let pendingTargetState = '';
+
+  // Currency Formatter
+  function formatUsd(val: number | null | undefined): string {
+    if (val === null || val === undefined || isNaN(val)) return '$0.00';
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(val);
+  }
+
+  // Time formatters
+  function formatTimeAgo(timestampMs: number | string): string {
+    const ms = typeof timestampMs === 'string' ? new Date(timestampMs).getTime() : timestampMs;
+    const diff = Date.now() - ms;
+    const secs = Math.floor(diff / 1000);
+    if (secs < 60) return `${secs}s ago`;
+    const mins = Math.floor(secs / 60);
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    return `${Math.floor(hrs / 24)}d ago`;
+  }
+
+  async function loadQuantSatelliteDashboard() {
+    // 1. Session & Role Verification
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    let isAdmin = false;
+    if (session) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+      isAdmin = profile?.role === 'admin';
+    }
+
+    if (!session || !isAdmin) {
+      window.location.href = '/login?redirect=/quant-satellite';
+      return;
+    }
+
+    // Uncloak Secure Enclave
+    const enclave = document.getElementById('secure-enclave');
+    if (enclave) {
+      enclave.classList.remove('opacity-0', 'pointer-events-none');
+    }
+
+    const userIdentity = document.getElementById('user-identity');
+    if (userIdentity && session?.user?.email) {
+      userIdentity.textContent = `// Identity: ${session.user.email} (Clearance Level: QUANT_ADMIN)`;
+    }
+
+    // Fetch and render initial data
+    await fetchAndRenderAll(session.access_token);
+
+    // Setup 15-second polling loop
+    if (pollingInterval) clearInterval(pollingInterval);
+    pollingInterval = setInterval(async () => {
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      if (currentSession?.access_token) {
+        await fetchAndRenderAll(currentSession.access_token, true);
+      }
+    }, 15000);
+
+    // Attach UI Event Listeners
+    setupEventListeners(session.access_token);
+  }
+
+  async function fetchAndRenderAll(accessToken: string, isAutoPoll: boolean = false) {
+    const syncTimerLabel = document.getElementById('sync-timer-label');
+    const refreshIcon = document.getElementById('refresh-icon');
+
+    if (!isAutoPoll && refreshIcon) {
+      refreshIcon.classList.add('animate-spin');
+    }
+
+    try {
+      // 1. Fetch Telemetry (via API or direct client)
+      let telemetryData: any = null;
+      try {
+        const res = await fetch(`/api/quant/telemetry?limit=500&_t=${Date.now()}`, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        });
+        if (res.ok) {
+          telemetryData = await res.json();
+        }
+      } catch (e) {
+        console.warn('API route error, falling back to direct supabase query:', e);
+      }
+
+      if (!telemetryData || !telemetryData.success) {
+        const { data: directData } = await supabase
+          .from('quant_satellite_telemetry')
+          .select('*')
+          .order('timestamp_ms', { ascending: false })
+          .limit(500);
+
+        const rows = directData || [];
+        telemetryData = {
+          success: true,
+          latest: rows[0] || null,
+          history: rows,
+        };
+      }
+
+      cachedTelemetryHistory = telemetryData.history || [];
+      const latest = telemetryData.latest;
+
+      // Render Section 1: State & N=2000 Progress
+      renderSection1(latest);
+
+      // Render Section 2: 6 KPI Cards
+      renderSection2(latest);
+
+      // Render Section 3: SVG Chart & Basket Table
+      renderSection3(latest, cachedTelemetryHistory);
+
+      // 2. Fetch C2 Commands
+      let commands: any[] = [];
+      try {
+        const cmdRes = await fetch('/api/quant/command', {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        });
+        if (cmdRes.ok) {
+          const json = await cmdRes.json();
+          commands = json.commands || [];
+        }
+      } catch (e) {
+        console.warn('API error fetching commands, falling back to direct supabase query:', e);
+      }
+
+      if (commands.length === 0) {
+        const { data: directCmds } = await supabase
+          .from('quant_satellite_commands')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(10);
+        commands = directCmds || [];
+      }
+
+      // Render Section 4: Commands Table
+      renderCommandsTable(commands);
+
+      if (syncTimerLabel) {
+        const now = new Date();
+        syncTimerLabel.textContent = `SYNCED ${now.toLocaleTimeString()}`;
+      }
+    } catch (err) {
+      console.error('Error fetching dashboard telemetry:', err);
+      if (syncTimerLabel) syncTimerLabel.textContent = 'SYNC ERROR';
+    } finally {
+      if (!isAutoPoll && refreshIcon) {
+        setTimeout(() => refreshIcon.classList.remove('animate-spin'), 400);
+      }
+    }
+  }
+
+  // ==========================================
+  // SECTION 1 RENDERER
+  // ==========================================
+  function renderSection1(latest: any) {
+    const pill = document.getElementById('runtime-state-pill');
+    const dot = document.getElementById('runtime-state-dot');
+    const label = document.getElementById('runtime-state-label');
+    const barIdxLabel = document.getElementById('bar-index-label');
+    const timeLabel = document.getElementById('latest-timestamp-label');
+    const estDaysLabel = document.getElementById('est-days-label');
+    const progressFill = document.getElementById('progress-bar-fill');
+    const progressPctLabel = document.getElementById('progress-pct-label');
+
+    if (!latest) {
+      if (label) label.textContent = 'STANDBY / NO DATA';
+      if (barIdxLabel) barIdxLabel.textContent = '#0 / 2,000';
+      if (timeLabel) timeLabel.textContent = 'Timestamp: --';
+      if (estDaysLabel) estDaysLabel.textContent = 'Awaiting Tokyo VPS Telemetry Stream...';
+      if (progressFill) progressFill.style.width = '0%';
+      if (progressPctLabel) progressPctLabel.textContent = '0.0% (0 / 2,000 Bars)';
+      return;
+    }
+
+    const state = latest.runtime_state || 'STATE_RUNNING';
+    const barIdx = Number(latest.bar_idx) || 0;
+    const evaluated = latest.gonogo_progress?.bars_evaluated ?? barIdx;
+    const targetBars = latest.gonogo_progress?.target_bars ?? 2000;
+    const pct = Math.min(100, Math.max(0, (evaluated / targetBars) * 100));
+
+    // Runtime state styling
+    if (pill && dot && label) {
+      label.textContent = state;
+      if (state === 'STATE_RUNNING') {
+        pill.className = 'inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-xl font-mono text-xs font-bold border transition-all duration-300 bg-emerald-500/15 text-emerald-500 border-emerald-500/40 shadow-sm shadow-emerald-500/10';
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+      } else if (state === 'STATE_PAUSE_MAINTAIN') {
+        pill.className = 'inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-xl font-mono text-xs font-bold border transition-all duration-300 bg-amber-500/15 text-amber-500 border-amber-500/40 shadow-sm shadow-amber-500/10';
+        dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
+      } else if (state === 'STATE_GRACEFUL_UNWIND_FLAT') {
+        pill.className = 'inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-xl font-mono text-xs font-bold border transition-all duration-300 bg-cyan-500/15 text-cyan-400 border-cyan-500/40 shadow-sm shadow-cyan-500/10';
+        dot.className = 'w-2 h-2 rounded-full bg-cyan-400 animate-pulse';
+      } else if (state === 'STATE_EMERGENCY_HALT') {
+        pill.className = 'inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-xl font-mono text-xs font-bold border transition-all duration-300 bg-rose-500/20 text-rose-400 border-rose-500/50 shadow-sm shadow-rose-500/20 animate-pulse';
+        dot.className = 'w-2 h-2 rounded-full bg-rose-500 animate-ping';
+      }
+    }
+
+    if (barIdxLabel) barIdxLabel.textContent = `#${barIdx.toLocaleString()} / 2,000`;
+
+    if (timeLabel && latest.timestamp_ms) {
+      const d = new Date(Number(latest.timestamp_ms));
+      timeLabel.textContent = `Timestamp: ${d.toISOString().replace('T', ' ').substring(0, 19)} UTC`;
+    }
+
+    // Remaining days based on 288 bars/day
+    const remainingBars = Math.max(0, targetBars - evaluated);
+    const remainingDays = (remainingBars / 288).toFixed(1);
+
+    if (estDaysLabel) {
+      if (evaluated >= targetBars) {
+        estDaysLabel.textContent = 'GO/NO-GO SAMPLE COMPLETE (N >= 2,000)';
+        estDaysLabel.className = 'text-xs font-mono font-bold text-emerald-400';
+      } else {
+        estDaysLabel.textContent = `~${remainingDays} Days Remaining (${remainingBars} bars @ 288/day)`;
+        estDaysLabel.className = 'text-xs font-mono font-bold text-cyan-400';
+      }
+    }
+
+    if (progressFill) progressFill.style.width = `${pct.toFixed(1)}%`;
+    if (progressPctLabel) {
+      progressPctLabel.textContent = `${pct.toFixed(1)}% (${evaluated.toLocaleString()} / ${targetBars.toLocaleString()} Bars)`;
+    }
+  }
+
+  // ==========================================
+  // SECTION 2 RENDERER (6 KPI CARDS)
+  // ==========================================
+  function renderSection2(latest: any) {
+    if (!latest) return;
+
+    // Card 1: NAV
+    const navVal = document.getElementById('nav-usd-val');
+    const walletVal = document.getElementById('wallet-balance-val');
+    const upnlVal = document.getElementById('unrealized-pnl-val');
+    const rpnlVal = document.getElementById('realized-pnl-val');
+    const feesVal = document.getElementById('total-fees-val');
+
+    const nav = Number(latest.nav_usd) || 0;
+    const wallet = Number(latest.wallet_balance_usd) || 0;
+    const upnl = Number(latest.unrealized_pnl_usd) || 0;
+    const rpnl = Number(latest.realized_pnl_usd) || 0;
+    const fees = Number(latest.total_fees_usd) || 0;
+
+    if (navVal) navVal.textContent = formatUsd(nav);
+    if (walletVal) walletVal.textContent = formatUsd(wallet);
+    if (upnlVal) {
+      upnlVal.textContent = formatUsd(upnl);
+      upnlVal.className = upnl >= 0 ? 'font-bold text-emerald-400' : 'font-bold text-rose-400';
+    }
+    if (rpnlVal) rpnlVal.textContent = formatUsd(rpnl);
+    if (feesVal) feesVal.textContent = formatUsd(fees);
+
+    // Card 2: Drawdown & Tail Risk
+    const ddVal = document.getElementById('drawdown-pct-val');
+    const ulcerVal = document.getElementById('ulcer-index-val');
+    const zStressVal = document.getElementById('z-stress-val');
+    const ddBadge = document.getElementById('dd-badge');
+
+    const dd = Number(latest.drawdown_pct) || 0;
+    const ulcer = Number(latest.ulcer_index) || 0;
+    const zStress = Number(latest.z_stress) || 0;
+
+    if (ddVal) {
+      ddVal.textContent = `${dd.toFixed(2)}%`;
+      ddVal.className = dd <= -4.0 
+        ? 'text-2xl sm:text-3xl font-extrabold text-rose-500 font-mono tracking-tight' 
+        : (dd < 0 ? 'text-2xl sm:text-3xl font-extrabold text-amber-400 font-mono tracking-tight' : 'text-2xl sm:text-3xl font-extrabold text-emerald-400 font-mono tracking-tight');
+    }
+    if (ulcerVal) ulcerVal.textContent = ulcer.toFixed(3);
+    if (zStressVal) zStressVal.textContent = zStress.toFixed(2);
+    if (ddBadge) {
+      if (dd <= -4.0) {
+        ddBadge.textContent = 'CIRCUIT BREACH';
+        ddBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-500/20 text-rose-400 border border-rose-500/40';
+      } else if (dd <= -2.0) {
+        ddBadge.textContent = 'TAIL DEFENSE';
+        ddBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-400 border border-amber-500/40';
+      } else {
+        ddBadge.textContent = 'NOMINAL RISK';
+        ddBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30';
+      }
+    }
+
+    // Card 3: Dual-Nullspace Neutrality
+    const betaVal = document.getElementById('tail-beta-val');
+    const netExpVal = document.getElementById('net-exposure-val');
+    const grossLevVal = document.getElementById('gross-leverage-val');
+    const betaBadge = document.getElementById('beta-badge');
+
+    const tailBeta = Number(latest.realized_tail_beta) || 0;
+    const netExp = Number(latest.net_dollar_exposure) || 0;
+    const grossLev = Number(latest.gross_leverage) || 0;
+
+    if (betaVal) betaVal.textContent = tailBeta.toFixed(3);
+    if (netExpVal) netExpVal.textContent = formatUsd(netExp);
+    if (grossLevVal) grossLevVal.textContent = `${grossLev.toFixed(2)}x`;
+
+    if (betaBadge) {
+      if (tailBeta <= 0.035) {
+        betaBadge.textContent = 'SAFE (<= 0.035)';
+        betaBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30';
+      } else {
+        betaBadge.textContent = 'BETA BREACH (> 0.035)';
+        betaBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-500/20 text-rose-400 border border-rose-500/50';
+      }
+    }
+
+    // Card 4: Layer-1 Regime & CSD Gate
+    const gateVal = document.getElementById('regime-gate-val');
+    const gCsdVal = document.getElementById('g-csd-val');
+    const rhoVal = document.getElementById('rho-h12-val');
+    const csdBadge = document.getElementById('csd-badge');
+    const csdRegimeLabel = document.getElementById('csd-regime-label');
+
+    const gate = Number(latest.regime_gate_global) || 1.0;
+    const gCsd = Number(latest.csd_status?.g_csd) || 0;
+    const rho = Number(latest.csd_status?.concordance_rho_h12) || 0;
+    const regime = latest.csd_status?.regime || (gate > 0 ? 'EIGEN_EXPANSION' : 'THROTTLED');
+
+    if (gateVal) gateVal.textContent = `${gate.toFixed(2)}x`;
+    if (gCsdVal) gCsdVal.textContent = gCsd.toFixed(3);
+    if (rhoVal) rhoVal.textContent = rho.toFixed(3);
+    if (csdRegimeLabel) csdRegimeLabel.textContent = regime;
+
+    if (csdBadge) {
+      if (gate >= 0.8) {
+        csdBadge.textContent = 'GATE OPEN (1.0x)';
+        csdBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30';
+      } else if (gate > 0) {
+        csdBadge.textContent = `THROTTLED (${gate.toFixed(2)}x)`;
+        csdBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-400 border border-amber-500/40';
+      } else {
+        csdBadge.textContent = 'GATE CLOSED (0.0x)';
+        csdBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-500/20 text-rose-400 border border-rose-500/50';
+      }
+    }
+
+    // Card 5: Execution Quality
+    const mtVal = document.getElementById('maker-taker-val');
+    const makerFillsVal = document.getElementById('maker-fills-val');
+    const takerFillsVal = document.getElementById('taker-fills-val');
+    const gtxRejectsVal = document.getElementById('gtx-rejects-val');
+
+    const mtRatio = Number(latest.maker_taker_ratio) || 0;
+    const makerFills = latest.positions_lots?.__execution?.maker_fills ?? 0;
+    const takerFills = latest.positions_lots?.__execution?.taker_fills ?? 0;
+    const gtxRejects = latest.positions_lots?.__execution?.gtx_rejects ?? 0;
+
+    if (mtVal) mtVal.textContent = `${mtRatio.toFixed(2)}x`;
+    if (makerFillsVal) makerFillsVal.textContent = String(makerFills);
+    if (takerFillsVal) takerFillsVal.textContent = String(takerFills);
+    if (gtxRejectsVal) gtxRejectsVal.textContent = `${gtxRejects} (Protected)`;
+
+    // Card 6: Core-Satellite Split Calculator calculation
+    updateCalculatorOutputs(nav);
+  }
+
+  // ==========================================
+  // CORE-SATELLITE CALCULATOR
+  // ==========================================
+  function updateCalculatorOutputs(currentSatNav?: number) {
+    const coreInput = document.getElementById('core-balance-input') as HTMLInputElement | null;
+    const salaryInput = document.getElementById('salary-deposit-input') as HTMLInputElement | null;
+    const satPctLabel = document.getElementById('calc-sat-pct');
+    const bandBadge = document.getElementById('band-status-badge');
+    const depCoreLabel = document.getElementById('calc-deposit-core');
+    const depSatLabel = document.getElementById('calc-deposit-sat');
+    const totalNavLabel = document.getElementById('calc-total-nav');
+
+    const coreNav = Math.max(0, Number(coreInput?.value) || 0);
+    const cNew = Math.max(0, Number(salaryInput?.value) || 0);
+    const satNav = currentSatNav !== undefined 
+      ? currentSatNav 
+      : Math.max(0, Number(document.getElementById('nav-usd-val')?.textContent?.replace(/[^0-9.-]+/g, '')) || 0);
+
+    const totalNav = coreNav + satNav;
+    const combinedTotal = totalNav + cNew;
+
+    // Current satellite allocation %
+    const satPct = totalNav > 0 ? (satNav / totalNav) * 100 : 10.0;
+
+    if (satPctLabel) satPctLabel.textContent = `${satPct.toFixed(2)}%`;
+    if (totalNavLabel) totalNavLabel.textContent = formatUsd(combinedTotal);
+
+    // 90/10 Split of new deposit C_new
+    const depCore = cNew * 0.90;
+    const depSat = cNew * 0.10;
+
+    if (depCoreLabel) depCoreLabel.textContent = `+${formatUsd(depCore)}`;
+    if (depSatLabel) depSatLabel.textContent = `+${formatUsd(depSat)}`;
+
+    // Tolerance band [7.0%, 13.5%]
+    if (bandBadge) {
+      if (satPct >= 7.0 && satPct <= 13.5) {
+        bandBadge.textContent = 'OPTIMAL [7.0%, 13.5%]';
+        bandBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30';
+      } else if (satPct < 7.0) {
+        bandBadge.textContent = 'UNDER-ALLOCATED (< 7.0%)';
+        bandBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-400 border border-amber-500/40';
+      } else {
+        bandBadge.textContent = 'OVER-ALLOCATED (> 13.5%)';
+        bandBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-500/20 text-rose-400 border border-rose-500/50';
+      }
+    }
+  }
+
+  // ==========================================
+  // SECTION 3 RENDERER (SVG CHART & BASKET)
+  // ==========================================
+  function renderSection3(latest: any, history: any[]) {
+    // 1. Render Basket Exposure Table
+    renderBasketTable(latest?.positions_lots || {});
+
+    // 2. Render SVG Chart
+    renderChart(history);
+  }
+
+  function renderBasketTable(positions: Record<string, any>) {
+    const tbody = document.getElementById('basket-table-body');
+    if (!tbody) return;
+
+    const basketTickers = ['BTCUSDC', 'ETHUSDC', 'SOLUSDC', 'SUIUSDT', 'XRPUSDC', 'DOGEUSDC'];
+    
+    const rowsHtml = basketTickers.map(ticker => {
+      const pos = positions[ticker] || {};
+      const lots = Number(pos.qty_lots) || 0;
+      const notional = Number(pos.notional_usd) || 0;
+      const weight = Number(pos.weight) || 0;
+      const entryPrice = Number(pos.entry_price) || 0;
+
+      const isLong = weight > 0;
+      const isShort = weight < 0;
+      const weightPct = Math.abs(weight * 100).toFixed(1);
+      const barColor = isLong ? 'bg-emerald-500' : (isShort ? 'bg-rose-500' : 'bg-slate-600');
+
+      return `
+        <tr class="hover:bg-slate-200/50 dark:hover:bg-slate-800/40 transition-colors">
+          <td class="py-2.5 pr-2 font-bold text-slate-900 dark:text-slate-100 flex items-center space-x-1.5">
+            <span class="w-1.5 h-1.5 rounded-full ${isLong ? 'bg-emerald-400' : (isShort ? 'bg-rose-400' : 'bg-slate-500')}"></span>
+            <span>${ticker}</span>
+          </td>
+          <td class="py-2.5 px-2 text-right text-slate-700 dark:text-slate-300">
+            ${lots !== 0 ? lots.toFixed(4) : '--'}
+          </td>
+          <td class="py-2.5 px-2 text-right font-bold text-slate-800 dark:text-slate-200">
+            ${formatUsd(notional)}
+          </td>
+          <td class="py-2.5 px-2 text-right">
+            <div class="flex items-center justify-end space-x-1.5">
+              <span class="${isLong ? 'text-emerald-500' : (isShort ? 'text-rose-400' : 'text-slate-500')} font-bold">
+                ${weight !== 0 ? (isShort ? '-' : '+') + weightPct + '%' : '0.0%'}
+              </span>
+              <div class="w-10 bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                <div class="h-full ${barColor}" style="width: ${Math.min(100, parseFloat(weightPct) * 2.5)}%"></div>
+              </div>
+            </div>
+          </td>
+          <td class="py-2.5 pl-2 text-right text-slate-600 dark:text-slate-400">
+            ${entryPrice > 0 ? formatUsd(entryPrice) : '--'}
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    tbody.innerHTML = rowsHtml;
+  }
+
+  function renderChart(history: any[]) {
+    const emptyState = document.getElementById('chart-empty-state');
+    const navArea = document.getElementById('chart-nav-area');
+    const navPath = document.getElementById('chart-nav-path');
+    const betaPath = document.getElementById('chart-beta-path');
+    const gridLines = document.getElementById('chart-grid-lines');
+    const yLabels = document.getElementById('chart-y-labels');
+    const betaThresholdLine = document.getElementById('chart-beta-threshold-line');
+    const betaThresholdLabel = document.getElementById('chart-beta-threshold-label');
+
+    if (!history || history.length === 0) {
+      if (emptyState) emptyState.classList.remove('hidden');
+      if (navArea) navArea.setAttribute('d', '');
+      if (navPath) navPath.setAttribute('d', '');
+      if (betaPath) betaPath.setAttribute('d', '');
+      return;
+    }
+
+    if (emptyState) emptyState.classList.add('hidden');
+
+    // Chronological order: reverse from DESC
+    const sorted = [...history].sort((a, b) => Number(a.timestamp_ms) - Number(b.timestamp_ms));
+
+    const width = 900;
+    const height = 300;
+    const padLeft = 60;
+    const padRight = 50;
+    const padTop = 25;
+    const padBottom = 35;
+    const chartW = width - padLeft - padRight;
+    const chartH = height - padTop - padBottom;
+
+    // NAV min & max
+    let minNav = Math.min(...sorted.map(d => Number(d.nav_usd) || 0));
+    let maxNav = Math.max(...sorted.map(d => Number(d.nav_usd) || 0));
+    if (minNav === maxNav) {
+      minNav *= 0.98;
+      maxNav *= 1.02;
+    }
+    const navMargin = (maxNav - minNav) * 0.1 || 100;
+    minNav = Math.max(0, minNav - navMargin);
+    maxNav = maxNav + navMargin;
+
+    // Beta min & max (0.0 to 0.05 min range)
+    let minBeta = 0.0;
+    let maxBeta = Math.max(0.045, ...sorted.map(d => Number(d.realized_tail_beta) || 0));
+
+    // Coordinate scales
+    const scaleX = (idx: number) => {
+      if (sorted.length === 1) return padLeft + chartW / 2;
+      return padLeft + (idx / (sorted.length - 1)) * chartW;
+    };
+
+    const scaleYNav = (val: number) => {
+      return padTop + chartH - ((val - minNav) / (maxNav - minNav)) * chartH;
+    };
+
+    const scaleYBeta = (val: number) => {
+      return padTop + chartH - ((val - minBeta) / (maxBeta - minBeta)) * chartH;
+    };
+
+    // Grid lines & labels (4 levels)
+    if (gridLines && yLabels) {
+      let gridHtml = '';
+      let labelHtml = '';
+
+      for (let i = 0; i <= 4; i++) {
+        const frac = i / 4;
+        const y = padTop + chartH * (1 - frac);
+        const navVal = minNav + frac * (maxNav - minNav);
+        const betaVal = minBeta + frac * (maxBeta - minBeta);
+
+        gridHtml += `<line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" />`;
+        labelHtml += `<text x="${padLeft - 8}" y="${y + 3}" text-anchor="end">${formatUsd(navVal)}</text>`;
+        labelHtml += `<text x="${width - padRight + 8}" y="${y + 3}" text-anchor="start" fill="#fbbf24">${betaVal.toFixed(3)}</text>`;
+      }
+
+      gridLines.innerHTML = gridHtml;
+      yLabels.innerHTML = labelHtml;
+    }
+
+    // Beta threshold reference line (0.035)
+    const thresholdY = scaleYBeta(0.035);
+    if (betaThresholdLine) {
+      betaThresholdLine.setAttribute('y1', thresholdY.toString());
+      betaThresholdLine.setAttribute('y2', thresholdY.toString());
+      betaThresholdLine.setAttribute('x1', padLeft.toString());
+      betaThresholdLine.setAttribute('x2', (width - padRight).toString());
+    }
+    if (betaThresholdLabel) {
+      betaThresholdLabel.setAttribute('y', (thresholdY - 4).toString());
+      betaThresholdLabel.setAttribute('x', (width - padRight - 5).toString());
+    }
+
+    // Build SVG paths
+    const navPoints = sorted.map((d, i) => ({
+      x: scaleX(i),
+      y: scaleYNav(Number(d.nav_usd) || 0),
+      data: d,
+    }));
+
+    const betaPoints = sorted.map((d, i) => ({
+      x: scaleX(i),
+      y: scaleYBeta(Number(d.realized_tail_beta) || 0),
+    }));
+
+    const navPathD = navPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+    const betaPathD = betaPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+
+    const baselineY = padTop + chartH;
+    const navAreaD = `${navPathD} L ${navPoints[navPoints.length - 1].x.toFixed(1)} ${baselineY} L ${navPoints[0].x.toFixed(1)} ${baselineY} Z`;
+
+    if (navPath) navPath.setAttribute('d', navPathD);
+    if (navArea) navArea.setAttribute('d', navAreaD);
+    if (betaPath) betaPath.setAttribute('d', betaPathD);
+
+    // Interactive Hover Crosshair
+    const svgEl = document.getElementById('telemetry-chart-svg');
+    const crosshairGroup = document.getElementById('chart-crosshair-group');
+    const crosshairV = document.getElementById('crosshair-v');
+    const dotNav = document.getElementById('crosshair-nav-dot');
+    const dotBeta = document.getElementById('crosshair-beta-dot');
+    const tooltip = document.getElementById('chart-floating-tooltip');
+    const tipTime = document.getElementById('tip-bar-time');
+    const tipNav = document.getElementById('tip-nav-val');
+    const tipBeta = document.getElementById('tip-beta-val');
+
+    if (svgEl && !svgEl.dataset.crosshairBound) {
+      svgEl.dataset.crosshairBound = 'true';
+
+      svgEl.addEventListener('mousemove', (e: MouseEvent) => {
+        const rect = svgEl.getBoundingClientRect();
+        const mouseX = ((e.clientX - rect.left) / rect.width) * width;
+
+        if (mouseX < padLeft || mouseX > width - padRight) {
+          if (crosshairGroup) crosshairGroup.setAttribute('opacity', '0');
+          if (tooltip) tooltip.classList.add('hidden');
+          return;
+        }
+
+        // Find nearest point
+        let nearestIdx = 0;
+        let minDist = Infinity;
+        navPoints.forEach((p, idx) => {
+          const dist = Math.abs(p.x - mouseX);
+          if (dist < minDist) {
+            minDist = dist;
+            nearestIdx = idx;
+          }
+        });
+
+        const np = navPoints[nearestIdx];
+        const bp = betaPoints[nearestIdx];
+        const record = np.data;
+
+        if (crosshairGroup) crosshairGroup.setAttribute('opacity', '1');
+        if (crosshairV) {
+          crosshairV.setAttribute('x1', np.x.toString());
+          crosshairV.setAttribute('x2', np.x.toString());
+        }
+        if (dotNav) {
+          dotNav.setAttribute('cx', np.x.toString());
+          dotNav.setAttribute('cy', np.y.toString());
+        }
+        if (dotBeta) {
+          dotBeta.setAttribute('cx', bp.x.toString());
+          dotBeta.setAttribute('cy', bp.y.toString());
+        }
+
+        if (tooltip && tipTime && tipNav && tipBeta) {
+          const d = new Date(Number(record.timestamp_ms));
+          tipTime.textContent = `Bar #${record.bar_idx} &bull; ${d.toISOString().replace('T', ' ').substring(0, 16)} UTC`;
+          tipNav.textContent = formatUsd(Number(record.nav_usd));
+          tipBeta.textContent = Number(record.realized_tail_beta).toFixed(3);
+          tooltip.classList.remove('hidden');
+        }
+      });
+
+      svgEl.addEventListener('mouseleave', () => {
+        if (crosshairGroup) crosshairGroup.setAttribute('opacity', '0');
+        if (tooltip) tooltip.classList.add('hidden');
+      });
+    }
+  }
+
+  // ==========================================
+  // SECTION 4 RENDERER (COMMANDS QUEUE TABLE)
+  // ==========================================
+  function renderCommandsTable(commands: any[]) {
+    const tbody = document.getElementById('commands-table-body');
+    if (!tbody) return;
+
+    if (!commands || commands.length === 0) {
+      tbody.innerHTML = `
+        <tr class="text-slate-500">
+          <td colspan="7" class="py-6 text-center text-xs">
+            // NO C2 COMMANDS IN QUEUE • Command transitions dispatched from this console will appear here.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    const html = commands.map(cmd => {
+      const state = cmd.target_state || 'UNKNOWN';
+      const status = cmd.status || 'PENDING';
+      const idShort = cmd.id ? `${cmd.id.substring(0, 8)}...` : '--';
+      const hmacShort = cmd.hmac_signature ? `${cmd.hmac_signature.substring(0, 10)}...` : '--';
+
+      let stateBadgeClass = 'bg-slate-800 text-slate-300';
+      if (state === 'STATE_RUNNING') stateBadgeClass = 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30';
+      else if (state === 'STATE_PAUSE_MAINTAIN') stateBadgeClass = 'bg-amber-500/15 text-amber-400 border border-amber-500/30';
+      else if (state === 'STATE_GRACEFUL_UNWIND_FLAT') stateBadgeClass = 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30';
+      else if (state === 'STATE_EMERGENCY_HALT') stateBadgeClass = 'bg-rose-500/20 text-rose-400 border border-rose-500/50';
+
+      let statusBadge = `
+        <span class="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+          <span>PENDING</span>
+        </span>
+      `;
+
+      if (status === 'ACKNOWLEDGED') {
+        statusBadge = `
+          <span class="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/15 text-blue-400 border border-blue-500/30">
+            <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+            <span>ACK</span>
+          </span>
+        `;
+      } else if (status === 'EXECUTED') {
+        statusBadge = `
+          <span class="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <span>EXECUTED</span>
+          </span>
+        `;
+      } else if (status === 'REJECTED') {
+        statusBadge = `
+          <span class="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/40">
+            <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+            <span>REJECTED</span>
+          </span>
+        `;
+      }
+
+      return `
+        <tr class="hover:bg-slate-200/50 dark:hover:bg-slate-800/40 transition-colors">
+          <td class="py-2.5 pr-3 text-cyan-600 dark:text-cyan-400 font-bold" title="${cmd.id}">
+            ${idShort}
+          </td>
+          <td class="py-2.5 px-3 text-slate-500 text-[11px]" title="${cmd.created_at}">
+            ${formatTimeAgo(cmd.created_at || cmd.issued_at_ms)}
+          </td>
+          <td class="py-2.5 px-3">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${stateBadgeClass}">
+              ${state}
+            </span>
+          </td>
+          <td class="py-2.5 px-3 text-slate-700 dark:text-slate-300 max-w-xs truncate" title="${cmd.reason}">
+            ${cmd.reason || '--'}
+          </td>
+          <td class="py-2.5 px-3 text-right font-bold text-slate-800 dark:text-slate-200">
+            ${cmd.target_nav_usd ? formatUsd(Number(cmd.target_nav_usd)) : '--'}
+          </td>
+          <td class="py-2.5 px-3 text-center">
+            ${statusBadge}
+          </td>
+          <td class="py-2.5 pl-3 text-right text-slate-500 text-[10px]" title="${cmd.hmac_signature}">
+            ${hmacShort}
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    tbody.innerHTML = html;
+  }
+
+  // ==========================================
+  // EVENT LISTENERS & C2 MODAL HANDLING
+  // ==========================================
+  function setupEventListeners(accessToken: string) {
+    const refreshBtn = document.getElementById('refresh-btn');
+    refreshBtn?.addEventListener('click', async () => {
+      await fetchAndRenderAll(accessToken, false);
+    });
+
+    // Calculator Inputs
+    const coreInput = document.getElementById('core-balance-input');
+    const salaryInput = document.getElementById('salary-deposit-input');
+    [coreInput, salaryInput].forEach(inp => {
+      inp?.addEventListener('input', () => updateCalculatorOutputs());
+    });
+
+    // Reason length counter
+    const reasonInput = document.getElementById('c2-reason-input') as HTMLInputElement | null;
+    const charCount = document.getElementById('reason-char-count');
+    reasonInput?.addEventListener('input', () => {
+      if (charCount && reasonInput) {
+        charCount.textContent = `${reasonInput.value.length} / 250`;
+      }
+    });
+
+    // Feedback close button
+    const fbBanner = document.getElementById('c2-feedback-banner');
+    const fbClose = document.getElementById('c2-feedback-close');
+    fbClose?.addEventListener('click', () => {
+      fbBanner?.classList.add('hidden');
+    });
+
+    // Modal elements
+    const modal = document.getElementById('c2-modal');
+    const modalStateBadge = document.getElementById('modal-target-state-badge');
+    const modalTargetNav = document.getElementById('modal-target-nav');
+    const modalReason = document.getElementById('modal-reason');
+    const modalCancelBtn = document.getElementById('modal-cancel-btn');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+    const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+    const modalConfirmSpinner = document.getElementById('modal-confirm-spinner');
+    const modalConfirmLabel = document.getElementById('modal-confirm-label');
+
+    function closeModal() {
+      modal?.classList.add('hidden');
+      pendingTargetState = '';
+    }
+
+    [modalCancelBtn, modalCloseBtn].forEach(b => b?.addEventListener('click', closeModal));
+
+    // C2 Action Buttons
+    const actionBtns = document.querySelectorAll('.c2-action-btn');
+    actionBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const reason = reasonInput?.value.trim() || '';
+        if (!reason) {
+          if (reasonInput) {
+            reasonInput.classList.add('border-rose-500', 'ring-2', 'ring-rose-500/30');
+            reasonInput.focus();
+            setTimeout(() => {
+              reasonInput.classList.remove('border-rose-500', 'ring-2', 'ring-rose-500/30');
+            }, 3000);
+          }
+          showFeedback('Please provide a Reason / Audit Note before dispatching a state transition.', 'error');
+          return;
+        }
+
+        const targetState = btn.getAttribute('data-target-state') || '';
+        const stateLabel = btn.getAttribute('data-state-label') || targetState;
+        const stateColor = btn.getAttribute('data-state-color') || 'cyan';
+        const targetNavInput = document.getElementById('c2-target-nav-input') as HTMLInputElement | null;
+        const targetNavVal = targetNavInput?.value ? Number(targetNavInput.value) : null;
+
+        pendingTargetState = targetState;
+
+        if (modalStateBadge) {
+          modalStateBadge.textContent = stateLabel;
+          modalStateBadge.className = `px-2 py-0.5 rounded font-bold text-xs bg-${stateColor}-500/20 text-${stateColor}-400 border border-${stateColor}-500/40`;
+        }
+
+        if (modalTargetNav) {
+          modalTargetNav.textContent = targetNavVal ? formatUsd(targetNavVal) : 'Unchanged (Current Balance)';
+        }
+
+        if (modalReason) {
+          modalReason.textContent = `"${reason}"`;
+        }
+
+        modal?.classList.remove('hidden');
+      });
+    });
+
+    // Confirm button in modal -> POST /api/quant/command
+    modalConfirmBtn?.addEventListener('click', async () => {
+      if (!pendingTargetState) return;
+
+      const reason = reasonInput?.value.trim() || '';
+      const targetNavInput = document.getElementById('c2-target-nav-input') as HTMLInputElement | null;
+      const targetNavVal = targetNavInput?.value ? Number(targetNavInput.value) : null;
+
+      // Loading state in modal
+      modalConfirmSpinner?.classList.remove('hidden');
+      if (modalConfirmLabel) modalConfirmLabel.textContent = 'Transmitting...';
+      if (modalConfirmBtn) (modalConfirmBtn as HTMLButtonElement).disabled = true;
+
+      try {
+        const res = await fetch('/api/quant/command', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            target_state: pendingTargetState,
+            reason: reason,
+            target_nav_usd: targetNavVal,
+          }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.ok) {
+          throw new Error(data.error || 'Failed to dispatch command');
+        }
+
+        closeModal();
+        showFeedback(`Successfully dispatched ${pendingTargetState} (Command ID: ${data.command_id.substring(0, 8)}...). Written to audit log.`, 'success');
+
+        // Clear input fields
+        if (reasonInput) reasonInput.value = '';
+        if (targetNavInput) targetNavInput.value = '';
+        if (charCount) charCount.textContent = '0 / 250';
+
+        // Refresh dashboard
+        await fetchAndRenderAll(accessToken, false);
+      } catch (err: any) {
+        showFeedback(`Error dispatching C2 command: ${err.message}`, 'error');
+      } finally {
+        modalConfirmSpinner?.classList.add('hidden');
+        if (modalConfirmLabel) modalConfirmLabel.textContent = 'Confirm & Transmit';
+        if (modalConfirmBtn) (modalConfirmBtn as HTMLButtonElement).disabled = false;
+      }
+    });
+  }
+
+  function showFeedback(msg: string, type: 'success' | 'error') {
+    const banner = document.getElementById('c2-feedback-banner');
+    const msgEl = document.getElementById('c2-feedback-msg');
+    if (!banner || !msgEl) return;
+
+    msgEl.textContent = msg;
+    banner.classList.remove('hidden');
+
+    if (type === 'success') {
+      banner.className = 'p-3.5 rounded-xl font-mono text-xs flex items-center justify-between bg-emerald-500/15 text-emerald-400 border border-emerald-500/40';
+    } else {
+      banner.className = 'p-3.5 rounded-xl font-mono text-xs flex items-center justify-between bg-rose-500/15 text-rose-400 border border-rose-500/40';
+    }
+
+    setTimeout(() => {
+      banner.classList.add('hidden');
+    }, 8000);
+  }
+
+  document.addEventListener('astro:page-load', loadQuantSatelliteDashboard);
+</script>
