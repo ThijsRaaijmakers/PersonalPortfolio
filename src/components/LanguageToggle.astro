@@ -1,6 +1,14 @@
 ---
 const pathname = Astro.url.pathname;
-const search = Astro.url.search || '';
+const searchParams = new URLSearchParams(Astro.url.search);
+searchParams.delete('venue');
+for (const [key, val] of Array.from(searchParams.entries())) {
+  if (val.includes('?venue=') || val.includes('&venue=')) {
+    searchParams.set(key, val.split(/[?&]venue=/)[0]);
+  }
+}
+const cleanSearchStr = searchParams.toString();
+const search = cleanSearchStr ? `?${cleanSearchStr}` : '';
 const isNl = pathname.startsWith('/nl');
 
 // Compute target URL cleanly
@@ -29,8 +37,20 @@ const targetUrl = `${targetPath}${search}`;
 </div>
 
 <script>
+  import { stripVenueFromCurrentUrl } from '../lib/venueState';
+
   function updateLanguageToggles() {
-    const search = window.location.search || '';
+    stripVenueFromCurrentUrl();
+    const url = new URL(window.location.href);
+    url.searchParams.delete('venue');
+    for (const [key, val] of Array.from(url.searchParams.entries())) {
+      if (val.includes('?venue=') || val.includes('&venue=')) {
+        url.searchParams.set(key, val.split(/[?&]venue=/)[0]);
+      }
+    }
+    const cleanSearchStr = url.searchParams.toString();
+    const search = cleanSearchStr ? `?${cleanSearchStr}` : '';
+
     const toggles = document.querySelectorAll<HTMLAnchorElement>('[data-lang-toggle]');
     toggles.forEach(toggle => {
       const targetBase = toggle.getAttribute('data-target-path');

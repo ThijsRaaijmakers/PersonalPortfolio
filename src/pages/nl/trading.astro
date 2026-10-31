@@ -741,6 +741,7 @@ if (session) {
 <script>
   import { supabase } from '../../lib/supabase';
   import { formatPct, formatDollar } from '../../lib/trading';
+  import { getActiveVenue, setActiveVenue, stripVenueFromCurrentUrl, type TradingVenue } from '../../lib/venueState';
 
   const ASSET_NAMES: Record<string, string> = {
     AAPL: 'Apple Inc.',
@@ -769,20 +770,9 @@ if (session) {
     CASH: '#06b6d4', // cyan
   };
 
-  const urlParams = new URLSearchParams(window.location.search);
-  let currentVenue: 'paper' | 'live' = urlParams.get('venue') === 'live' ? 'live' : 'paper';
+  // Active venue state management (cookie/session-driven, no ?venue= in URL)
+  let currentVenue: TradingVenue = getActiveVenue();
   let activeChartTab: 'equity' | 'streams' | 'drawdown' = 'equity';
-
-  function syncUrlAndLangToggles(venue: 'paper' | 'live') {
-    const newUrl = `${window.location.pathname}?venue=${venue}`;
-    window.history.replaceState(null, '', newUrl);
-
-    const langToggles = document.querySelectorAll<HTMLAnchorElement>('[data-lang-toggle]');
-    langToggles.forEach(toggle => {
-      const targetBase = toggle.getAttribute('data-target-path') || '/trading';
-      toggle.href = `${targetBase}?venue=${venue}`;
-    });
-  }
 
   function formatRelativeTime(dateStr: string | null | undefined): string {
     if (!dateStr) return 'Geen transacties geregistreerd';
@@ -1959,19 +1949,19 @@ if (session) {
       renderOrdersLedger(latest, error);
     }
 
-    const initialParams = new URLSearchParams(window.location.search);
-    currentVenue = initialParams.get('venue') === 'live' ? 'live' : 'paper';
-    syncUrlAndLangToggles(currentVenue);
+    // Initialize Venue from getActiveVenue and strip any legacy query params
+    currentVenue = getActiveVenue();
+    stripVenueFromCurrentUrl();
     updateEnvButtons();
 
     const enclave = document.getElementById('secure-enclave');
-    if (!enclave?.dataset.bound) {
-      if (enclave) enclave.dataset.bound = 'true';
+    if (enclave && !enclave.dataset.bound) {
+      enclave.dataset.bound = 'true';
 
       paperBtn?.addEventListener('click', async () => {
         if (currentVenue === 'paper') return;
         currentVenue = 'paper';
-        syncUrlAndLangToggles(currentVenue);
+        setActiveVenue('paper');
         updateEnvButtons();
         await triggerRefresh();
       });
@@ -1979,9 +1969,19 @@ if (session) {
       liveBtn?.addEventListener('click', async () => {
         if (currentVenue === 'live') return;
         currentVenue = 'live';
-        syncUrlAndLangToggles(currentVenue);
+        setActiveVenue('live');
         updateEnvButtons();
         await triggerRefresh();
+      });
+
+      window.addEventListener('quant:venue-change', async (e: Event) => {
+        const customEvt = e as CustomEvent<{ venue: TradingVenue }>;
+        const nextVenue = customEvt.detail?.venue;
+        if (nextVenue && nextVenue !== currentVenue) {
+          currentVenue = nextVenue;
+          updateEnvButtons();
+          await triggerRefresh();
+        }
       });
 
       const tabEquityBtn = document.getElementById('chart-tab-equity');

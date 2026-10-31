@@ -152,9 +152,11 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
       return; // Bypass database query entirely for non-admins
     }
 
-    // Extract shift date from query parameters
+    // Extract shift date from query parameters (100% sanitized against corrupted/leaked params)
     const params = new URLSearchParams(window.location.search);
-    const shiftDate = params.get('date');
+    const rawDate = params.get('date') || '';
+    const dateMatch = rawDate.match(/^\d{4}-\d{2}-\d{2}/);
+    const shiftDate = dateMatch ? dateMatch[0] : rawDate.split(/[?&]/)[0].trim();
 
     if (!shiftDate) {
       if (loadingEl) loadingEl.classList.add('hidden');

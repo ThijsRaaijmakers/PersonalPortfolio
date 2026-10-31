@@ -78,6 +78,26 @@ if (session) {
       
       <!-- Right Action Controls -->
       <div class="flex flex-wrap items-center gap-3">
+        <!-- Environment Filter Switcher Toggle -->
+        <div class="inline-flex p-1 rounded-xl bg-slate-100/90 dark:bg-slate-950/80 border border-slate-300 dark:border-slate-800 text-xs font-mono shadow-sm">
+          <button 
+            id="sat-env-paper-btn" 
+            type="button"
+            class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border transition-all duration-200 font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/40 shadow-sm cursor-pointer"
+          >
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+            <span>Paper Trading</span>
+          </button>
+          <button 
+            id="sat-env-live-btn" 
+            type="button"
+            class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-200 font-medium cursor-pointer"
+          >
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500/40"></span>
+            <span>Live Trading</span>
+          </button>
+        </div>
+
         <button 
           id="refresh-btn" 
           class="px-4 py-2 rounded-lg bg-cyan-950/20 dark:bg-cyan-950/50 hover:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 border border-cyan-500/40 font-mono text-xs font-bold transition-all flex items-center space-x-2 shadow-sm cursor-pointer"
@@ -269,7 +289,7 @@ if (session) {
       </div>
 
       <!-- Card 4: Layer-1 Regime & CSD Gate -->
-      <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl flex flex-col justify-between space-y-4">
+      <div class="p-5 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl flex flex-col justify-between space-y-4">
         <div>
           <div class="flex items-center justify-between gap-2 mb-2">
             <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// L1 REGIME & CSD GATE</span>
@@ -283,26 +303,34 @@ if (session) {
             </div>
             <span class="text-xs font-mono text-slate-500">Global Allocation Multiplier</span>
           </div>
+          <!-- Progress bar -->
+          <div class="h-1.5 w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden mt-2">
+            <div id="csd-gate-progress-bar" class="h-full bg-cyan-400 rounded-full transition-all duration-500" style="width: 100%"></div>
+          </div>
         </div>
 
-        <div class="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 font-mono text-xs">
-          <div class="flex justify-between items-center text-slate-600 dark:text-slate-400">
-            <span>Spectral Divergence (G_csd):</span>
+        <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 font-mono text-xs">
+          <div class="space-y-0.5">
+            <span class="text-slate-500 text-[10px] block">G_csd Divergence:</span>
             <span id="g-csd-val" class="font-bold text-slate-900 dark:text-slate-200">0.000</span>
           </div>
-          <div class="flex justify-between items-center text-slate-600 dark:text-slate-400">
-            <span>Concordance (&rho;_H12):</span>
+          <div class="space-y-0.5">
+            <span class="text-slate-500 text-[10px] block">Concordance (ρ_H12):</span>
             <span id="rho-h12-val" class="font-bold text-slate-900 dark:text-slate-200">0.000</span>
           </div>
-          <div class="flex justify-between items-center text-[11px] text-slate-500">
-            <span>Regime Classification:</span>
-            <span id="csd-regime-label" class="text-cyan-400 font-bold">STANDBY</span>
+          <div class="space-y-0.5">
+            <span class="text-slate-500 text-[10px] block">Regime Classification:</span>
+            <span id="csd-regime-label" class="font-bold text-cyan-400">STANDBY</span>
+          </div>
+          <div class="space-y-0.5">
+            <span class="text-slate-500 text-[10px] block">Quant L1 Err:</span>
+            <span id="quant-l1-err-val" class="font-bold text-emerald-400">0.000 (NOMINAL)</span>
           </div>
         </div>
       </div>
 
       <!-- Card 5: Execution Quality -->
-      <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl flex flex-col justify-between space-y-4">
+      <div class="p-5 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl flex flex-col justify-between space-y-4">
         <div>
           <div class="flex items-center justify-between gap-2 mb-2">
             <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// EXECUTION QUALITY</span>
@@ -312,30 +340,38 @@ if (session) {
           </div>
           <div class="flex items-baseline space-x-2">
             <div id="maker-taker-val" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-mono tracking-tight">
-              0.00x
+              0.00%
             </div>
-            <span class="text-xs font-mono text-slate-500">Maker/Taker Ratio</span>
+            <span class="text-xs font-mono text-slate-500">Maker / Taker Ratio</span>
+          </div>
+          <!-- Progress bar -->
+          <div class="h-1.5 w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden mt-2">
+            <div id="maker-taker-progress-bar" class="h-full bg-emerald-400 rounded-full transition-all duration-500" style="width: 0%"></div>
           </div>
         </div>
 
-        <div class="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 font-mono text-xs">
-          <div class="flex justify-between items-center text-slate-600 dark:text-slate-400">
-            <span>Maker Executions (Rebate):</span>
+        <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 font-mono text-xs">
+          <div class="space-y-0.5">
+            <span class="text-slate-500 text-[10px] block">Maker Fills:</span>
             <span id="maker-fills-val" class="font-bold text-emerald-500">0</span>
           </div>
-          <div class="flex justify-between items-center text-slate-600 dark:text-slate-400">
-            <span>Taker Executions:</span>
+          <div class="space-y-0.5">
+            <span class="text-slate-500 text-[10px] block">Taker Fills:</span>
             <span id="taker-fills-val" class="font-bold text-slate-400">0</span>
           </div>
-          <div class="flex justify-between items-center text-[11px] text-slate-500">
-            <span>GTX Slippage Rejects:</span>
-            <span id="gtx-rejects-val" class="text-slate-400 font-bold">0 (Protected)</span>
+          <div class="space-y-0.5">
+            <span class="text-slate-500 text-[10px] block">GTX Rejects:</span>
+            <span id="gtx-rejects-val" class="font-bold text-slate-400">0 (Protected)</span>
+          </div>
+          <div class="space-y-0.5">
+            <span class="text-slate-500 text-[10px] block">Total Fees ($):</span>
+            <span id="card5-fees-val" class="font-bold text-slate-200">$0.00</span>
           </div>
         </div>
       </div>
 
       <!-- Card 6: Core-Satellite Split Calculator -->
-      <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl flex flex-col justify-between space-y-3">
+      <div class="p-5 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl flex flex-col justify-between space-y-3">
         <div>
           <div class="flex items-center justify-between gap-2 mb-2">
             <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// CORE-SATELLITE 90/10</span>
@@ -352,13 +388,23 @@ if (session) {
         <!-- Interactive Calculator Inputs -->
         <div class="space-y-2 font-mono text-xs">
           <div class="flex items-center justify-between gap-2">
-            <label for="core-balance-input" class="text-[11px] text-slate-500">Alpaca Core ($):</label>
+            <div class="flex items-center space-x-1.5 min-w-0">
+              <label for="core-balance-input" class="text-[11px] text-slate-500 truncate">Alpaca Core ($):</label>
+              <button 
+                id="reset-core-live-btn" 
+                type="button" 
+                title="Reset to live Alpaca Core portfolio value"
+                class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-500 hover:bg-cyan-500/20 border border-cyan-500/30 transition-colors hidden cursor-pointer shrink-0"
+              >
+                LIVE: <span id="core-live-val">$0.00</span> ↺
+              </button>
+            </div>
             <input 
               type="number" 
               id="core-balance-input" 
               value="100000" 
               min="0" 
-              step="1000"
+              step="100"
               class="w-28 px-2 py-1 rounded bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-right font-mono text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-cyan-500"
             />
           </div>
@@ -837,10 +883,12 @@ if (session) {
 
 <script>
   import { supabase } from '../lib/supabase';
+  import { getActiveVenue, setActiveVenue, stripVenueFromCurrentUrl, type TradingVenue } from '../lib/venueState';
 
   let pollingInterval: any = null;
   let cachedTelemetryHistory: any[] = [];
   let pendingTargetState = '';
+  let liveAlpacaCoreNav: number | null = null;
 
   // Currency Formatter
   function formatUsd(val: number | null | undefined): string {
@@ -866,7 +914,57 @@ if (session) {
     return `${Math.floor(hrs / 24)}d ago`;
   }
 
+  function updateSatEnvButtons(venue: TradingVenue) {
+    const satPaperBtn = document.getElementById('sat-env-paper-btn');
+    const satLiveBtn = document.getElementById('sat-env-live-btn');
+    if (!satPaperBtn || !satLiveBtn) return;
+
+    if (venue === 'paper') {
+      satPaperBtn.className = 'flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border transition-all duration-200 font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/40 shadow-sm cursor-pointer';
+      satPaperBtn.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span><span>Paper Trading</span>';
+      satLiveBtn.className = 'flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-200 font-medium cursor-pointer';
+      satLiveBtn.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500/40"></span><span>Live Trading</span>';
+    } else {
+      satPaperBtn.className = 'flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-200 font-medium cursor-pointer';
+      satPaperBtn.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400/40"></span><span>Paper Trading</span>';
+      satLiveBtn.className = 'flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border transition-all duration-200 font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/40 shadow-sm cursor-pointer';
+      satLiveBtn.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span><span>Live Trading</span>';
+    }
+  }
+
+  async function fetchLiveAlpacaCoreNav() {
+    try {
+      const { data, error } = await supabase
+        .from('trading_telemetry')
+        .select('portfolio_value, run_timestamp')
+        .order('run_timestamp', { ascending: false })
+        .limit(1);
+
+      if (!error && data && data.length > 0 && data[0].portfolio_value != null) {
+        const val = Number(data[0].portfolio_value);
+        if (!isNaN(val) && val > 0) {
+          liveAlpacaCoreNav = val;
+          const coreInput = document.getElementById('core-balance-input') as HTMLInputElement | null;
+          const liveBtn = document.getElementById('reset-core-live-btn');
+          const liveValSpan = document.getElementById('core-live-val');
+
+          if (liveValSpan) liveValSpan.textContent = formatUsd(val);
+          if (liveBtn) liveBtn.classList.remove('hidden');
+
+          if (coreInput && !coreInput.dataset.userEdited) {
+            coreInput.value = val.toFixed(2);
+            updateCalculatorOutputs();
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Unable to query live Alpaca core NAV:', e);
+    }
+  }
+
   async function loadQuantSatelliteDashboard() {
+    stripVenueFromCurrentUrl();
+
     // 1. Session & Role Verification
     const { data: { session } } = await supabase.auth.getSession();
     
@@ -896,6 +994,12 @@ if (session) {
       userIdentity.textContent = `// Identity: ${session.user.email} (Clearance Level: QUANT_ADMIN)`;
     }
 
+    const activeVenue = getActiveVenue();
+    updateSatEnvButtons(activeVenue);
+
+    // Fetch live Alpaca Core NAV from trading_telemetry
+    await fetchLiveAlpacaCoreNav();
+
     // Fetch and render initial data
     await fetchAndRenderAll(session.access_token);
 
@@ -922,9 +1026,10 @@ if (session) {
 
     try {
       // 1. Fetch Telemetry (via API or direct client)
+      const currentVenue = getActiveVenue();
       let telemetryData: any = null;
       try {
-        const res = await fetch(`/api/quant/telemetry?limit=500&_t=${Date.now()}`, {
+        const res = await fetch(`/api/quant/telemetry?venue=${currentVenue}&limit=500&_t=${Date.now()}`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
           },
@@ -940,6 +1045,7 @@ if (session) {
         const { data: directData } = await supabase
           .from('quant_satellite_telemetry')
           .select('*')
+          .eq('venue', currentVenue)
           .order('timestamp_ms', { ascending: false })
           .limit(500);
 
@@ -1168,16 +1274,25 @@ if (session) {
     const rhoVal = document.getElementById('rho-h12-val');
     const csdBadge = document.getElementById('csd-badge');
     const csdRegimeLabel = document.getElementById('csd-regime-label');
+    const quantL1ErrVal = document.getElementById('quant-l1-err-val');
+    const csdProgressBar = document.getElementById('csd-gate-progress-bar');
 
-    const gate = Number(latest.regime_gate_global) || 1.0;
-    const gCsd = Number(latest.csd_status?.g_csd) || 0;
-    const rho = Number(latest.csd_status?.concordance_rho_h12) || 0;
+    const rawGate = Number(latest.regime_gate_global);
+    const gate = isNaN(rawGate) ? 1.0 : rawGate;
+    const rawGCsd = Number(latest.csd_status?.g_csd);
+    const gCsd = isNaN(rawGCsd) ? 0 : rawGCsd;
+    const rawRho = Number(latest.csd_status?.concordance_rho_h12);
+    const rho = isNaN(rawRho) ? 0 : rawRho;
     const regime = latest.csd_status?.regime || (gate > 0 ? 'EIGEN_EXPANSION' : 'THROTTLED');
+    const rawL1Err = Number(latest.csd_status?.l1_err ?? latest.metadata?.l1_err ?? 0);
+    const l1Err = isNaN(rawL1Err) ? 0 : rawL1Err;
 
     if (gateVal) gateVal.textContent = `${gate.toFixed(2)}x`;
     if (gCsdVal) gCsdVal.textContent = gCsd.toFixed(3);
     if (rhoVal) rhoVal.textContent = rho.toFixed(3);
     if (csdRegimeLabel) csdRegimeLabel.textContent = regime;
+    if (quantL1ErrVal) quantL1ErrVal.textContent = l1Err === 0 ? '0.000 (NOMINAL)' : l1Err.toFixed(3);
+    if (csdProgressBar) csdProgressBar.style.width = `${Math.min(100, Math.max(0, gate * 100))}%`;
 
     if (csdBadge) {
       if (gate >= 0.8) {
@@ -1197,16 +1312,32 @@ if (session) {
     const makerFillsVal = document.getElementById('maker-fills-val');
     const takerFillsVal = document.getElementById('taker-fills-val');
     const gtxRejectsVal = document.getElementById('gtx-rejects-val');
+    const card5FeesVal = document.getElementById('card5-fees-val');
+    const mtProgressBar = document.getElementById('maker-taker-progress-bar');
 
-    const mtRatio = Number(latest.maker_taker_ratio) || 0;
-    const makerFills = latest.positions_lots?.__execution?.maker_fills ?? 0;
-    const takerFills = latest.positions_lots?.__execution?.taker_fills ?? 0;
-    const gtxRejects = latest.positions_lots?.__execution?.gtx_rejects ?? 0;
+    const rawMt = Number(latest.maker_taker_ratio);
+    const mtRatio = isNaN(rawMt) ? 0 : rawMt;
+    // Database can store ratio as 0.3111 or percentage - always display as percentage
+    const mtPercentage = mtRatio <= 1 ? mtRatio * 100 : mtRatio;
 
-    if (mtVal) mtVal.textContent = `${mtRatio.toFixed(2)}x`;
+    const rawMakerFills = Number(latest.positions_lots?.__execution?.maker_fills ?? latest.metadata?.maker_fills ?? 0);
+    const makerFills = isNaN(rawMakerFills) ? 0 : rawMakerFills;
+
+    const rawTakerFills = Number(latest.positions_lots?.__execution?.taker_fills ?? latest.metadata?.taker_fills ?? 0);
+    const takerFills = isNaN(rawTakerFills) ? 0 : rawTakerFills;
+
+    const rawGtxRejects = Number(latest.positions_lots?.__execution?.gtx_rejects ?? latest.metadata?.gtx_rejects ?? 0);
+    const gtxRejects = isNaN(rawGtxRejects) ? 0 : rawGtxRejects;
+
+    const rawFees = Number(latest.total_fees_usd);
+    const feesNum = isNaN(rawFees) ? 0 : rawFees;
+
+    if (mtVal) mtVal.textContent = `${mtPercentage.toFixed(2)}%`;
+    if (mtProgressBar) mtProgressBar.style.width = `${Math.min(100, Math.max(0, mtPercentage))}%`;
     if (makerFillsVal) makerFillsVal.textContent = String(makerFills);
     if (takerFillsVal) takerFillsVal.textContent = String(takerFills);
     if (gtxRejectsVal) gtxRejectsVal.textContent = `${gtxRejects} (Protected)`;
+    if (card5FeesVal) card5FeesVal.textContent = formatUsd(feesNum);
 
     // Card 6: Core-Satellite Split Calculator calculation
     updateCalculatorOutputs(nav);
@@ -1608,11 +1739,55 @@ if (session) {
       await fetchAndRenderAll(accessToken, false);
     });
 
+    // Environment Switchers (Paper / Live)
+    const satPaperBtn = document.getElementById('sat-env-paper-btn');
+    const satLiveBtn = document.getElementById('sat-env-live-btn');
+
+    satPaperBtn?.addEventListener('click', async () => {
+      const current = getActiveVenue();
+      if (current === 'paper') return;
+      setActiveVenue('paper');
+      updateSatEnvButtons('paper');
+      await fetchAndRenderAll(accessToken, false);
+    });
+
+    satLiveBtn?.addEventListener('click', async () => {
+      const current = getActiveVenue();
+      if (current === 'live') return;
+      setActiveVenue('live');
+      updateSatEnvButtons('live');
+      await fetchAndRenderAll(accessToken, false);
+    });
+
+    window.addEventListener('quant:venue-change', async (e: Event) => {
+      const customEvt = e as CustomEvent<{ venue: TradingVenue }>;
+      const nextVenue = customEvt.detail?.venue;
+      if (nextVenue) {
+        updateSatEnvButtons(nextVenue);
+        await fetchAndRenderAll(accessToken, false);
+      }
+    });
+
     // Calculator Inputs
-    const coreInput = document.getElementById('core-balance-input');
-    const salaryInput = document.getElementById('salary-deposit-input');
-    [coreInput, salaryInput].forEach(inp => {
-      inp?.addEventListener('input', () => updateCalculatorOutputs());
+    const coreInput = document.getElementById('core-balance-input') as HTMLInputElement | null;
+    const salaryInput = document.getElementById('salary-deposit-input') as HTMLInputElement | null;
+    const resetCoreLiveBtn = document.getElementById('reset-core-live-btn');
+
+    coreInput?.addEventListener('input', () => {
+      if (coreInput) coreInput.dataset.userEdited = 'true';
+      updateCalculatorOutputs();
+    });
+
+    salaryInput?.addEventListener('input', () => {
+      updateCalculatorOutputs();
+    });
+
+    resetCoreLiveBtn?.addEventListener('click', () => {
+      if (liveAlpacaCoreNav != null && coreInput) {
+        delete coreInput.dataset.userEdited;
+        coreInput.value = liveAlpacaCoreNav.toFixed(2);
+        updateCalculatorOutputs();
+      }
     });
 
     // Reason length counter

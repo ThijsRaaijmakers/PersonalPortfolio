@@ -119,6 +119,10 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'http://localhost
     <!-- Global Layout Client Scripts -->
     <script>
       import { supabase } from '../lib/supabase';
+      import { stripVenueFromCurrentUrl } from '../lib/venueState';
+
+      // Strip legacy or leaked ?venue= parameters immediately
+      stripVenueFromCurrentUrl();
 
       const CIPHER_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*<>/[]{}~';
 
@@ -228,6 +232,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'http://localhost
       }
 
       document.addEventListener('astro:page-load', () => {
+        stripVenueFromCurrentUrl();
         initCipherHover();
         evaluatePasskeyNudge();
       });
