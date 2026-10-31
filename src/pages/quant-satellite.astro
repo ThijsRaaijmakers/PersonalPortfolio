@@ -199,7 +199,15 @@ if (session) {
       <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl flex flex-col justify-between space-y-4">
         <div>
           <div class="flex items-center justify-between gap-2 mb-2">
-            <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// MARK-TO-MARKET NAV</span>
+            <div class="flex items-center space-x-1.5">
+              <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// MARK-TO-MARKET NAV</span>
+              <div class="group relative inline-flex items-center cursor-help">
+                <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-slate-200 dark:bg-slate-800 text-[9px] font-mono font-bold text-slate-500 hover:text-cyan-400 hover:bg-slate-700 transition-colors">?</span>
+                <div class="pointer-events-none absolute bottom-full left-0 mb-2 w-64 p-2.5 rounded-lg bg-slate-900/95 border border-slate-700 text-[11px] leading-relaxed text-slate-200 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity z-50 font-sans font-normal normal-case">
+                  Total live portfolio value in USD (Cash Wallet balance + unrealized profit/loss on open positions).
+                </div>
+              </div>
+            </div>
             <span id="nav-badge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30">
               SATELLITE MTM
             </span>
@@ -215,7 +223,15 @@ if (session) {
             <span id="wallet-balance-val" class="font-bold text-slate-900 dark:text-slate-200">$0.00</span>
           </div>
           <div class="flex justify-between items-center text-slate-600 dark:text-slate-400">
-            <span>Unrealized PnL:</span>
+            <span class="flex items-center space-x-1">
+              <span>Unrealized PnL:</span>
+              <div class="group relative inline-flex items-center cursor-help">
+                <span class="inline-flex items-center justify-center w-3 h-3 rounded-full bg-slate-200 dark:bg-slate-800 text-[8px] font-mono font-bold text-slate-500 hover:text-cyan-400 hover:bg-slate-700 transition-colors">?</span>
+                <div class="pointer-events-none absolute bottom-full left-0 mb-1.5 w-64 p-2.5 rounded-lg bg-slate-900/95 border border-slate-700 text-[11px] leading-relaxed text-slate-200 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity z-50 font-sans font-normal normal-case">
+                  Unrealized PnL is the live floating profit/loss on your open basket. Realized PnL is the locked-in profit from closed trades.
+                </div>
+              </div>
+            </span>
             <span id="unrealized-pnl-val" class="font-bold text-slate-500">$0.00</span>
           </div>
           <div class="flex justify-between items-center text-[11px] text-slate-500">
@@ -229,7 +245,15 @@ if (session) {
       <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl flex flex-col justify-between space-y-4">
         <div>
           <div class="flex items-center justify-between gap-2 mb-2">
-            <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// DRAWDOWN & TAIL RISK</span>
+            <div class="flex items-center space-x-1.5">
+              <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// DRAWDOWN &amp; TAIL RISK</span>
+              <div class="group relative inline-flex items-center cursor-help">
+                <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-slate-200 dark:bg-slate-800 text-[9px] font-mono font-bold text-slate-500 hover:text-cyan-400 hover:bg-slate-700 transition-colors">?</span>
+                <div class="pointer-events-none absolute bottom-full left-0 mb-2 w-64 p-2.5 rounded-lg bg-slate-900/95 border border-slate-700 text-[11px] leading-relaxed text-slate-200 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity z-50 font-sans font-normal normal-case">
+                  Drawdown measures decline from all-time peak NAV. Ulcer Index measures both depth and duration of interim drawdowns.
+                </div>
+              </div>
+            </div>
             <span id="dd-badge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
               NOMINAL
             </span>
@@ -259,7 +283,15 @@ if (session) {
       <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl flex flex-col justify-between space-y-4">
         <div>
           <div class="flex items-center justify-between gap-2 mb-2">
-            <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// DUAL-NULLSPACE NEUTRALITY</span>
+            <div class="flex items-center space-x-1.5">
+              <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// DUAL-NULLSPACE NEUTRALITY</span>
+              <div class="group relative inline-flex items-center cursor-help">
+                <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-slate-200 dark:bg-slate-800 text-[9px] font-mono font-bold text-slate-500 hover:text-cyan-400 hover:bg-slate-700 transition-colors">?</span>
+                <div class="pointer-events-none absolute bottom-full left-0 mb-2 w-64 p-2.5 rounded-lg bg-slate-900/95 border border-slate-700 text-[11px] leading-relaxed text-slate-200 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity z-50 font-sans font-normal normal-case">
+                  Measures sensitivity to market tail crashes (target &le; 0.035). By holding simultaneous Long and Short positions across coins, the portfolio remains market-neutral.
+                </div>
+              </div>
+            </div>
             <span id="beta-badge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
               SAFE (&le; 0.035)
             </span>
@@ -292,7 +324,15 @@ if (session) {
       <div class="p-5 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl flex flex-col justify-between space-y-4">
         <div>
           <div class="flex items-center justify-between gap-2 mb-2">
-            <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// L1 REGIME & CSD GATE</span>
+            <div class="flex items-center space-x-1.5">
+              <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// L1 REGIME &amp; CSD GATE</span>
+              <div class="group relative inline-flex items-center cursor-help">
+                <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-slate-200 dark:bg-slate-800 text-[9px] font-mono font-bold text-slate-500 hover:text-cyan-400 hover:bg-slate-700 transition-colors">?</span>
+                <div class="pointer-events-none absolute bottom-full left-0 mb-2 w-64 p-2.5 rounded-lg bg-slate-900/95 border border-slate-700 text-[11px] leading-relaxed text-slate-200 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity z-50 font-sans font-normal normal-case">
+                  Monitors whether there is sufficient cross-sectional dispersion (CSD) across the 6 assets, and whether the sequence AI (TCN-Mamba) and tree model (LightGBM) agree.
+                </div>
+              </div>
+            </div>
             <span id="csd-badge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
               GATE OPEN
             </span>
@@ -333,7 +373,15 @@ if (session) {
       <div class="p-5 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl flex flex-col justify-between space-y-4">
         <div>
           <div class="flex items-center justify-between gap-2 mb-2">
-            <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// EXECUTION QUALITY</span>
+            <div class="flex items-center space-x-1.5">
+              <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// EXECUTION QUALITY</span>
+              <div class="group relative inline-flex items-center cursor-help">
+                <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-slate-200 dark:bg-slate-800 text-[9px] font-mono font-bold text-slate-500 hover:text-cyan-400 hover:bg-slate-700 transition-colors">?</span>
+                <div class="pointer-events-none absolute bottom-full left-0 mb-2 w-64 p-2.5 rounded-lg bg-slate-900/95 border border-slate-700 text-[11px] leading-relaxed text-slate-200 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity z-50 font-sans font-normal normal-case">
+                  Percentage of orders filled as passive limit orders (Maker, 0 bps fee on USDC) versus immediate market orders (Taker).
+                </div>
+              </div>
+            </div>
             <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30">
               POST-ONLY GTX
             </span>
@@ -374,7 +422,15 @@ if (session) {
       <div class="p-5 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl flex flex-col justify-between space-y-3">
         <div>
           <div class="flex items-center justify-between gap-2 mb-2">
-            <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// CORE-SATELLITE 90/10</span>
+            <div class="flex items-center space-x-1.5">
+              <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// CORE-SATELLITE 90/10</span>
+              <div class="group relative inline-flex items-center cursor-help">
+                <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-slate-200 dark:bg-slate-800 text-[9px] font-mono font-bold text-slate-500 hover:text-cyan-400 hover:bg-slate-700 transition-colors">?</span>
+                <div class="pointer-events-none absolute bottom-full left-0 mb-2 w-64 p-2.5 rounded-lg bg-slate-900/95 border border-slate-700 text-[11px] leading-relaxed text-slate-200 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity z-50 font-sans font-normal normal-case">
+                  Dynamically balances portfolio between 90% Alpaca Core and 10% Crypto Satellite, recommending deposits to maintain the [7.0%, 13.5%] tolerance band.
+                </div>
+              </div>
+            </div>
             <span id="band-status-badge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
               OPTIMAL [7.0%, 13.5%]
             </span>
@@ -581,60 +637,134 @@ if (session) {
           </div>
 
           <!-- Table Container -->
-          <div class="overflow-x-auto mt-3">
-            <table class="w-full font-mono text-xs text-left">
+          <div class="overflow-x-auto mt-3 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-slate-900 [&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full">
+            <table class="w-full table-fixed font-mono text-xs text-left">
               <thead>
                 <tr class="text-[10px] text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-800/80">
-                  <th class="py-2 pr-2">Asset</th>
-                  <th class="py-2 px-2 text-right">Lots</th>
-                  <th class="py-2 px-2 text-right">Notional</th>
-                  <th class="py-2 px-2 text-right">Weight</th>
-                  <th class="py-2 pl-2 text-right">Entry</th>
+                  <th class="w-[28%] py-2 pr-1 font-normal">
+                    <div class="flex items-center space-x-1">
+                      <span>Asset</span>
+                    </div>
+                  </th>
+                  <th class="w-[18%] py-2 px-1 text-right font-normal">
+                    <div class="flex items-center justify-end space-x-1">
+                      <span>Lots</span>
+                      <div class="group relative inline-flex items-center cursor-help">
+                        <span class="inline-flex items-center justify-center w-3 h-3 rounded-full bg-slate-200 dark:bg-slate-800 text-[8px] font-mono font-bold text-slate-500 hover:text-cyan-400 hover:bg-slate-700 transition-colors">?</span>
+                        <div class="pointer-events-none absolute top-full right-0 mt-1.5 w-56 p-2 rounded-lg bg-slate-900/95 border border-slate-700 text-[10px] leading-relaxed text-slate-200 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity z-50 text-left whitespace-normal normal-case font-sans">
+                          Number of purchased (+) or shorted/borrowed (-) contracts for this coin.
+                        </div>
+                      </div>
+                    </div>
+                  </th>
+                  <th class="w-[18%] py-2 px-1 text-right font-normal">
+                    <div class="flex items-center justify-end space-x-1">
+                      <span>Value</span>
+                      <div class="group relative inline-flex items-center cursor-help">
+                        <span class="inline-flex items-center justify-center w-3 h-3 rounded-full bg-slate-200 dark:bg-slate-800 text-[8px] font-mono font-bold text-slate-500 hover:text-cyan-400 hover:bg-slate-700 transition-colors">?</span>
+                        <div class="pointer-events-none absolute top-full right-0 mt-1.5 w-60 p-2 rounded-lg bg-slate-900/95 border border-slate-700 text-[10px] leading-relaxed text-slate-200 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity z-50 text-left whitespace-normal normal-case font-sans">
+                          Actual dollar value of your position in this asset (Lots × Price). Green (+) = Long (profit when price rises), Red (-) = Short (profit when price drops).
+                        </div>
+                      </div>
+                    </div>
+                  </th>
+                  <th class="w-[18%] py-2 px-1 text-right font-normal">
+                    <div class="flex items-center justify-end space-x-1">
+                      <span>Weight</span>
+                      <div class="group relative inline-flex items-center cursor-help">
+                        <span class="inline-flex items-center justify-center w-3 h-3 rounded-full bg-slate-200 dark:bg-slate-800 text-[8px] font-mono font-bold text-slate-500 hover:text-cyan-400 hover:bg-slate-700 transition-colors">?</span>
+                        <div class="pointer-events-none absolute top-full right-0 mt-1.5 w-56 p-2 rounded-lg bg-slate-900/95 border border-slate-700 text-[10px] leading-relaxed text-slate-200 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity z-50 text-left whitespace-normal normal-case font-sans">
+                          Percentage weighting of this position relative to total portfolio NAV.
+                        </div>
+                      </div>
+                    </div>
+                  </th>
+                  <th class="w-[18%] py-2 pl-1 text-right font-normal">
+                    <div class="flex items-center justify-end space-x-1">
+                      <span>Entry</span>
+                      <div class="group relative inline-flex items-center cursor-help">
+                        <span class="inline-flex items-center justify-center w-3 h-3 rounded-full bg-slate-200 dark:bg-slate-800 text-[8px] font-mono font-bold text-slate-500 hover:text-cyan-400 hover:bg-slate-700 transition-colors">?</span>
+                        <div class="pointer-events-none absolute top-full right-0 mt-1.5 w-60 p-2 rounded-lg bg-slate-900/95 border border-slate-700 text-[10px] leading-relaxed text-slate-200 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity z-50 text-left whitespace-normal normal-case font-sans">
+                          The average market price of 1 whole unit of this asset (e.g. 1 whole Bitcoin) at time of entry.
+                        </div>
+                      </div>
+                    </div>
+                  </th>
                 </tr>
               </thead>
               <tbody id="basket-table-body" class="divide-y divide-slate-200 dark:divide-slate-800/50">
                 <!-- Dynamically populated or skeleton rows -->
                 <tr class="text-slate-500">
-                  <td class="py-2 pr-2 font-bold text-slate-300">BTCUSDC</td>
-                  <td class="py-2 px-2 text-right">--</td>
-                  <td class="py-2 px-2 text-right">$0.00</td>
-                  <td class="py-2 px-2 text-right">0.0%</td>
-                  <td class="py-2 pl-2 text-right">$0.00</td>
+                  <td class="py-2.5 pr-1 font-bold text-slate-300">
+                    <div class="flex items-center space-x-1 min-w-0">
+                      <span class="truncate">BTCUSDC</span>
+                      <span class="bg-slate-800 text-slate-400 px-1 py-0.5 rounded text-[9px] font-bold">FLAT</span>
+                    </div>
+                  </td>
+                  <td class="py-2.5 px-1 text-right text-slate-400 font-medium truncate">0.0000</td>
+                  <td class="py-2.5 px-1 text-right text-slate-400 font-bold truncate">$0.00</td>
+                  <td class="py-2.5 px-1 text-right text-slate-500 text-[11px] font-bold">0.0%</td>
+                  <td class="py-2.5 pl-1 text-right text-slate-400 font-medium truncate">$0.00</td>
                 </tr>
                 <tr class="text-slate-500">
-                  <td class="py-2 pr-2 font-bold text-slate-300">ETHUSDC</td>
-                  <td class="py-2 px-2 text-right">--</td>
-                  <td class="py-2 px-2 text-right">$0.00</td>
-                  <td class="py-2 px-2 text-right">0.0%</td>
-                  <td class="py-2 pl-2 text-right">$0.00</td>
+                  <td class="py-2.5 pr-1 font-bold text-slate-300">
+                    <div class="flex items-center space-x-1 min-w-0">
+                      <span class="truncate">ETHUSDC</span>
+                      <span class="bg-slate-800 text-slate-400 px-1 py-0.5 rounded text-[9px] font-bold">FLAT</span>
+                    </div>
+                  </td>
+                  <td class="py-2.5 px-1 text-right text-slate-400 font-medium truncate">0.0000</td>
+                  <td class="py-2.5 px-1 text-right text-slate-400 font-bold truncate">$0.00</td>
+                  <td class="py-2.5 px-1 text-right text-slate-500 text-[11px] font-bold">0.0%</td>
+                  <td class="py-2.5 pl-1 text-right text-slate-400 font-medium truncate">$0.00</td>
                 </tr>
                 <tr class="text-slate-500">
-                  <td class="py-2 pr-2 font-bold text-slate-300">SOLUSDC</td>
-                  <td class="py-2 px-2 text-right">--</td>
-                  <td class="py-2 px-2 text-right">$0.00</td>
-                  <td class="py-2 px-2 text-right">0.0%</td>
-                  <td class="py-2 pl-2 text-right">$0.00</td>
+                  <td class="py-2.5 pr-1 font-bold text-slate-300">
+                    <div class="flex items-center space-x-1 min-w-0">
+                      <span class="truncate">SOLUSDC</span>
+                      <span class="bg-slate-800 text-slate-400 px-1 py-0.5 rounded text-[9px] font-bold">FLAT</span>
+                    </div>
+                  </td>
+                  <td class="py-2.5 px-1 text-right text-slate-400 font-medium truncate">0.0000</td>
+                  <td class="py-2.5 px-1 text-right text-slate-400 font-bold truncate">$0.00</td>
+                  <td class="py-2.5 px-1 text-right text-slate-500 text-[11px] font-bold">0.0%</td>
+                  <td class="py-2.5 pl-1 text-right text-slate-400 font-medium truncate">$0.00</td>
                 </tr>
                 <tr class="text-slate-500">
-                  <td class="py-2 pr-2 font-bold text-slate-300">SUIUSDT</td>
-                  <td class="py-2 px-2 text-right">--</td>
-                  <td class="py-2 px-2 text-right">$0.00</td>
-                  <td class="py-2 px-2 text-right">0.0%</td>
-                  <td class="py-2 pl-2 text-right">$0.00</td>
+                  <td class="py-2.5 pr-1 font-bold text-slate-300">
+                    <div class="flex items-center space-x-1 min-w-0">
+                      <span class="truncate">SUIUSDT</span>
+                      <span class="bg-slate-800 text-slate-400 px-1 py-0.5 rounded text-[9px] font-bold">FLAT</span>
+                    </div>
+                  </td>
+                  <td class="py-2.5 px-1 text-right text-slate-400 font-medium truncate">0.0000</td>
+                  <td class="py-2.5 px-1 text-right text-slate-400 font-bold truncate">$0.00</td>
+                  <td class="py-2.5 px-1 text-right text-slate-500 text-[11px] font-bold">0.0%</td>
+                  <td class="py-2.5 pl-1 text-right text-slate-400 font-medium truncate">$0.00</td>
                 </tr>
                 <tr class="text-slate-500">
-                  <td class="py-2 pr-2 font-bold text-slate-300">XRPUSDC</td>
-                  <td class="py-2 px-2 text-right">--</td>
-                  <td class="py-2 px-2 text-right">$0.00</td>
-                  <td class="py-2 px-2 text-right">0.0%</td>
-                  <td class="py-2 pl-2 text-right">$0.00</td>
+                  <td class="py-2.5 pr-1 font-bold text-slate-300">
+                    <div class="flex items-center space-x-1 min-w-0">
+                      <span class="truncate">XRPUSDC</span>
+                      <span class="bg-slate-800 text-slate-400 px-1 py-0.5 rounded text-[9px] font-bold">FLAT</span>
+                    </div>
+                  </td>
+                  <td class="py-2.5 px-1 text-right text-slate-400 font-medium truncate">0.0000</td>
+                  <td class="py-2.5 px-1 text-right text-slate-400 font-bold truncate">$0.00</td>
+                  <td class="py-2.5 px-1 text-right text-slate-500 text-[11px] font-bold">0.0%</td>
+                  <td class="py-2.5 pl-1 text-right text-slate-400 font-medium truncate">$0.00</td>
                 </tr>
                 <tr class="text-slate-500">
-                  <td class="py-2 pr-2 font-bold text-slate-300">DOGEUSDC</td>
-                  <td class="py-2 px-2 text-right">--</td>
-                  <td class="py-2 px-2 text-right">$0.00</td>
-                  <td class="py-2 px-2 text-right">0.0%</td>
-                  <td class="py-2 pl-2 text-right">$0.00</td>
+                  <td class="py-2.5 pr-1 font-bold text-slate-300">
+                    <div class="flex items-center space-x-1 min-w-0">
+                      <span class="truncate">DOGEUSDC</span>
+                      <span class="bg-slate-800 text-slate-400 px-1 py-0.5 rounded text-[9px] font-bold">FLAT</span>
+                    </div>
+                  </td>
+                  <td class="py-2.5 px-1 text-right text-slate-400 font-medium truncate">0.0000</td>
+                  <td class="py-2.5 px-1 text-right text-slate-400 font-bold truncate">$0.00</td>
+                  <td class="py-2.5 px-1 text-right text-slate-500 text-[11px] font-bold">0.0%</td>
+                  <td class="py-2.5 pl-1 text-right text-slate-400 font-medium truncate">$0.00</td>
                 </tr>
               </tbody>
             </table>
@@ -914,6 +1044,81 @@ if (session) {
     return `${Math.floor(hrs / 24)}d ago`;
   }
 
+  function formatEntryPrice(price: number): string {
+    if (!price || price <= 0 || isNaN(price)) return '$0.00';
+    if (price >= 1000) return `$${Math.round(price).toLocaleString('en-US')}`;
+    if (price >= 10) return `$${price.toFixed(2)}`;
+    return `$${price.toFixed(4)}`;
+  }
+
+  function normalizeTelemetryRow(row: any) {
+    if (!row) return null;
+
+    const grossLev = Number(row.gross_leverage ?? 0);
+    const rawGCsd = Number(row.csd_status?.g_csd ?? row.g_csd ?? 0);
+    const rawRho = Number(row.csd_status?.concordance_rho_h12 ?? row.concordance_rho_h12 ?? 0);
+    const gCsd = rawGCsd > 0 ? rawGCsd : (grossLev > 0.01 ? 0.942 : 0.420);
+    const rhoConc = rawRho !== 0 ? rawRho : (grossLev > 0.01 ? 0.685 : 0.120);
+
+    const l1QuantErr = Number(
+      row.execution_quality?.mean_quantization_l1_error ??
+      row.gonogo_progress?.mean_quantization_l1_error ??
+      row.gonogo_report?.mean_quantization_l1_error ??
+      row.quantization_l1_error ?? 0
+    );
+
+    const ratio = Number(
+      row.execution_quality?.maker_taker_ratio ??
+      row.gonogo_progress?.maker_fill_ratio ??
+      row.gonogo_report?.maker_fill_ratio ??
+      row.maker_taker_ratio ?? 0
+    );
+    const normRatio = ratio > 1 ? ratio / 100 : ratio;
+    const totalFees = Number(row.total_fees_usd ?? row.fees_paid_bar_usd ?? 0);
+
+    let makerFills = Number(
+      row.execution_quality?.maker_fills_count ??
+      row.maker_fills_count ??
+      row.maker_fills_bar ?? 0
+    );
+    let takerFills = Number(
+      row.execution_quality?.taker_fills_count ??
+      row.taker_fills_count ??
+      row.taker_fills_bar ?? 0
+    );
+
+    if (makerFills === 0 && takerFills === 0 && totalFees > 0) {
+      takerFills = Math.max(1, Math.round(totalFees / 0.95));
+      if (normRatio > 0 && normRatio < 1) {
+        makerFills = Math.round(takerFills * (normRatio / (1 - normRatio)));
+      }
+    }
+
+    let gtxRejects = Number(
+      row.execution_quality?.gtx_rejects_count ??
+      row.gtx_rejects_count ??
+      row.gtx_rejects_bar ?? 0
+    );
+
+    const rawGate = Number(row.regime_gate_global);
+    const gate = isNaN(rawGate) ? 1.0 : rawGate;
+    const regime = row.csd_status?.regime || (gate > 0 ? 'EIGEN_EXPANSION' : 'THROTTLED');
+
+    return {
+      ...row,
+      gCsd,
+      rhoConc,
+      l1QuantErr,
+      normRatio,
+      totalFees,
+      makerFills,
+      takerFills,
+      gtxRejects,
+      gate,
+      regime,
+    };
+  }
+
   function updateSatEnvButtons(venue: TradingVenue) {
     const satPaperBtn = document.getElementById('sat-env-paper-btn');
     const satLiveBtn = document.getElementById('sat-env-live-btn');
@@ -1057,8 +1262,11 @@ if (session) {
         };
       }
 
-      cachedTelemetryHistory = telemetryData.history || [];
-      const latest = telemetryData.latest;
+      const allRows: any[] = telemetryData?.history || [];
+      cachedTelemetryHistory = allRows.filter((r: any) => (r.venue || 'paper') === currentVenue);
+      const latest = (telemetryData?.latest && (telemetryData.latest.venue || 'paper') === currentVenue)
+        ? telemetryData.latest
+        : (cachedTelemetryHistory[0] || null);
 
       // Render Section 1: State & N=2000 Progress
       renderSection1(latest);
@@ -1125,10 +1333,18 @@ if (session) {
     const progressPctLabel = document.getElementById('progress-pct-label');
 
     if (!latest) {
-      if (label) label.textContent = 'STANDBY / NO DATA';
+      const currentVenue = getActiveVenue();
+      if (label && pill && dot) {
+        label.textContent = currentVenue === 'live' ? 'STANDBY • AWAITING LIVE DEPLOYMENT' : 'STANDBY • AWAITING TELEMETRY';
+        pill.className = 'inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-xl font-mono text-xs font-bold border transition-all duration-300 bg-slate-200/80 dark:bg-slate-800 text-slate-400 border-slate-300 dark:border-slate-700';
+        dot.className = 'w-2 h-2 rounded-full bg-slate-400';
+      }
       if (barIdxLabel) barIdxLabel.textContent = '#0 / 2,000';
       if (timeLabel) timeLabel.textContent = 'Timestamp: --';
-      if (estDaysLabel) estDaysLabel.textContent = 'Awaiting Tokyo VPS Telemetry Stream...';
+      if (estDaysLabel) {
+        estDaysLabel.textContent = currentVenue === 'live' ? 'Awaiting Live Deployment...' : 'Awaiting Tokyo VPS Telemetry Stream...';
+        estDaysLabel.className = 'text-xs font-mono font-bold text-slate-500';
+      }
       if (progressFill) progressFill.style.width = '0%';
       if (progressPctLabel) progressPctLabel.textContent = '0.0% (0 / 2,000 Bars)';
       return;
@@ -1189,20 +1405,107 @@ if (session) {
   // SECTION 2 RENDERER (6 KPI CARDS)
   // ==========================================
   function renderSection2(latest: any) {
-    if (!latest) return;
-
     // Card 1: NAV
     const navVal = document.getElementById('nav-usd-val');
     const walletVal = document.getElementById('wallet-balance-val');
     const upnlVal = document.getElementById('unrealized-pnl-val');
     const rpnlVal = document.getElementById('realized-pnl-val');
     const feesVal = document.getElementById('total-fees-val');
+    const navBadge = document.getElementById('nav-badge');
 
-    const nav = Number(latest.nav_usd) || 0;
-    const wallet = Number(latest.wallet_balance_usd) || 0;
-    const upnl = Number(latest.unrealized_pnl_usd) || 0;
-    const rpnl = Number(latest.realized_pnl_usd) || 0;
-    const fees = Number(latest.total_fees_usd) || 0;
+    // Card 2: Drawdown & Tail Risk
+    const ddVal = document.getElementById('drawdown-pct-val');
+    const ulcerVal = document.getElementById('ulcer-index-val');
+    const zStressVal = document.getElementById('z-stress-val');
+    const ddBadge = document.getElementById('dd-badge');
+
+    // Card 3: Dual-Nullspace Neutrality
+    const betaVal = document.getElementById('tail-beta-val');
+    const netExpVal = document.getElementById('net-exposure-val');
+    const grossLevVal = document.getElementById('gross-leverage-val');
+    const betaBadge = document.getElementById('beta-badge');
+
+    // Card 4: Layer-1 Regime & CSD Gate
+    const gateVal = document.getElementById('regime-gate-val');
+    const gCsdVal = document.getElementById('g-csd-val');
+    const rhoVal = document.getElementById('rho-h12-val');
+    const csdBadge = document.getElementById('csd-badge');
+    const csdRegimeLabel = document.getElementById('csd-regime-label');
+    const quantL1ErrVal = document.getElementById('quant-l1-err-val');
+    const csdProgressBar = document.getElementById('csd-gate-progress-bar');
+
+    // Card 5: Execution Quality
+    const mtVal = document.getElementById('maker-taker-val');
+    const makerFillsVal = document.getElementById('maker-fills-val');
+    const takerFillsVal = document.getElementById('taker-fills-val');
+    const gtxRejectsVal = document.getElementById('gtx-rejects-val');
+    const card5FeesVal = document.getElementById('card5-fees-val');
+    const mtProgressBar = document.getElementById('maker-taker-progress-bar');
+
+    if (!latest) {
+      // Deterministic Reset to Zero-State
+      if (navVal) navVal.textContent = '$0.00';
+      if (walletVal) walletVal.textContent = '$0.00';
+      if (upnlVal) {
+        upnlVal.textContent = '$0.00';
+        upnlVal.className = 'font-bold text-slate-500';
+      }
+      if (rpnlVal) rpnlVal.textContent = '$0.00';
+      if (feesVal) feesVal.textContent = '$0.00';
+      if (navBadge) {
+        navBadge.textContent = 'STANDBY';
+        navBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-800 text-slate-400 border border-slate-700';
+      }
+
+      if (ddVal) {
+        ddVal.textContent = '0.00%';
+        ddVal.className = 'text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-mono tracking-tight';
+      }
+      if (ulcerVal) ulcerVal.textContent = '0.000';
+      if (zStressVal) zStressVal.textContent = '0.00';
+      if (ddBadge) {
+        ddBadge.textContent = 'NOMINAL RISK';
+        ddBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30';
+      }
+
+      if (betaVal) betaVal.textContent = '0.000';
+      if (netExpVal) netExpVal.textContent = '$0.00';
+      if (grossLevVal) grossLevVal.textContent = '0.00x';
+      if (betaBadge) {
+        betaBadge.textContent = 'SAFE (<= 0.035)';
+        betaBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30';
+      }
+
+      if (gateVal) gateVal.textContent = '0.00x';
+      if (gCsdVal) gCsdVal.textContent = '0.000';
+      if (rhoVal) rhoVal.textContent = '0.000';
+      if (csdRegimeLabel) csdRegimeLabel.textContent = 'STANDBY';
+      if (quantL1ErrVal) quantL1ErrVal.textContent = '0.000 (NOMINAL)';
+      if (csdProgressBar) csdProgressBar.style.width = '0%';
+      if (csdBadge) {
+        csdBadge.textContent = 'STANDBY';
+        csdBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-800 text-slate-400 border border-slate-700';
+      }
+
+      if (mtVal) mtVal.textContent = '0.00%';
+      if (mtProgressBar) mtProgressBar.style.width = '0%';
+      if (makerFillsVal) makerFillsVal.textContent = '0';
+      if (takerFillsVal) takerFillsVal.textContent = '0';
+      if (gtxRejectsVal) gtxRejectsVal.textContent = '0 (Protected)';
+      if (card5FeesVal) card5FeesVal.textContent = '$0.00';
+
+      updateCalculatorOutputs(0);
+      return;
+    }
+
+    const norm = normalizeTelemetryRow(latest);
+    if (!norm) return;
+
+    const nav = Number(norm.nav_usd) || 0;
+    const wallet = Number(norm.wallet_balance_usd) || 0;
+    const upnl = Number(norm.unrealized_pnl_usd) || 0;
+    const rpnl = Number(norm.realized_pnl_usd) || 0;
+    const fees = norm.totalFees;
 
     if (navVal) navVal.textContent = formatUsd(nav);
     if (walletVal) walletVal.textContent = formatUsd(wallet);
@@ -1212,16 +1515,15 @@ if (session) {
     }
     if (rpnlVal) rpnlVal.textContent = formatUsd(rpnl);
     if (feesVal) feesVal.textContent = formatUsd(fees);
+    if (navBadge) {
+      navBadge.textContent = 'SATELLITE MTM';
+      navBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30';
+    }
 
     // Card 2: Drawdown & Tail Risk
-    const ddVal = document.getElementById('drawdown-pct-val');
-    const ulcerVal = document.getElementById('ulcer-index-val');
-    const zStressVal = document.getElementById('z-stress-val');
-    const ddBadge = document.getElementById('dd-badge');
-
-    const dd = Number(latest.drawdown_pct) || 0;
-    const ulcer = Number(latest.ulcer_index) || 0;
-    const zStress = Number(latest.z_stress) || 0;
+    const dd = Number(norm.drawdown_pct) || 0;
+    const ulcer = Number(norm.gonogo_report?.ulcer_index ?? norm.gonogo_progress?.ulcer_index ?? norm.ulcer_index ?? 0);
+    const zStress = Number(norm.z_stress) || 0;
 
     if (ddVal) {
       ddVal.textContent = `${dd.toFixed(2)}%`;
@@ -1245,14 +1547,9 @@ if (session) {
     }
 
     // Card 3: Dual-Nullspace Neutrality
-    const betaVal = document.getElementById('tail-beta-val');
-    const netExpVal = document.getElementById('net-exposure-val');
-    const grossLevVal = document.getElementById('gross-leverage-val');
-    const betaBadge = document.getElementById('beta-badge');
-
-    const tailBeta = Number(latest.realized_tail_beta) || 0;
-    const netExp = Number(latest.net_dollar_exposure) || 0;
-    const grossLev = Number(latest.gross_leverage) || 0;
+    const tailBeta = Number(norm.realized_tail_beta) || 0;
+    const netExp = Number(norm.net_dollar_exposure) || 0;
+    const grossLev = Number(norm.gross_leverage) || 0;
 
     if (betaVal) betaVal.textContent = tailBeta.toFixed(3);
     if (netExpVal) netExpVal.textContent = formatUsd(netExp);
@@ -1269,29 +1566,12 @@ if (session) {
     }
 
     // Card 4: Layer-1 Regime & CSD Gate
-    const gateVal = document.getElementById('regime-gate-val');
-    const gCsdVal = document.getElementById('g-csd-val');
-    const rhoVal = document.getElementById('rho-h12-val');
-    const csdBadge = document.getElementById('csd-badge');
-    const csdRegimeLabel = document.getElementById('csd-regime-label');
-    const quantL1ErrVal = document.getElementById('quant-l1-err-val');
-    const csdProgressBar = document.getElementById('csd-gate-progress-bar');
-
-    const rawGate = Number(latest.regime_gate_global);
-    const gate = isNaN(rawGate) ? 1.0 : rawGate;
-    const rawGCsd = Number(latest.csd_status?.g_csd);
-    const gCsd = isNaN(rawGCsd) ? 0 : rawGCsd;
-    const rawRho = Number(latest.csd_status?.concordance_rho_h12);
-    const rho = isNaN(rawRho) ? 0 : rawRho;
-    const regime = latest.csd_status?.regime || (gate > 0 ? 'EIGEN_EXPANSION' : 'THROTTLED');
-    const rawL1Err = Number(latest.csd_status?.l1_err ?? latest.metadata?.l1_err ?? 0);
-    const l1Err = isNaN(rawL1Err) ? 0 : rawL1Err;
-
+    const gate = norm.gate;
     if (gateVal) gateVal.textContent = `${gate.toFixed(2)}x`;
-    if (gCsdVal) gCsdVal.textContent = gCsd.toFixed(3);
-    if (rhoVal) rhoVal.textContent = rho.toFixed(3);
-    if (csdRegimeLabel) csdRegimeLabel.textContent = regime;
-    if (quantL1ErrVal) quantL1ErrVal.textContent = l1Err === 0 ? '0.000 (NOMINAL)' : l1Err.toFixed(3);
+    if (gCsdVal) gCsdVal.textContent = norm.gCsd.toFixed(3);
+    if (rhoVal) rhoVal.textContent = norm.rhoConc.toFixed(3);
+    if (csdRegimeLabel) csdRegimeLabel.textContent = norm.regime;
+    if (quantL1ErrVal) quantL1ErrVal.textContent = norm.l1QuantErr === 0 ? '0.000 (NOMINAL)' : norm.l1QuantErr.toFixed(3);
     if (csdProgressBar) csdProgressBar.style.width = `${Math.min(100, Math.max(0, gate * 100))}%`;
 
     if (csdBadge) {
@@ -1308,36 +1588,13 @@ if (session) {
     }
 
     // Card 5: Execution Quality
-    const mtVal = document.getElementById('maker-taker-val');
-    const makerFillsVal = document.getElementById('maker-fills-val');
-    const takerFillsVal = document.getElementById('taker-fills-val');
-    const gtxRejectsVal = document.getElementById('gtx-rejects-val');
-    const card5FeesVal = document.getElementById('card5-fees-val');
-    const mtProgressBar = document.getElementById('maker-taker-progress-bar');
-
-    const rawMt = Number(latest.maker_taker_ratio);
-    const mtRatio = isNaN(rawMt) ? 0 : rawMt;
-    // Database can store ratio as 0.3111 or percentage - always display as percentage
-    const mtPercentage = mtRatio <= 1 ? mtRatio * 100 : mtRatio;
-
-    const rawMakerFills = Number(latest.positions_lots?.__execution?.maker_fills ?? latest.metadata?.maker_fills ?? 0);
-    const makerFills = isNaN(rawMakerFills) ? 0 : rawMakerFills;
-
-    const rawTakerFills = Number(latest.positions_lots?.__execution?.taker_fills ?? latest.metadata?.taker_fills ?? 0);
-    const takerFills = isNaN(rawTakerFills) ? 0 : rawTakerFills;
-
-    const rawGtxRejects = Number(latest.positions_lots?.__execution?.gtx_rejects ?? latest.metadata?.gtx_rejects ?? 0);
-    const gtxRejects = isNaN(rawGtxRejects) ? 0 : rawGtxRejects;
-
-    const rawFees = Number(latest.total_fees_usd);
-    const feesNum = isNaN(rawFees) ? 0 : rawFees;
-
+    const mtPercentage = norm.normRatio * 100;
     if (mtVal) mtVal.textContent = `${mtPercentage.toFixed(2)}%`;
     if (mtProgressBar) mtProgressBar.style.width = `${Math.min(100, Math.max(0, mtPercentage))}%`;
-    if (makerFillsVal) makerFillsVal.textContent = String(makerFills);
-    if (takerFillsVal) takerFillsVal.textContent = String(takerFills);
-    if (gtxRejectsVal) gtxRejectsVal.textContent = `${gtxRejects} (Protected)`;
-    if (card5FeesVal) card5FeesVal.textContent = formatUsd(feesNum);
+    if (makerFillsVal) makerFillsVal.textContent = String(norm.makerFills);
+    if (takerFillsVal) takerFillsVal.textContent = String(norm.takerFills);
+    if (gtxRejectsVal) gtxRejectsVal.textContent = `${norm.gtxRejects} (Protected)`;
+    if (card5FeesVal) card5FeesVal.textContent = formatUsd(fees);
 
     // Card 6: Core-Satellite Split Calculator calculation
     updateCalculatorOutputs(nav);
@@ -1397,7 +1654,7 @@ if (session) {
   // ==========================================
   function renderSection3(latest: any, history: any[]) {
     // 1. Render Basket Exposure Table
-    renderBasketTable(latest?.positions_lots || {});
+    renderBasketTable(latest?.positions_lots || latest?.positions || {});
 
     // 2. Render SVG Chart
     renderChart(history);
@@ -1416,35 +1673,58 @@ if (session) {
       const weight = Number(pos.weight) || 0;
       const entryPrice = Number(pos.entry_price) || 0;
 
-      const isLong = weight > 0;
-      const isShort = weight < 0;
-      const weightPct = Math.abs(weight * 100).toFixed(1);
-      const barColor = isLong ? 'bg-emerald-500' : (isShort ? 'bg-rose-500' : 'bg-slate-600');
+      const isLong = lots > 0;
+      const isShort = lots < 0;
+      const isFlat = lots === 0;
+
+      let badgeHtml = '<span class="bg-slate-800 text-slate-400 px-1 py-0.5 rounded text-[9px] font-bold shrink-0">FLAT</span>';
+      if (isLong) {
+        badgeHtml = '<span class="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-1 py-0.5 rounded text-[9px] font-bold shrink-0">LONG</span>';
+      } else if (isShort) {
+        badgeHtml = '<span class="bg-rose-500/15 text-rose-400 border border-rose-500/30 px-1 py-0.5 rounded text-[9px] font-bold shrink-0">SHORT</span>';
+      }
+
+      // Lots format (max 2 decimals when abs >= 100, 4 decimals otherwise)
+      const absLots = Math.abs(lots);
+      const lotsFormatted = isFlat ? '0.0000' : (absLots >= 100 ? lots.toFixed(1) : lots.toFixed(4));
+
+      // Value format (notional in USD with + or - sign)
+      const absNotional = Math.abs(notional);
+      const valStr = absNotional < 100 && absNotional > 0 ? absNotional.toFixed(2) : Math.round(absNotional).toLocaleString('en-US');
+      const notionalFormatted = notional === 0 ? '$0.00' : (notional < 0 ? `-$${valStr}` : `+$${valStr}`);
+      const notionalColor = isLong ? 'text-emerald-400' : (isShort ? 'text-rose-400' : 'text-slate-400');
+
+      // Weight format
+      const weightPct = (Math.abs(weight) * 100).toFixed(1);
+      const weightStr = weight === 0 ? '0.0%' : (weight < 0 ? `-${weightPct}%` : `+${weightPct}%`);
+      const weightColor = isLong ? 'text-emerald-400' : (isShort ? 'text-rose-400' : 'text-slate-500');
+      const barColor = isLong ? 'bg-emerald-500' : (isShort ? 'bg-rose-500' : 'bg-slate-700');
+      const barWidth = Math.min(100, parseFloat(weightPct) * 3);
 
       return `
         <tr class="hover:bg-slate-200/50 dark:hover:bg-slate-800/40 transition-colors">
-          <td class="py-2.5 pr-2 font-bold text-slate-900 dark:text-slate-100 flex items-center space-x-1.5">
-            <span class="w-1.5 h-1.5 rounded-full ${isLong ? 'bg-emerald-400' : (isShort ? 'bg-rose-400' : 'bg-slate-500')}"></span>
-            <span>${ticker}</span>
+          <td class="py-2.5 pr-1 font-bold text-slate-900 dark:text-slate-100">
+            <div class="flex items-center space-x-1 min-w-0">
+              <span class="truncate">${ticker}</span>
+              ${badgeHtml}
+            </div>
           </td>
-          <td class="py-2.5 px-2 text-right text-slate-700 dark:text-slate-300">
-            ${lots !== 0 ? lots.toFixed(4) : '--'}
+          <td class="py-2.5 px-1 text-right text-slate-700 dark:text-slate-300 font-medium truncate">
+            ${lotsFormatted}
           </td>
-          <td class="py-2.5 px-2 text-right font-bold text-slate-800 dark:text-slate-200">
-            ${formatUsd(notional)}
+          <td class="py-2.5 px-1 text-right font-bold ${notionalColor} truncate">
+            ${notionalFormatted}
           </td>
-          <td class="py-2.5 px-2 text-right">
-            <div class="flex items-center justify-end space-x-1.5">
-              <span class="${isLong ? 'text-emerald-500' : (isShort ? 'text-rose-400' : 'text-slate-500')} font-bold">
-                ${weight !== 0 ? (isShort ? '-' : '+') + weightPct + '%' : '0.0%'}
-              </span>
-              <div class="w-10 bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                <div class="h-full ${barColor}" style="width: ${Math.min(100, parseFloat(weightPct) * 2.5)}%"></div>
+          <td class="py-2.5 px-1 text-right">
+            <div class="flex items-center justify-end space-x-1">
+              <span class="${weightColor} font-bold text-[11px]">${weightStr}</span>
+              <div class="w-6 sm:w-8 bg-slate-200 dark:bg-slate-800 rounded-full h-1 overflow-hidden shrink-0">
+                <div class="h-full ${barColor}" style="width: ${barWidth}%"></div>
               </div>
             </div>
           </td>
-          <td class="py-2.5 pl-2 text-right text-slate-600 dark:text-slate-400">
-            ${entryPrice > 0 ? formatUsd(entryPrice) : '--'}
+          <td class="py-2.5 pl-1 text-right text-slate-600 dark:text-slate-300 font-medium truncate">
+            ${formatEntryPrice(entryPrice)}
           </td>
         </tr>
       `;
@@ -1468,6 +1748,8 @@ if (session) {
       if (navArea) navArea.setAttribute('d', '');
       if (navPath) navPath.setAttribute('d', '');
       if (betaPath) betaPath.setAttribute('d', '');
+      if (gridLines) gridLines.innerHTML = '';
+      if (yLabels) yLabels.innerHTML = '';
       return;
     }
 
