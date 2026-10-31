@@ -97,6 +97,32 @@ if (session) {
           </button>
         </div>
 
+        <!-- Diagnostic Export Pill -->
+        <div class="inline-flex items-center rounded-lg border border-cyan-500/30 bg-cyan-950/10 dark:bg-cyan-950/40 p-0.5 shadow-sm">
+          <button
+            id="copy-core-snapshot-btn"
+            type="button"
+            title="Copy structured Markdown diagnostic snapshot for AI analysis"
+            class="px-3 py-1.5 rounded-md bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-700 dark:text-cyan-300 font-mono text-xs font-bold transition-colors cursor-pointer flex items-center space-x-1.5"
+          >
+            <svg class="w-3.5 h-3.5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+            </svg>
+            <span id="copy-core-snapshot-label">Copy AI Snapshot</span>
+          </button>
+          <button
+            id="export-core-json-btn"
+            type="button"
+            title="Download full JSON audit file"
+            class="px-2.5 py-1.5 rounded-md hover:bg-slate-200/60 dark:hover:bg-slate-800/80 text-slate-600 dark:text-slate-400 font-mono text-[11px] font-semibold transition-colors cursor-pointer flex items-center space-x-1"
+          >
+            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+            </svg>
+            <span>JSON</span>
+          </button>
+        </div>
+
         <!-- Refresh Telemetry Button -->
         <button 
           id="refresh-telemetry-btn" 
@@ -746,6 +772,13 @@ if (session) {
   import { supabase } from '../lib/supabase';
   import { formatPct, formatDollar } from '../lib/trading';
   import { getActiveVenue, setActiveVenue, stripVenueFromCurrentUrl, type TradingVenue } from '../lib/venueState';
+  import {
+    buildCoreMarkdownSnapshot,
+    normalizeCoreSnapshot,
+    copyTextToClipboard,
+    triggerJsonDownload,
+    showDiagnosticToast
+  } from '../lib/diagnosticExporter';
 
   const ASSET_NAMES: Record<string, string> = {
     AAPL: 'Apple Inc.',
@@ -777,6 +810,8 @@ if (session) {
   // Active venue state management (cookie/session-driven, no ?venue= in URL)
   let currentVenue: TradingVenue = getActiveVenue();
   let activeChartTab: 'equity' | 'streams' | 'drawdown' = 'equity';
+  let latestCoreTelemetryRow: Record<string, any> | null = null;
+  let coreHistoryRows: Array<Record<string, any>> = [];
 
   function formatRelativeTime(dateStr: string | null | undefined): string {
     if (!dateStr) return 'No executions recorded';
@@ -1946,6 +1981,8 @@ if (session) {
 
     async function updateDashboard() {
       const { latest, history, error } = await fetchTelemetryData(currentVenue);
+      latestCoreTelemetryRow = latest;
+      coreHistoryRows = history || [];
       renderKPIs(latest, history, error);
       renderExecutiveWidgets(latest, error);
       renderAllocationMatrix(latest, error);
@@ -2057,6 +2094,42 @@ if (session) {
       const refreshBtn = document.getElementById('refresh-telemetry-btn');
       refreshBtn?.addEventListener('click', async () => {
         await triggerRefresh();
+      });
+
+      // Copy Core AI Snapshot
+      const copyCoreBtn = document.getElementById('copy-core-snapshot-btn');
+      const copyCoreLabel = document.getElementById('copy-core-snapshot-label');
+      copyCoreBtn?.addEventListener('click', async () => {
+        const md = buildCoreMarkdownSnapshot({
+          latestRow: latestCoreTelemetryRow || {},
+          historyRows: coreHistoryRows,
+          venue: currentVenue,
+        });
+
+        const ok = await copyTextToClipboard(md);
+        if (ok) {
+          if (copyCoreLabel) copyCoreLabel.textContent = 'Copied!';
+          setTimeout(() => {
+            if (copyCoreLabel) copyCoreLabel.textContent = 'Copy AI Snapshot';
+          }, 2000);
+          showDiagnosticToast('[OK] Quant-Core AI Snapshot copied to clipboard!');
+        } else {
+          showDiagnosticToast('[ERROR] Failed to copy to clipboard', true);
+        }
+      });
+
+      // Export Core Audit JSON
+      const exportCoreJsonBtn = document.getElementById('export-core-json-btn');
+      exportCoreJsonBtn?.addEventListener('click', () => {
+        const auditJson = normalizeCoreSnapshot({
+          latestRow: latestCoreTelemetryRow || {},
+          historyRows: coreHistoryRows,
+          venue: currentVenue,
+        });
+
+        const filename = `quant_core_audit_${new Date().toISOString().slice(0, 10)}.json`;
+        triggerJsonDownload(filename, auditJson);
+        showDiagnosticToast(`[OK] ${filename} downloaded!`);
       });
     }
 
