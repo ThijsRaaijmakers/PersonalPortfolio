@@ -71,6 +71,99 @@ function formatCetTimestamp(date: Date): string {
   }
 }
 
+export function fmtContractPrice(price: unknown, symbol = ''): string {
+  const p = Math.abs(num(price, 0));
+  if (p === 0) return '$0.00';
+  const sym = symbol.toUpperCase();
+  let decimals = 2;
+  if (sym.includes('DOGE') || p < 0.1) {
+    decimals = 5;
+  } else if (sym.includes('SUI') || sym.includes('XRP') || p < 10) {
+    decimals = 4;
+  }
+  return `$${p.toLocaleString('en-US', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  })}`;
+}
+
+export interface EnrichedAssetHolding {
+  symbol: string;
+  direction: 'LONG' | 'SHORT' | 'FLAT';
+  qty_lots: number;
+  notional_usd: number;
+  weight: number;
+  entry_price: number;
+  mark_price: number;
+  upnl_usd: number;
+  upnl_pct: number;
+}
+
+export function computeAssetHoldingMetrics(
+  symbol: string,
+  rawEntry: any,
+  navUsd: number
+): EnrichedAssetHolding {
+  let qtyLots = 0;
+  let notionalUsd = 0;
+  let weight = 0;
+  let entryPrice = 0;
+
+  if (typeof rawEntry === 'number') {
+    qtyLots = num(rawEntry, 0);
+  } else if (typeof rawEntry === 'object' && rawEntry !== null) {
+    qtyLots = num(rawEntry.qty_lots ?? rawEntry.qty ?? rawEntry.lots, 0);
+    notionalUsd = num(rawEntry.notional_usd ?? rawEntry.notional, 0);
+    weight = num(rawEntry.weight ?? (navUsd > 0 ? notionalUsd / navUsd : 0), 0);
+    entryPrice = num(rawEntry.entry_price ?? rawEntry.avg_entry_price ?? rawEntry.mark_price, 0);
+  }
+
+  const isFlat = Math.abs(qtyLots) <= 1e-9 || Math.abs(notionalUsd) <= 1e-2;
+  const direction: 'LONG' | 'SHORT' | 'FLAT' = isFlat
+    ? 'FLAT'
+    : qtyLots > 0 || notionalUsd > 0
+      ? 'LONG'
+      : 'SHORT';
+
+  if (isFlat) {
+    return {
+      symbol,
+      direction: 'FLAT',
+      qty_lots: 0,
+      notional_usd: 0,
+      weight: 0,
+      entry_price: 0,
+      mark_price: 0,
+      upnl_usd: 0,
+      upnl_pct: 0,
+    };
+  }
+
+  const sign = direction === 'LONG' ? 1 : -1;
+  const absQty = Math.abs(qtyLots);
+  const absNotional = Math.abs(notionalUsd);
+  const signedNotional = sign * absNotional;
+  const signedQty = sign * absQty;
+
+  const markPrice = absQty > 1e-12 ? absNotional / absQty : entryPrice;
+  const costBasisUsd = absQty * entryPrice;
+  const upnlUsd = entryPrice > 0 ? signedNotional - signedQty * entryPrice : 0;
+  const upnlPct = costBasisUsd > 1e-6 ? (upnlUsd / costBasisUsd) * 100 : 0;
+  const effectiveWeight = navUsd > 0 ? signedNotional / navUsd : weight;
+
+  return {
+    symbol,
+    direction,
+    qty_lots: signedQty,
+    notional_usd: signedNotional,
+    weight: effectiveWeight,
+    entry_price: entryPrice,
+    mark_price: markPrice,
+    upnl_usd: upnlUsd,
+    upnl_pct: upnlPct,
+  };
+}
+
 export function normalizeSatelliteSnapshot(ctx: SatelliteDiagnosticContext) {
   const row = ctx.latestRow || {};
   const history = Array.isArray(ctx.historyRows) && ctx.historyRows.length > 0 ? ctx.historyRows : [row];
@@ -154,37 +247,9 @@ export function normalizeSatelliteSnapshot(ctx: SatelliteDiagnosticContext) {
       ? [`bars_evaluated (${barsEvaluated}) < ${targetBars}`]
       : [];
 
-  const holdings = SATELLITE_ASSETS.map((symbol) => {
+  const holdings: EnrichedAssetHolding[] = SATELLITE_ASSETS.map((symbol) => {
     const rawEntry = rawPositions[symbol] ?? rawPositions[symbol.replace('USDC', '')] ?? 0;
-    let qtyLots = 0;
-    let notionalUsd = 0;
-    let weight = 0;
-    let entryPrice = 0;
-
-    if (typeof rawEntry === 'number') {
-      qtyLots = num(rawEntry, 0);
-    } else if (typeof rawEntry === 'object' && rawEntry !== null) {
-      qtyLots = num(rawEntry.qty_lots ?? rawEntry.qty ?? rawEntry.lots, 0);
-      notionalUsd = num(rawEntry.notional_usd ?? rawEntry.notional, 0);
-      weight = num(rawEntry.weight ?? (navUsd > 0 ? notionalUsd / navUsd : 0), 0);
-      entryPrice = num(rawEntry.entry_price ?? rawEntry.mark_price, 0);
-    }
-
-    const direction =
-      Math.abs(qtyLots) <= 1e-9 && Math.abs(notionalUsd) <= 1e-2
-        ? 'FLAT'
-        : qtyLots > 0 || notionalUsd > 0
-          ? 'LONG'
-          : 'SHORT';
-
-    return {
-      symbol,
-      direction,
-      qty_lots: qtyLots,
-      notional_usd: notionalUsd,
-      weight,
-      entry_price: entryPrice,
-    };
+    return computeAssetHoldingMetrics(symbol, rawEntry, navUsd);
   });
 
   return {
@@ -266,7 +331,7 @@ export function buildSatelliteMarkdownSnapshot(ctx: SatelliteDiagnosticContext):
   const holdingsRows = s.holdings
     .map(
       (h) =>
-        `| \`${h.symbol}\` | \`${h.direction}\` | \`${h.qty_lots.toFixed(4)}\` | \`${fmtUsd(h.notional_usd)}\` | \`${fmtSignedPct(h.weight, 2)}\` | \`${fmtUsd(h.entry_price)}\` |`
+        `| \`${h.symbol}\` | \`${h.direction}\` | \`${h.qty_lots.toFixed(4)}\` | \`${fmtUsd(h.notional_usd)}\` | \`${fmtSignedPct(h.weight, 2)}\` | \`${fmtContractPrice(h.entry_price, h.symbol)} -> ${fmtContractPrice(h.mark_price, h.symbol)}\` | \`${fmtSignedUsd(h.upnl_usd)} (${h.upnl_pct >= 0 ? '+' : ''}${h.upnl_pct.toFixed(2)}%)\` |`
     )
     .join('\n');
 
@@ -318,8 +383,8 @@ export function buildSatelliteMarkdownSnapshot(ctx: SatelliteDiagnosticContext):
     `- **Mean Lot Quantization L1 Error:** \`${fmtPct(eq.mean_quantization_l1_error, 2)}\` (\`${eq.mean_quantization_l1_error.toFixed(4)}\`)`,
     ``,
     `## 4. 6-Asset Coupled Basket Holdings`,
-    `| Asset | Direction | Quantity (Lots) | Notional (USD) | Weight (%) | Entry Price |`,
-    `| :--- | :--- | :--- | :--- | :--- | :--- |`,
+    `| Asset | Direction | Quantity (Lots) | Notional (USD) | Weight (%) | Entry -> Mark | Unrealized PnL |`,
+    `| :--- | :--- | :--- | :--- | :--- | :--- | :--- |`,
     holdingsRows,
     ``,
     `## 5. N=2,000 Go/No-Go Protocol Invariants (8-Point Check)`,

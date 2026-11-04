@@ -662,19 +662,19 @@ if (session) {
             </span>
           </div>
 
-          <!-- Table Container -->
-          <div class="overflow-x-auto mt-3 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-slate-900 [&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full">
+          <!-- Table Container (Geen Horizontale Scrollbar) -->
+          <div class="overflow-x-hidden mt-3 rounded-xl border border-slate-200 dark:border-slate-800">
             <table class="w-full table-fixed font-mono text-xs text-left">
               <thead>
-                <tr class="text-[10px] text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-800/80">
-                  <th class="w-[28%] py-2 pr-1 font-normal">
+                <tr class="text-[10px] text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-800/80 bg-slate-100/40 dark:bg-slate-950/40">
+                  <th class="w-[23%] py-2.5 px-2 font-normal">
                     <div class="flex items-center space-x-1">
-                      <span>Asset</span>
+                      <span>ACTIEF</span>
                     </div>
                   </th>
-                  <th class="w-[18%] py-2 px-1 text-right font-normal">
+                  <th class="w-[18%] py-2.5 px-1.5 text-right font-normal">
                     <div class="flex items-center justify-end space-x-1">
-                      <span>Lots</span>
+                      <span>GROOTTE (LOTS)</span>
                       <div class="group relative inline-flex items-center cursor-help">
                         <span class="inline-flex items-center justify-center w-3 h-3 rounded-full bg-slate-200 dark:bg-slate-800 text-[8px] font-mono font-bold text-slate-500 hover:text-cyan-400 hover:bg-slate-700 transition-colors">?</span>
                         <div class="pointer-events-none absolute top-full right-0 mt-1.5 w-56 p-2 rounded-lg bg-slate-900/95 border border-slate-700 text-[10px] leading-relaxed text-slate-200 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity z-50 text-left whitespace-normal normal-case font-sans">
@@ -683,35 +683,35 @@ if (session) {
                       </div>
                     </div>
                   </th>
-                  <th class="w-[18%] py-2 px-1 text-right font-normal">
+                  <th class="w-[19%] py-2.5 px-1.5 text-right font-normal">
                     <div class="flex items-center justify-end space-x-1">
-                      <span>Value</span>
+                      <span>POSITIE ($ / %)</span>
                       <div class="group relative inline-flex items-center cursor-help">
                         <span class="inline-flex items-center justify-center w-3 h-3 rounded-full bg-slate-200 dark:bg-slate-800 text-[8px] font-mono font-bold text-slate-500 hover:text-cyan-400 hover:bg-slate-700 transition-colors">?</span>
                         <div class="pointer-events-none absolute top-full right-0 mt-1.5 w-60 p-2 rounded-lg bg-slate-900/95 border border-slate-700 text-[10px] leading-relaxed text-slate-200 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity z-50 text-left whitespace-normal normal-case font-sans">
-                          Werkelijke dollarwaarde van jouw positie in deze munt (Lots × Prijs). Groen (+) = Long (winst bij stijging), Rood (-) = Short (winst bij daling).
+                          Werkelijke dollarwaarde van jouw positie in deze munt (Lots × Prijs) en weging t.o.v. de totale NAV.
                         </div>
                       </div>
                     </div>
                   </th>
-                  <th class="w-[18%] py-2 px-1 text-right font-normal">
+                  <th class="w-[20%] py-2.5 px-1.5 text-right font-normal">
                     <div class="flex items-center justify-end space-x-1">
-                      <span>Weight</span>
+                      <span>INSTAP / KOERS ($)</span>
                       <div class="group relative inline-flex items-center cursor-help">
                         <span class="inline-flex items-center justify-center w-3 h-3 rounded-full bg-slate-200 dark:bg-slate-800 text-[8px] font-mono font-bold text-slate-500 hover:text-cyan-400 hover:bg-slate-700 transition-colors">?</span>
-                        <div class="pointer-events-none absolute top-full right-0 mt-1.5 w-56 p-2 rounded-lg bg-slate-900/95 border border-slate-700 text-[10px] leading-relaxed text-slate-200 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity z-50 text-left whitespace-normal normal-case font-sans">
-                          Procentuele weging van deze positie ten opzichte van je totale portefeuille-NAV.
+                        <div class="pointer-events-none absolute top-full right-0 mt-1.5 w-60 p-2 rounded-lg bg-slate-900/95 border border-slate-700 text-[10px] leading-relaxed text-slate-200 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity z-50 text-left whitespace-normal normal-case font-sans">
+                          Gemiddelde instapprijs (IN) vs actuele berekende marktprijs (NOW).
                         </div>
                       </div>
                     </div>
                   </th>
-                  <th class="w-[18%] py-2 pl-1 text-right font-normal">
+                  <th class="w-[20%] py-2.5 px-2 text-right font-normal">
                     <div class="flex items-center justify-end space-x-1">
-                      <span>Entry</span>
+                      <span>ONGEREALISEERDE PNL</span>
                       <div class="group relative inline-flex items-center cursor-help">
                         <span class="inline-flex items-center justify-center w-3 h-3 rounded-full bg-slate-200 dark:bg-slate-800 text-[8px] font-mono font-bold text-slate-500 hover:text-cyan-400 hover:bg-slate-700 transition-colors">?</span>
                         <div class="pointer-events-none absolute top-full right-0 mt-1.5 w-60 p-2 rounded-lg bg-slate-900/95 border border-slate-700 text-[10px] leading-relaxed text-slate-200 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity z-50 text-left whitespace-normal normal-case font-sans">
-                          De gemiddelde marktprijs van 1 hele eenheid van deze munt (bijv. 1 hele Bitcoin) op het moment van instappen.
+                          Real-time ongerealiseerde zwevende winst of verlies in USD en procentueel rendement op instapkosten.
                         </div>
                       </div>
                     </div>
@@ -721,79 +721,128 @@ if (session) {
               <tbody id="basket-table-body" class="divide-y divide-slate-200 dark:divide-slate-800/50">
                 <!-- Dynamically populated or skeleton rows -->
                 <tr class="text-slate-500">
-                  <td class="py-2.5 pr-1 font-bold text-slate-300">
+                  <td class="py-2.5 px-2 font-bold text-slate-300">
                     <div class="flex items-center space-x-1 min-w-0">
                       <span class="truncate">BTCUSDC</span>
                       <span class="bg-slate-800 text-slate-400 px-1 py-0.5 rounded text-[9px] font-bold">FLAT</span>
                     </div>
                   </td>
-                  <td class="py-2.5 px-1 text-right text-slate-400 font-medium truncate">0.0000</td>
-                  <td class="py-2.5 px-1 text-right text-slate-400 font-bold truncate">$0.00</td>
-                  <td class="py-2.5 px-1 text-right text-slate-500 text-[11px] font-bold">0.0%</td>
-                  <td class="py-2.5 pl-1 text-right text-slate-400 font-medium truncate">$0.00</td>
+                  <td class="py-2.5 px-1.5 text-right text-slate-400 font-medium truncate">0.0000</td>
+                  <td class="py-2.5 px-1.5 text-right text-slate-400 font-medium truncate">
+                    <div>$0.00</div>
+                    <div class="text-[10px] text-slate-500">(0.00%)</div>
+                  </td>
+                  <td class="py-2.5 px-1.5 text-right text-slate-500 truncate">—</td>
+                  <td class="py-2.5 px-2 text-right text-slate-400 font-medium truncate">
+                    <div>$0.00</div>
+                    <div class="text-[10px] text-slate-500">0.00%</div>
+                  </td>
                 </tr>
                 <tr class="text-slate-500">
-                  <td class="py-2.5 pr-1 font-bold text-slate-300">
+                  <td class="py-2.5 px-2 font-bold text-slate-300">
                     <div class="flex items-center space-x-1 min-w-0">
                       <span class="truncate">ETHUSDC</span>
                       <span class="bg-slate-800 text-slate-400 px-1 py-0.5 rounded text-[9px] font-bold">FLAT</span>
                     </div>
                   </td>
-                  <td class="py-2.5 px-1 text-right text-slate-400 font-medium truncate">0.0000</td>
-                  <td class="py-2.5 px-1 text-right text-slate-400 font-bold truncate">$0.00</td>
-                  <td class="py-2.5 px-1 text-right text-slate-500 text-[11px] font-bold">0.0%</td>
-                  <td class="py-2.5 pl-1 text-right text-slate-400 font-medium truncate">$0.00</td>
+                  <td class="py-2.5 px-1.5 text-right text-slate-400 font-medium truncate">0.0000</td>
+                  <td class="py-2.5 px-1.5 text-right text-slate-400 font-medium truncate">
+                    <div>$0.00</div>
+                    <div class="text-[10px] text-slate-500">(0.00%)</div>
+                  </td>
+                  <td class="py-2.5 px-1.5 text-right text-slate-500 truncate">—</td>
+                  <td class="py-2.5 px-2 text-right text-slate-400 font-medium truncate">
+                    <div>$0.00</div>
+                    <div class="text-[10px] text-slate-500">0.00%</div>
+                  </td>
                 </tr>
                 <tr class="text-slate-500">
-                  <td class="py-2.5 pr-1 font-bold text-slate-300">
+                  <td class="py-2.5 px-2 font-bold text-slate-300">
                     <div class="flex items-center space-x-1 min-w-0">
                       <span class="truncate">SOLUSDC</span>
                       <span class="bg-slate-800 text-slate-400 px-1 py-0.5 rounded text-[9px] font-bold">FLAT</span>
                     </div>
                   </td>
-                  <td class="py-2.5 px-1 text-right text-slate-400 font-medium truncate">0.0000</td>
-                  <td class="py-2.5 px-1 text-right text-slate-400 font-bold truncate">$0.00</td>
-                  <td class="py-2.5 px-1 text-right text-slate-500 text-[11px] font-bold">0.0%</td>
-                  <td class="py-2.5 pl-1 text-right text-slate-400 font-medium truncate">$0.00</td>
+                  <td class="py-2.5 px-1.5 text-right text-slate-400 font-medium truncate">0.0000</td>
+                  <td class="py-2.5 px-1.5 text-right text-slate-400 font-medium truncate">
+                    <div>$0.00</div>
+                    <div class="text-[10px] text-slate-500">(0.00%)</div>
+                  </td>
+                  <td class="py-2.5 px-1.5 text-right text-slate-500 truncate">—</td>
+                  <td class="py-2.5 px-2 text-right text-slate-400 font-medium truncate">
+                    <div>$0.00</div>
+                    <div class="text-[10px] text-slate-500">0.00%</div>
+                  </td>
                 </tr>
                 <tr class="text-slate-500">
-                  <td class="py-2.5 pr-1 font-bold text-slate-300">
+                  <td class="py-2.5 px-2 font-bold text-slate-300">
                     <div class="flex items-center space-x-1 min-w-0">
                       <span class="truncate">SUIUSDT</span>
                       <span class="bg-slate-800 text-slate-400 px-1 py-0.5 rounded text-[9px] font-bold">FLAT</span>
                     </div>
                   </td>
-                  <td class="py-2.5 px-1 text-right text-slate-400 font-medium truncate">0.0000</td>
-                  <td class="py-2.5 px-1 text-right text-slate-400 font-bold truncate">$0.00</td>
-                  <td class="py-2.5 px-1 text-right text-slate-500 text-[11px] font-bold">0.0%</td>
-                  <td class="py-2.5 pl-1 text-right text-slate-400 font-medium truncate">$0.00</td>
+                  <td class="py-2.5 px-1.5 text-right text-slate-400 font-medium truncate">0.0000</td>
+                  <td class="py-2.5 px-1.5 text-right text-slate-400 font-medium truncate">
+                    <div>$0.00</div>
+                    <div class="text-[10px] text-slate-500">(0.00%)</div>
+                  </td>
+                  <td class="py-2.5 px-1.5 text-right text-slate-500 truncate">—</td>
+                  <td class="py-2.5 px-2 text-right text-slate-400 font-medium truncate">
+                    <div>$0.00</div>
+                    <div class="text-[10px] text-slate-500">0.00%</div>
+                  </td>
                 </tr>
                 <tr class="text-slate-500">
-                  <td class="py-2.5 pr-1 font-bold text-slate-300">
+                  <td class="py-2.5 px-2 font-bold text-slate-300">
                     <div class="flex items-center space-x-1 min-w-0">
                       <span class="truncate">XRPUSDC</span>
                       <span class="bg-slate-800 text-slate-400 px-1 py-0.5 rounded text-[9px] font-bold">FLAT</span>
                     </div>
                   </td>
-                  <td class="py-2.5 px-1 text-right text-slate-400 font-medium truncate">0.0000</td>
-                  <td class="py-2.5 px-1 text-right text-slate-400 font-bold truncate">$0.00</td>
-                  <td class="py-2.5 px-1 text-right text-slate-500 text-[11px] font-bold">0.0%</td>
-                  <td class="py-2.5 pl-1 text-right text-slate-400 font-medium truncate">$0.00</td>
+                  <td class="py-2.5 px-1.5 text-right text-slate-400 font-medium truncate">0.0000</td>
+                  <td class="py-2.5 px-1.5 text-right text-slate-400 font-medium truncate">
+                    <div>$0.00</div>
+                    <div class="text-[10px] text-slate-500">(0.00%)</div>
+                  </td>
+                  <td class="py-2.5 px-1.5 text-right text-slate-500 truncate">—</td>
+                  <td class="py-2.5 px-2 text-right text-slate-400 font-medium truncate">
+                    <div>$0.00</div>
+                    <div class="text-[10px] text-slate-500">0.00%</div>
+                  </td>
                 </tr>
                 <tr class="text-slate-500">
-                  <td class="py-2.5 pr-1 font-bold text-slate-300">
+                  <td class="py-2.5 px-2 font-bold text-slate-300">
                     <div class="flex items-center space-x-1 min-w-0">
                       <span class="truncate">DOGEUSDC</span>
                       <span class="bg-slate-800 text-slate-400 px-1 py-0.5 rounded text-[9px] font-bold">FLAT</span>
                     </div>
                   </td>
-                  <td class="py-2.5 px-1 text-right text-slate-400 font-medium truncate">0.0000</td>
-                  <td class="py-2.5 px-1 text-right text-slate-400 font-bold truncate">$0.00</td>
-                  <td class="py-2.5 px-1 text-right text-slate-500 text-[11px] font-bold">0.0%</td>
-                  <td class="py-2.5 pl-1 text-right text-slate-400 font-medium truncate">$0.00</td>
+                  <td class="py-2.5 px-1.5 text-right text-slate-400 font-medium truncate">0.0000</td>
+                  <td class="py-2.5 px-1.5 text-right text-slate-400 font-medium truncate">
+                    <div>$0.00</div>
+                    <div class="text-[10px] text-slate-500">(0.00%)</div>
+                  </td>
+                  <td class="py-2.5 px-1.5 text-right text-slate-500 truncate">—</td>
+                  <td class="py-2.5 px-2 text-right text-slate-400 font-medium truncate">
+                    <div>$0.00</div>
+                    <div class="text-[10px] text-slate-500">0.00%</div>
+                  </td>
                 </tr>
               </tbody>
             </table>
+
+            <!-- Basket Samenvatting Footer -->
+            <div id="basket-table-footer" class="border-t border-slate-300 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-950/50 px-3 sm:px-4 py-2 sm:py-2.5 flex flex-wrap items-center justify-between gap-2 font-mono text-xs">
+              <div class="flex items-center space-x-3 text-slate-500 dark:text-slate-400">
+                <span>Actieve Benen: <span id="basket-active-legs" class="font-bold text-slate-700 dark:text-slate-200">0 / 6</span></span>
+                <span>&bull;</span>
+                <span>Bruto Exposure: <span id="basket-gross-exposure" class="font-bold text-slate-700 dark:text-slate-200">$0.00</span></span>
+              </div>
+              <div class="flex items-center space-x-1.5">
+                <span class="text-slate-500 dark:text-slate-400">Basket Ongerealiseerde PnL:</span>
+                <span id="basket-total-upnl" class="font-bold text-slate-500 dark:text-slate-400">$0.00 (0.00%)</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1043,6 +1092,8 @@ if (session) {
   import {
     buildSatelliteMarkdownSnapshot,
     normalizeSatelliteSnapshot,
+    computeAssetHoldingMetrics,
+    fmtContractPrice,
     copyTextToClipboard,
     triggerJsonDownload,
     showDiagnosticToast,
@@ -1079,13 +1130,6 @@ if (session) {
     const hrs = Math.floor(mins / 60);
     if (hrs < 24) return `${hrs}h ago`;
     return `${Math.floor(hrs / 24)}d ago`;
-  }
-
-  function formatEntryPrice(price: number): string {
-    if (!price || price <= 0 || isNaN(price)) return '$0.00';
-    if (price >= 1000) return `$${Math.round(price).toLocaleString('en-US')}`;
-    if (price >= 10) return `$${price.toFixed(2)}`;
-    return `$${price.toFixed(4)}`;
   }
 
   function normalizeTelemetryRow(row: any) {
@@ -1700,29 +1744,39 @@ if (session) {
   // ==========================================
   function renderSection3(latest: any, history: any[]) {
     // 1. Render Basket Exposure Table
-    renderBasketTable(latest?.positions_lots || latest?.positions || {});
+    const navUsd = Number(latest?.nav_usd) || 100000;
+    renderBasketTable(latest?.positions_lots || latest?.positions || {}, navUsd);
 
     // 2. Render SVG Chart
     renderChart(history);
   }
 
-  function renderBasketTable(positions: Record<string, any>) {
+  function renderBasketTable(positions: Record<string, any>, navUsdParam?: number) {
     const tbody = document.getElementById('basket-table-body');
     if (!tbody) return;
 
+    const navUsd = Number(navUsdParam) || (latestTelemetryRow ? Number(latestTelemetryRow.nav_usd) : 100000) || 100000;
     const basketTickers = ['BTCUSDC', 'ETHUSDC', 'SOLUSDC', 'SUIUSDT', 'XRPUSDC', 'DOGEUSDC'];
-    
+
+    let activeLegsCount = 0;
+    let totalGrossExposure = 0;
+    let totalBasketUpnlUsd = 0;
+
     const rowsHtml = basketTickers.map(ticker => {
-      const pos = positions[ticker] || {};
-      const lots = Number(pos.qty_lots) || 0;
-      const notional = Number(pos.notional_usd) || 0;
-      const weight = Number(pos.weight) || 0;
-      const entryPrice = Number(pos.entry_price) || 0;
+      const rawEntry = positions[ticker] ?? positions[ticker.replace('USDC', '')] ?? {};
+      const h = computeAssetHoldingMetrics(ticker, rawEntry, navUsd);
 
-      const isLong = lots > 0;
-      const isShort = lots < 0;
-      const isFlat = lots === 0;
+      const isLong = h.direction === 'LONG';
+      const isShort = h.direction === 'SHORT';
+      const isFlat = h.direction === 'FLAT';
 
+      if (!isFlat) {
+        activeLegsCount++;
+        totalGrossExposure += Math.abs(h.notional_usd);
+        totalBasketUpnlUsd += h.upnl_usd;
+      }
+
+      // Column 1: Asset + Badge
       let badgeHtml = '<span class="bg-slate-800 text-slate-400 px-1 py-0.5 rounded text-[9px] font-bold shrink-0">FLAT</span>';
       if (isLong) {
         badgeHtml = '<span class="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-1 py-0.5 rounded text-[9px] font-bold shrink-0">LONG</span>';
@@ -1730,53 +1784,122 @@ if (session) {
         badgeHtml = '<span class="bg-rose-500/15 text-rose-400 border border-rose-500/30 px-1 py-0.5 rounded text-[9px] font-bold shrink-0">SHORT</span>';
       }
 
-      // Lots format (max 2 decimals when abs >= 100, 4 decimals otherwise)
-      const absLots = Math.abs(lots);
-      const lotsFormatted = isFlat ? '0.0000' : (absLots >= 100 ? lots.toFixed(1) : lots.toFixed(4));
+      // Column 2: Size (Lots)
+      let lotsFormatted = '0.0000';
+      if (!isFlat) {
+        const absLots = Math.abs(h.qty_lots);
+        const signLots = h.qty_lots > 0 ? '+' : '';
+        lotsFormatted = absLots >= 100 
+          ? `${signLots}${h.qty_lots.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 2 })}`
+          : `${signLots}${h.qty_lots.toFixed(4)}`;
+      }
 
-      // Value format (notional in USD with + or - sign)
-      const absNotional = Math.abs(notional);
-      const valStr = absNotional < 100 && absNotional > 0 ? absNotional.toFixed(2) : Math.round(absNotional).toLocaleString('en-US');
-      const notionalFormatted = notional === 0 ? '$0.00' : (notional < 0 ? `-$${valStr}` : `+$${valStr}`);
-      const notionalColor = isLong ? 'text-emerald-400' : (isShort ? 'text-rose-400' : 'text-slate-400');
+      // Column 3: Exposure ($ / %)
+      let exposureTop = '$0.00';
+      let exposureBottom = '(0.00%)';
+      let exposureColor = 'text-slate-400';
+      if (!isFlat) {
+        const absNotional = Math.abs(h.notional_usd);
+        const signNotional = h.notional_usd > 0 ? '+' : '-';
+        exposureTop = `${signNotional}$${absNotional.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        exposureColor = isLong ? 'text-emerald-500 dark:text-emerald-400 font-bold' : 'text-rose-500 dark:text-rose-400 font-bold';
+        const weightPct = h.weight * 100;
+        exposureBottom = `(${weightPct >= 0 ? '+' : ''}${weightPct.toFixed(2)}%)`;
+      }
 
-      // Weight format
-      const weightPct = (Math.abs(weight) * 100).toFixed(1);
-      const weightStr = weight === 0 ? '0.0%' : (weight < 0 ? `-${weightPct}%` : `+${weightPct}%`);
-      const weightColor = isLong ? 'text-emerald-400' : (isShort ? 'text-rose-400' : 'text-slate-500');
-      const barColor = isLong ? 'bg-emerald-500' : (isShort ? 'bg-rose-500' : 'bg-slate-700');
-      const barWidth = Math.min(100, parseFloat(weightPct) * 3);
+      // Column 4: Entry / Mark ($)
+      let entryMarkHtml = '<span class="text-slate-500">—</span>';
+      if (!isFlat) {
+        entryMarkHtml = `
+          <div><span class="text-slate-400 text-[10px] mr-1">IN:</span><span class="text-slate-700 dark:text-slate-200 font-semibold">${fmtContractPrice(h.entry_price, h.symbol)}</span></div>
+          <div class="mt-0.5"><span class="text-slate-400 text-[10px] mr-1">NOW:</span><span class="text-cyan-600 dark:text-cyan-400 font-semibold">${fmtContractPrice(h.mark_price, h.symbol)}</span></div>
+        `;
+      }
+
+      // Column 5: Unrealized PnL ($ / %)
+      let upnlHtml = `
+        <div class="font-bold text-slate-400 dark:text-slate-500 leading-tight">$0.00</div>
+        <div class="text-[10px] text-slate-400 dark:text-slate-500 leading-tight mt-0.5">0.00%</div>
+      `;
+      if (!isFlat) {
+        if (h.upnl_usd > 0.005) {
+          upnlHtml = `
+            <div class="font-bold text-emerald-600 dark:text-emerald-400 leading-tight">
+              +$${h.upnl_usd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </div>
+            <div class="mt-0.5">
+              <span class="inline-block px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">
+                +${h.upnl_pct.toFixed(2)}%
+              </span>
+            </div>
+          `;
+        } else if (h.upnl_usd < -0.005) {
+          upnlHtml = `
+            <div class="font-bold text-rose-600 dark:text-rose-400 leading-tight">
+              -$${Math.abs(h.upnl_usd).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </div>
+            <div class="mt-0.5">
+              <span class="inline-block px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 text-[10px] font-bold">
+                ${h.upnl_pct.toFixed(2)}%
+              </span>
+            </div>
+          `;
+        } else {
+          upnlHtml = `
+            <div class="font-bold text-slate-500 dark:text-slate-400 leading-tight">$0.00</div>
+            <div class="text-[10px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5">0.00%</div>
+          `;
+        }
+      }
 
       return `
         <tr class="hover:bg-slate-200/50 dark:hover:bg-slate-800/40 transition-colors">
-          <td class="py-2.5 pr-1 font-bold text-slate-900 dark:text-slate-100">
+          <td class="py-2.5 px-2 font-bold text-slate-900 dark:text-slate-100">
             <div class="flex items-center space-x-1 min-w-0">
               <span class="truncate">${ticker}</span>
               ${badgeHtml}
             </div>
           </td>
-          <td class="py-2.5 px-1 text-right text-slate-700 dark:text-slate-300 font-medium truncate">
+          <td class="py-2.5 px-1.5 text-right text-slate-700 dark:text-slate-300 font-medium truncate">
             ${lotsFormatted}
           </td>
-          <td class="py-2.5 px-1 text-right font-bold ${notionalColor} truncate">
-            ${notionalFormatted}
+          <td class="py-2.5 px-1.5 text-right truncate">
+            <div class="${exposureColor} leading-tight">${exposureTop}</div>
+            <div class="text-[11px] text-slate-400 leading-tight mt-0.5">${exposureBottom}</div>
           </td>
-          <td class="py-2.5 px-1 text-right">
-            <div class="flex items-center justify-end space-x-1">
-              <span class="${weightColor} font-bold text-[11px]">${weightStr}</span>
-              <div class="w-6 sm:w-8 bg-slate-200 dark:bg-slate-800 rounded-full h-1 overflow-hidden shrink-0">
-                <div class="h-full ${barColor}" style="width: ${barWidth}%"></div>
-              </div>
-            </div>
+          <td class="py-2.5 px-1.5 text-right truncate">
+            ${entryMarkHtml}
           </td>
-          <td class="py-2.5 pl-1 text-right text-slate-600 dark:text-slate-300 font-medium truncate">
-            ${formatEntryPrice(entryPrice)}
+          <td class="py-2.5 px-2 text-right truncate">
+            ${upnlHtml}
           </td>
         </tr>
       `;
     }).join('');
 
     tbody.innerHTML = rowsHtml;
+
+    // Update Footer Summary
+    const activeLegsEl = document.getElementById('basket-active-legs');
+    const grossExpEl = document.getElementById('basket-gross-exposure');
+    const totalUpnlEl = document.getElementById('basket-total-upnl');
+
+    if (activeLegsEl) activeLegsEl.textContent = `${activeLegsCount} / 6`;
+    if (grossExpEl) grossExpEl.textContent = formatUsd(totalGrossExposure);
+
+    if (totalUpnlEl) {
+      const basketUpnlPct = navUsd > 0 ? (totalBasketUpnlUsd / navUsd) * 100 : 0;
+      if (totalBasketUpnlUsd > 0.005) {
+        totalUpnlEl.textContent = `+${formatUsd(totalBasketUpnlUsd)} (+${basketUpnlPct.toFixed(2)}%)`;
+        totalUpnlEl.className = 'font-bold text-emerald-600 dark:text-emerald-400';
+      } else if (totalBasketUpnlUsd < -0.005) {
+        totalUpnlEl.textContent = `-${formatUsd(Math.abs(totalBasketUpnlUsd))} (${basketUpnlPct.toFixed(2)}%)`;
+        totalUpnlEl.className = 'font-bold text-rose-600 dark:text-rose-400';
+      } else {
+        totalUpnlEl.textContent = `$0.00 (0.00%)`;
+        totalUpnlEl.className = 'font-bold text-slate-500 dark:text-slate-400';
+      }
+    }
   }
 
   function renderChart(history: any[]) {
