@@ -525,39 +525,62 @@ if (session) {
     <!-- ============================================================== -->
     <!-- SECTION 3: SVG TELEMETRY CURVES & 6-ASSET EXPOSURE TABLE      -->
     <!-- ============================================================== -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div class="flex flex-col space-y-8 w-full">
       
-      <!-- Left (7 cols): Responsive SVG Telemetry Chart -->
-      <div class="lg:col-span-7 p-5 sm:p-6 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl space-y-4 flex flex-col justify-between">
+      <!-- Panel 1: Responsive SVG Telemetry Chart (100% Full Width) -->
+      <div class="w-full p-5 sm:p-6 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl space-y-4">
         <div>
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
-            <div class="space-y-0.5">
-              <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// MULTI-BAR TELEMETRY (LAST 500 BARS)</span>
-              <div class="text-sm font-bold text-slate-800 dark:text-slate-200 font-sans">
-                NAV ($) &amp; Realized Tail &beta; Orthogonality Curve
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+            <!-- Left: Subtitle, Title, Period Return Badge & Period Stats -->
+            <div class="space-y-1.5 min-w-0">
+              <div class="flex items-center space-x-2">
+                <span id="chart-subtitle" class="text-xs font-mono text-slate-500 uppercase tracking-wider">// MULTI-BAR TELEMETRY (LAST 500 BARS)</span>
+              </div>
+              <div class="flex flex-wrap items-center gap-2.5">
+                <span class="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 font-sans tracking-tight">
+                  NAV ($) &amp; Realized Tail &beta; Orthogonality Curve
+                </span>
+                <span id="chart-period-return" class="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                  +$0.00 (+0.00%)
+                </span>
+              </div>
+              <div id="chart-period-stats" class="text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                Period High: -- &bull; Period Low: -- &bull; Bars in View: 0
               </div>
             </div>
 
-            <!-- Legend -->
-            <div class="flex items-center space-x-3 text-xs font-mono">
-              <div class="flex items-center space-x-1.5">
-                <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
-                <span class="text-slate-400">NAV ($)</span>
+            <!-- Right: Interactive Timeframe Selector & Series Toggles -->
+            <div class="flex flex-wrap items-center gap-3 shrink-0">
+              <!-- Timeframe Pills -->
+              <div class="inline-flex p-1 rounded-xl bg-slate-200/80 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-xs font-mono">
+                <button type="button" data-chart-tf="50" title="~4 Hours (50 Bars)" class="chart-tf-btn px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer">50B</button>
+                <button type="button" data-chart-tf="150" title="~12 Hours (150 Bars)" class="chart-tf-btn px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer">150B</button>
+                <button type="button" data-chart-tf="288" title="24 Hours (288 Bars)" class="chart-tf-btn px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer">288B</button>
+                <button type="button" data-chart-tf="500" title="Default Window (500 Bars)" class="chart-tf-btn active px-2.5 py-1 rounded-lg font-bold bg-white dark:bg-slate-800 text-cyan-600 dark:text-cyan-400 shadow-sm transition-colors cursor-pointer">500B</button>
+                <button type="button" data-chart-tf="all" title="All Loaded Session Bars" class="chart-tf-btn px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer">ALL</button>
               </div>
-              <div class="flex items-center space-x-1.5">
-                <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
-                <span class="text-slate-400">Tail &beta;</span>
-              </div>
-              <div class="flex items-center space-x-1 text-[10px] text-rose-400">
-                <span class="w-2 h-0.5 bg-rose-400"></span>
-                <span>&le; 0.035 Stop</span>
+
+              <!-- Interactive Series Toggles -->
+              <div class="flex items-center space-x-2 text-xs font-mono">
+                <button type="button" id="toggle-series-nav" title="Toggle NAV ($) Curve" class="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg border border-cyan-500/30 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 font-semibold cursor-pointer transition-all">
+                  <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                  <span>NAV ($)</span>
+                </button>
+                <button type="button" id="toggle-series-beta" title="Toggle Tail β Curve" class="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold cursor-pointer transition-all">
+                  <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                  <span>Tail &beta;</span>
+                </button>
+                <button type="button" id="toggle-series-stop" title="Toggle ≤ 0.035 Stop Guide" class="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg border border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400 font-semibold cursor-pointer transition-all text-[11px]">
+                  <span class="w-2.5 h-0.5 bg-rose-400"></span>
+                  <span>&le; 0.035 Stop</span>
+                </button>
               </div>
             </div>
           </div>
         </div>
 
         <!-- SVG Container -->
-        <div class="relative w-full h-72 sm:h-80 bg-slate-100/50 dark:bg-slate-950/60 rounded-xl border border-slate-200 dark:border-slate-800/80 p-2 overflow-hidden select-none">
+        <div class="relative w-full h-[300px] sm:h-[360px] bg-slate-100/50 dark:bg-slate-950/60 rounded-xl border border-slate-200 dark:border-slate-800/80 p-2 overflow-hidden select-none">
           
           <!-- Empty State -->
           <div id="chart-empty-state" class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center space-y-2 z-10 hidden">
@@ -572,28 +595,31 @@ if (session) {
             </p>
           </div>
 
-          <!-- The SVG Element -->
+          <!-- The SVG Element (ViewBox 1100 340) -->
           <svg 
             id="telemetry-chart-svg" 
-            viewBox="0 0 900 300" 
-            class="w-full h-full cursor-crosshair"
+            viewBox="0 0 1100 340" 
+            class="w-full h-full cursor-crosshair select-none"
             preserveAspectRatio="none"
           >
             <defs>
-              <linearGradient id="nav-area-gradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.25" />
+              <linearGradient id="navAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.22" />
                 <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.0" />
               </linearGradient>
             </defs>
 
             <!-- Grid Lines & Labels -->
             <g id="chart-grid-lines" stroke="#334155" stroke-width="0.5" opacity="0.3"></g>
-            <g id="chart-y-labels" fill="#64748b" font-size="9" font-family="monospace"></g>
+            <g id="chart-y-labels" fill="#64748b" font-size="10" font-family="monospace"></g>
+
+            <!-- High / Low Guide Lines & Labels -->
+            <g id="chart-high-low-guides"></g>
 
             <!-- 0.035 Beta Reference Line -->
             <line 
               id="chart-beta-threshold-line" 
-              x1="50" y1="150" x2="880" y2="150" 
+              x1="65" y1="170" x2="1035" y2="170" 
               stroke="#f43f5e" 
               stroke-width="1" 
               stroke-dasharray="4,4" 
@@ -601,9 +627,9 @@ if (session) {
             />
             <text 
               id="chart-beta-threshold-label" 
-              x="875" y="145" 
+              x="1030" y="165" 
               fill="#f43f5e" 
-              font-size="8" 
+              font-size="9" 
               font-family="monospace" 
               text-anchor="end"
             >
@@ -611,24 +637,24 @@ if (session) {
             </text>
 
             <!-- Area Fill & Curves -->
-            <path id="chart-nav-area" d="" fill="url(#nav-area-gradient)" />
+            <path id="chart-nav-area" d="" fill="url(#navAreaGrad)" />
             <path id="chart-nav-path" d="" fill="none" stroke="#22d3ee" stroke-width="2" stroke-linecap="round" />
             <path id="chart-beta-path" d="" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round" />
 
-            <!-- Interactive Crosshair & Tooltip Group -->
+            <!-- Interactive Crosshair & Tooltip Indicator Group -->
             <g id="chart-crosshair-group" opacity="0">
-              <line id="crosshair-v" x1="0" y1="20" x2="0" y2="280" stroke="#06b6d4" stroke-width="1" stroke-dasharray="2,2" />
-              <circle id="crosshair-nav-dot" cx="0" cy="0" r="4" fill="#22d3ee" stroke="#0f172a" stroke-width="2" />
-              <circle id="crosshair-beta-dot" cx="0" cy="0" r="3.5" fill="#fbbf24" stroke="#0f172a" stroke-width="2" />
+              <line id="crosshair-v" x1="0" y1="20" x2="0" y2="305" stroke="rgba(148, 163, 184, 0.45)" stroke-width="1" stroke-dasharray="3,3" />
+              <circle id="crosshair-nav-dot" cx="0" cy="0" r="4.5" fill="#22d3ee" stroke="#0f172a" stroke-width="2" />
+              <circle id="crosshair-beta-dot" cx="0" cy="0" r="4" fill="#fbbf24" stroke="#0f172a" stroke-width="2" />
             </g>
           </svg>
 
-          <!-- Floating Tooltip Box -->
+          <!-- Floating HUD Tooltip Card -->
           <div 
-            id="chart-floating-tooltip" 
-            class="absolute top-3 left-3 pointer-events-none p-2.5 rounded-lg bg-slate-950/90 border border-slate-700 shadow-xl font-mono text-[11px] space-y-1 hidden z-20 backdrop-blur-sm"
+            id="chart-crosshair-hud" 
+            class="pointer-events-none absolute top-3 left-16 z-20 px-3.5 py-2.5 rounded-xl bg-slate-950/90 border border-slate-700/80 backdrop-blur-md font-mono text-[11px] shadow-xl space-y-1 hidden"
           >
-            <div id="tip-bar-time" class="text-slate-400 text-[10px] border-b border-slate-800 pb-1">--</div>
+            <div id="tip-bar-meta" class="text-slate-400 text-[10px] border-b border-slate-800 pb-1">--</div>
             <div class="flex items-center justify-between space-x-3 text-cyan-400">
               <span>NAV:</span>
               <span id="tip-nav-val" class="font-bold">--</span>
@@ -637,217 +663,66 @@ if (session) {
               <span>Tail &beta;:</span>
               <span id="tip-beta-val" class="font-bold">--</span>
             </div>
+            <div class="flex items-center justify-between space-x-3 text-slate-300">
+              <span>Gross Lev:</span>
+              <span id="tip-lev-val" class="font-bold">--</span>
+            </div>
           </div>
         </div>
 
         <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 pt-1">
-          <span>// Left Axis: NAV ($)</span>
-          <span>// Right Axis: Tail &beta;</span>
+          <span>// Left Axis: NAV ($) &bull; Period High / Low Guides</span>
           <span>Tokyo VPS 5-Min Master Bars</span>
+          <span>// Right Axis: Tail &beta;</span>
         </div>
       </div>
 
-      <!-- Right (5 cols): 6-Asset Basket Exposure Table -->
-      <div class="lg:col-span-5 p-5 sm:p-6 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl space-y-4 flex flex-col justify-between">
-        <div>
-          <div class="flex items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
-            <div class="space-y-0.5">
-              <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// 6-ASSET SATELLITE BASKET</span>
-              <div class="text-sm font-bold text-slate-800 dark:text-slate-200 font-sans">
-                Real-Time Holdings &amp; Exposure
-              </div>
+      <!-- Panel 2: 6-Asset Basket Exposure Table (100% Full Width) -->
+      <div class="w-full p-5 sm:p-6 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl space-y-4">
+        <div class="flex items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+          <div class="space-y-0.5">
+            <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// 6-ASSET SATELLITE BASKET</span>
+            <div class="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 font-sans tracking-tight">
+              Real-Time Holdings &amp; Exposure
             </div>
-            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30">
-              DIRICHLET 6
-            </span>
+          </div>
+          <span class="px-2.5 py-1 rounded text-[10px] font-mono font-bold bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30">
+            DIRICHLET 6
+          </span>
+        </div>
+
+        <!-- 12-Column Responsive Holdings Table -->
+        <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100/30 dark:bg-slate-950/40 overflow-hidden font-mono text-xs">
+          <!-- Header Row (Hidden on mobile, visible on sm and up) -->
+          <div class="hidden sm:grid sm:grid-cols-12 items-center gap-4 px-5 py-3 border-b border-slate-200 dark:border-slate-800/80 bg-slate-100/70 dark:bg-slate-950/80 text-[10px] text-slate-500 uppercase tracking-wider font-semibold">
+            <div class="sm:col-span-2">ASSET</div>
+            <div class="sm:col-span-2 text-right">SIZE (LOTS)</div>
+            <div class="sm:col-span-3 text-right">EXPOSURE ($ / %)</div>
+            <div class="sm:col-span-3 text-right">ENTRY / LIVE MARK ($)</div>
+            <div class="sm:col-span-2 text-right">UNREALIZED PNL</div>
           </div>
 
-          <!-- Table Container (No Horizontal Scrollbar) -->
-          <div class="overflow-x-hidden mt-3 rounded-xl border border-slate-200 dark:border-slate-800">
-            <table class="w-full table-fixed font-mono text-xs text-left">
-              <thead>
-                <tr class="text-[10px] text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-800/80 bg-slate-100/40 dark:bg-slate-950/40">
-                  <th class="w-[23%] py-2.5 px-2 font-normal">
-                    <div class="flex items-center space-x-1">
-                      <span>ASSET</span>
-                    </div>
-                  </th>
-                  <th class="w-[18%] py-2.5 px-1.5 text-right font-normal">
-                    <div class="flex items-center justify-end space-x-1">
-                      <span>SIZE (LOTS)</span>
-                      <div class="group relative inline-flex items-center cursor-help">
-                        <span class="inline-flex items-center justify-center w-3 h-3 rounded-full bg-slate-200 dark:bg-slate-800 text-[8px] font-mono font-bold text-slate-500 hover:text-cyan-400 hover:bg-slate-700 transition-colors">?</span>
-                        <div class="pointer-events-none absolute top-full right-0 mt-1.5 w-56 p-2 rounded-lg bg-slate-900/95 border border-slate-700 text-[10px] leading-relaxed text-slate-200 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity z-50 text-left whitespace-normal normal-case font-sans">
-                          Number of purchased (+) or shorted/borrowed (-) contracts for this coin.
-                        </div>
-                      </div>
-                    </div>
-                  </th>
-                  <th class="w-[19%] py-2.5 px-1.5 text-right font-normal">
-                    <div class="flex items-center justify-end space-x-1">
-                      <span>EXPOSURE ($ / %)</span>
-                      <div class="group relative inline-flex items-center cursor-help">
-                        <span class="inline-flex items-center justify-center w-3 h-3 rounded-full bg-slate-200 dark:bg-slate-800 text-[8px] font-mono font-bold text-slate-500 hover:text-cyan-400 hover:bg-slate-700 transition-colors">?</span>
-                        <div class="pointer-events-none absolute top-full right-0 mt-1.5 w-60 p-2 rounded-lg bg-slate-900/95 border border-slate-700 text-[10px] leading-relaxed text-slate-200 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity z-50 text-left whitespace-normal normal-case font-sans">
-                          Actual dollar value of your position in this asset (Lots × Price) and weight relative to total NAV.
-                        </div>
-                      </div>
-                    </div>
-                  </th>
-                  <th class="w-[20%] py-2.5 px-1.5 text-right font-normal">
-                    <div class="flex items-center justify-end space-x-1">
-                      <span>ENTRY / MARK ($)</span>
-                      <div class="group relative inline-flex items-center cursor-help">
-                        <span class="inline-flex items-center justify-center w-3 h-3 rounded-full bg-slate-200 dark:bg-slate-800 text-[8px] font-mono font-bold text-slate-500 hover:text-cyan-400 hover:bg-slate-700 transition-colors">?</span>
-                        <div class="pointer-events-none absolute top-full right-0 mt-1.5 w-60 p-2 rounded-lg bg-slate-900/95 border border-slate-700 text-[10px] leading-relaxed text-slate-200 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity z-50 text-left whitespace-normal normal-case font-sans">
-                          Average trade entry price (IN) vs current live mark price (NOW).
-                        </div>
-                      </div>
-                    </div>
-                  </th>
-                  <th class="w-[20%] py-2.5 px-2 text-right font-normal">
-                    <div class="flex items-center justify-end space-x-1">
-                      <span>UNREALIZED PNL</span>
-                      <div class="group relative inline-flex items-center cursor-help">
-                        <span class="inline-flex items-center justify-center w-3 h-3 rounded-full bg-slate-200 dark:bg-slate-800 text-[8px] font-mono font-bold text-slate-500 hover:text-cyan-400 hover:bg-slate-700 transition-colors">?</span>
-                        <div class="pointer-events-none absolute top-full right-0 mt-1.5 w-60 p-2 rounded-lg bg-slate-900/95 border border-slate-700 text-[10px] leading-relaxed text-slate-200 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity z-50 text-left whitespace-normal normal-case font-sans">
-                          Real-time floating profit or loss in USD and percentage return on position cost basis.
-                        </div>
-                      </div>
-                    </div>
-                  </th>
-                </tr>
-              </thead>
-              <tbody id="basket-table-body" class="divide-y divide-slate-200 dark:divide-slate-800/50">
-                <!-- Dynamically populated or skeleton rows -->
-                <tr class="text-slate-500">
-                  <td class="py-2.5 px-2 font-bold text-slate-300">
-                    <div class="flex items-center space-x-1 min-w-0">
-                      <span class="truncate">BTCUSDC</span>
-                      <span class="bg-slate-800 text-slate-400 px-1 py-0.5 rounded text-[9px] font-bold">FLAT</span>
-                    </div>
-                  </td>
-                  <td class="py-2.5 px-1.5 text-right text-slate-400 font-medium truncate">0.0000</td>
-                  <td class="py-2.5 px-1.5 text-right text-slate-400 font-medium truncate">
-                    <div>$0.00</div>
-                    <div class="text-[10px] text-slate-500">(0.00%)</div>
-                  </td>
-                  <td class="py-2.5 px-1.5 text-right text-slate-500 truncate">—</td>
-                  <td class="py-2.5 px-2 text-right text-slate-400 font-medium truncate">
-                    <div>$0.00</div>
-                    <div class="text-[10px] text-slate-500">0.00%</div>
-                  </td>
-                </tr>
-                <tr class="text-slate-500">
-                  <td class="py-2.5 px-2 font-bold text-slate-300">
-                    <div class="flex items-center space-x-1 min-w-0">
-                      <span class="truncate">ETHUSDC</span>
-                      <span class="bg-slate-800 text-slate-400 px-1 py-0.5 rounded text-[9px] font-bold">FLAT</span>
-                    </div>
-                  </td>
-                  <td class="py-2.5 px-1.5 text-right text-slate-400 font-medium truncate">0.0000</td>
-                  <td class="py-2.5 px-1.5 text-right text-slate-400 font-medium truncate">
-                    <div>$0.00</div>
-                    <div class="text-[10px] text-slate-500">(0.00%)</div>
-                  </td>
-                  <td class="py-2.5 px-1.5 text-right text-slate-500 truncate">—</td>
-                  <td class="py-2.5 px-2 text-right text-slate-400 font-medium truncate">
-                    <div>$0.00</div>
-                    <div class="text-[10px] text-slate-500">0.00%</div>
-                  </td>
-                </tr>
-                <tr class="text-slate-500">
-                  <td class="py-2.5 px-2 font-bold text-slate-300">
-                    <div class="flex items-center space-x-1 min-w-0">
-                      <span class="truncate">SOLUSDC</span>
-                      <span class="bg-slate-800 text-slate-400 px-1 py-0.5 rounded text-[9px] font-bold">FLAT</span>
-                    </div>
-                  </td>
-                  <td class="py-2.5 px-1.5 text-right text-slate-400 font-medium truncate">0.0000</td>
-                  <td class="py-2.5 px-1.5 text-right text-slate-400 font-medium truncate">
-                    <div>$0.00</div>
-                    <div class="text-[10px] text-slate-500">(0.00%)</div>
-                  </td>
-                  <td class="py-2.5 px-1.5 text-right text-slate-500 truncate">—</td>
-                  <td class="py-2.5 px-2 text-right text-slate-400 font-medium truncate">
-                    <div>$0.00</div>
-                    <div class="text-[10px] text-slate-500">0.00%</div>
-                  </td>
-                </tr>
-                <tr class="text-slate-500">
-                  <td class="py-2.5 px-2 font-bold text-slate-300">
-                    <div class="flex items-center space-x-1 min-w-0">
-                      <span class="truncate">SUIUSDT</span>
-                      <span class="bg-slate-800 text-slate-400 px-1 py-0.5 rounded text-[9px] font-bold">FLAT</span>
-                    </div>
-                  </td>
-                  <td class="py-2.5 px-1.5 text-right text-slate-400 font-medium truncate">0.0000</td>
-                  <td class="py-2.5 px-1.5 text-right text-slate-400 font-medium truncate">
-                    <div>$0.00</div>
-                    <div class="text-[10px] text-slate-500">(0.00%)</div>
-                  </td>
-                  <td class="py-2.5 px-1.5 text-right text-slate-500 truncate">—</td>
-                  <td class="py-2.5 px-2 text-right text-slate-400 font-medium truncate">
-                    <div>$0.00</div>
-                    <div class="text-[10px] text-slate-500">0.00%</div>
-                  </td>
-                </tr>
-                <tr class="text-slate-500">
-                  <td class="py-2.5 px-2 font-bold text-slate-300">
-                    <div class="flex items-center space-x-1 min-w-0">
-                      <span class="truncate">XRPUSDC</span>
-                      <span class="bg-slate-800 text-slate-400 px-1 py-0.5 rounded text-[9px] font-bold">FLAT</span>
-                    </div>
-                  </td>
-                  <td class="py-2.5 px-1.5 text-right text-slate-400 font-medium truncate">0.0000</td>
-                  <td class="py-2.5 px-1.5 text-right text-slate-400 font-medium truncate">
-                    <div>$0.00</div>
-                    <div class="text-[10px] text-slate-500">(0.00%)</div>
-                  </td>
-                  <td class="py-2.5 px-1.5 text-right text-slate-500 truncate">—</td>
-                  <td class="py-2.5 px-2 text-right text-slate-400 font-medium truncate">
-                    <div>$0.00</div>
-                    <div class="text-[10px] text-slate-500">0.00%</div>
-                  </td>
-                </tr>
-                <tr class="text-slate-500">
-                  <td class="py-2.5 px-2 font-bold text-slate-300">
-                    <div class="flex items-center space-x-1 min-w-0">
-                      <span class="truncate">DOGEUSDC</span>
-                      <span class="bg-slate-800 text-slate-400 px-1 py-0.5 rounded text-[9px] font-bold">FLAT</span>
-                    </div>
-                  </td>
-                  <td class="py-2.5 px-1.5 text-right text-slate-400 font-medium truncate">0.0000</td>
-                  <td class="py-2.5 px-1.5 text-right text-slate-400 font-medium truncate">
-                    <div>$0.00</div>
-                    <div class="text-[10px] text-slate-500">(0.00%)</div>
-                  </td>
-                  <td class="py-2.5 px-1.5 text-right text-slate-500 truncate">—</td>
-                  <td class="py-2.5 px-2 text-right text-slate-400 font-medium truncate">
-                    <div>$0.00</div>
-                    <div class="text-[10px] text-slate-500">0.00%</div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <!-- Dynamic Rows Container -->
+          <div id="basket-table-rows" class="divide-y divide-slate-200 dark:divide-slate-800/50">
+            <!-- Populated via renderBasketTable -->
+          </div>
 
-            <!-- Basket Summary Footer -->
-            <div id="basket-table-footer" class="border-t border-slate-300 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-950/50 px-3 sm:px-4 py-2 sm:py-2.5 flex flex-wrap items-center justify-between gap-2 font-mono text-xs">
-              <div class="flex items-center space-x-3 text-slate-500 dark:text-slate-400">
-                <span>Active Legs: <span id="basket-active-legs" class="font-bold text-slate-700 dark:text-slate-200">0 / 6</span></span>
-                <span>&bull;</span>
-                <span>Gross Exposure: <span id="basket-gross-exposure" class="font-bold text-slate-700 dark:text-slate-200">$0.00</span></span>
-              </div>
-              <div class="flex items-center space-x-1.5">
-                <span class="text-slate-500 dark:text-slate-400">Basket Unrealized PnL:</span>
-                <span id="basket-total-upnl" class="font-bold text-slate-500 dark:text-slate-400">$0.00 (0.00%)</span>
-              </div>
+          <!-- Basket Summary Footer -->
+          <div id="basket-table-footer" class="border-t border-slate-300 dark:border-slate-800 bg-slate-100/70 dark:bg-slate-950/70 px-5 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div class="flex items-center space-x-4 text-slate-500 dark:text-slate-400">
+              <span>Active Legs: <span id="basket-active-legs" class="font-bold text-slate-800 dark:text-slate-200">0 / 6</span></span>
+              <span>&bull;</span>
+              <span>Gross Exposure: <span id="basket-gross-exposure" class="font-bold text-slate-800 dark:text-slate-200">$0.00</span></span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="text-slate-500 dark:text-slate-400">Basket Unrealized PnL:</span>
+              <span id="basket-total-upnl" class="font-bold text-slate-500 dark:text-slate-400">$0.00 (0.00%)</span>
             </div>
           </div>
         </div>
 
-        <div class="text-[11px] font-mono text-slate-500 pt-2 border-t border-slate-200 dark:border-slate-800">
-          // 6-Asset Orthogonal Core Basket • Auto-Hedging Active
+        <div class="text-[11px] font-mono text-slate-500 pt-1">
+          // 6-Asset Orthogonal Core Basket &bull; Binance USD&Scy;-M Futures Mark Resolution &bull; Auto-Hedging Active
         </div>
       </div>
 
@@ -1092,7 +967,8 @@ if (session) {
   import {
     buildSatelliteMarkdownSnapshot,
     normalizeSatelliteSnapshot,
-    computeAssetHoldingMetrics,
+    computeAllBasketHoldings,
+    fetchLiveBinanceFuturesPrices,
     fmtContractPrice,
     copyTextToClipboard,
     triggerJsonDownload,
@@ -1107,6 +983,32 @@ if (session) {
   let telemetryHistoryRows: Array<Record<string, any>> = [];
   let latestCoreRow: Record<string, any> | null = null;
   let recentCommands: Array<Record<string, any>> = [];
+
+  // Broker Charting State
+  let activeTimeframe: '50' | '150' | '288' | '500' | 'all' = '500';
+  let showSeriesNav = true;
+  let showSeriesBeta = true;
+  let showSeriesStop = true;
+  let lastVisiblePoints: { navPoints: any[]; betaPoints: any[]; firstNav: number } | null = null;
+
+  // Format lots with base asset name and non-truncating precision
+  function formatLotsWithAsset(lots: number, symbol: string): string {
+    if (Math.abs(lots) <= 1e-9) return '0.0000';
+    const symUpper = symbol.toUpperCase();
+    const baseAsset = symUpper.replace('USDC', '').replace('USDT', '');
+    const sign = lots > 0 ? '+' : '-';
+    const absVal = Math.abs(lots);
+    let formattedNumber = '';
+
+    if (symUpper.includes('DOGE') && absVal >= 1000) {
+      formattedNumber = Math.round(absVal).toLocaleString('en-US');
+    } else if (symUpper.includes('SUI') || symUpper.includes('XRP')) {
+      formattedNumber = absVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    } else {
+      formattedNumber = absVal.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+    }
+    return `${sign}${formattedNumber} ${baseAsset}`;
+  }
 
   // Currency Formatter
   function formatUsd(val: number | null | undefined): string {
@@ -1319,7 +1221,7 @@ if (session) {
       const currentVenue = getActiveVenue();
       let telemetryData: any = null;
       try {
-        const res = await fetch(`/api/quant/telemetry?venue=${currentVenue}&limit=500&_t=${Date.now()}`, {
+        const res = await fetch(`/api/quant/telemetry?venue=${currentVenue}&limit=2000&_t=${Date.now()}`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
           },
@@ -1337,7 +1239,7 @@ if (session) {
           .select('*')
           .eq('venue', currentVenue)
           .order('timestamp_ms', { ascending: false })
-          .limit(500);
+          .limit(2000);
 
         const rows = directData || [];
         telemetryData = {
@@ -1362,8 +1264,11 @@ if (session) {
       // Render Section 2: 6 KPI Cards
       renderSection2(latest);
 
+      // Fetch live Binance Futures prices for real-time Mark Price & uPnL
+      const livePrices = await fetchLiveBinanceFuturesPrices();
+
       // Render Section 3: SVG Chart & Basket Table
-      renderSection3(latest, cachedTelemetryHistory);
+      renderSection3(latest, cachedTelemetryHistory, livePrices);
 
       // 2. Fetch C2 Commands
       let commands: any[] = [];
@@ -1742,30 +1647,33 @@ if (session) {
   // ==========================================
   // SECTION 3 RENDERER (SVG CHART & BASKET)
   // ==========================================
-  function renderSection3(latest: any, history: any[]) {
+  function renderSection3(latest: any, history: any[], livePricesMap?: Record<string, number>) {
     // 1. Render Basket Exposure Table
     const navUsd = Number(latest?.nav_usd) || 100000;
-    renderBasketTable(latest?.positions_lots || latest?.positions || {}, navUsd);
+    const ledgerUpnl = Number(latest?.unrealized_pnl_usd) || 0;
+    renderBasketTable(latest?.positions_lots || latest?.positions || {}, navUsd, ledgerUpnl, livePricesMap);
 
     // 2. Render SVG Chart
     renderChart(history);
   }
 
-  function renderBasketTable(positions: Record<string, any>, navUsdParam?: number) {
-    const tbody = document.getElementById('basket-table-body');
-    if (!tbody) return;
+  function renderBasketTable(
+    positions: Record<string, any>,
+    navUsdParam?: number,
+    totalLedgerUpnlUsd: number = 0,
+    livePricesMap?: Record<string, number>
+  ) {
+    const container = document.getElementById('basket-table-rows');
+    if (!container) return;
 
     const navUsd = Number(navUsdParam) || (latestTelemetryRow ? Number(latestTelemetryRow.nav_usd) : 100000) || 100000;
-    const basketTickers = ['BTCUSDC', 'ETHUSDC', 'SOLUSDC', 'SUIUSDT', 'XRPUSDC', 'DOGEUSDC'];
+    const holdings = computeAllBasketHoldings(positions, navUsd, totalLedgerUpnlUsd, livePricesMap);
 
     let activeLegsCount = 0;
     let totalGrossExposure = 0;
     let totalBasketUpnlUsd = 0;
 
-    const rowsHtml = basketTickers.map(ticker => {
-      const rawEntry = positions[ticker] ?? positions[ticker.replace('USDC', '')] ?? {};
-      const h = computeAssetHoldingMetrics(ticker, rawEntry, navUsd);
-
+    const rowsHtml = holdings.map(h => {
       const isLong = h.direction === 'LONG';
       const isShort = h.direction === 'SHORT';
       const isFlat = h.direction === 'FLAT';
@@ -1777,49 +1685,45 @@ if (session) {
       }
 
       // Column 1: Asset + Badge
-      let badgeHtml = '<span class="bg-slate-800 text-slate-400 px-1 py-0.5 rounded text-[9px] font-bold shrink-0">FLAT</span>';
+      let badgeHtml = '<span class="bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded text-[9px] font-bold shrink-0">FLAT</span>';
       if (isLong) {
-        badgeHtml = '<span class="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-1 py-0.5 rounded text-[9px] font-bold shrink-0">LONG</span>';
+        badgeHtml = '<span class="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 px-1.5 py-0.5 rounded text-[9px] font-bold shrink-0">LONG</span>';
       } else if (isShort) {
-        badgeHtml = '<span class="bg-rose-500/15 text-rose-400 border border-rose-500/30 px-1 py-0.5 rounded text-[9px] font-bold shrink-0">SHORT</span>';
+        badgeHtml = '<span class="bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30 px-1.5 py-0.5 rounded text-[9px] font-bold shrink-0">SHORT</span>';
       }
 
       // Column 2: Size (Lots)
-      let lotsFormatted = '0.0000';
-      if (!isFlat) {
-        const absLots = Math.abs(h.qty_lots);
-        const signLots = h.qty_lots > 0 ? '+' : '';
-        lotsFormatted = absLots >= 100 
-          ? `${signLots}${h.qty_lots.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 2 })}`
-          : `${signLots}${h.qty_lots.toFixed(4)}`;
-      }
+      const lotsFormatted = formatLotsWithAsset(h.qty_lots, h.symbol);
 
       // Column 3: Exposure ($ / %)
       let exposureTop = '$0.00';
-      let exposureBottom = '(0.00%)';
+      let exposureBottom = '(0.00% of NAV)';
       let exposureColor = 'text-slate-400';
+      let barWidthPct = 0;
+
       if (!isFlat) {
         const absNotional = Math.abs(h.notional_usd);
-        const signNotional = h.notional_usd > 0 ? '+' : '-';
+        const signNotional = h.notional_usd >= 0 ? '+' : '-';
         exposureTop = `${signNotional}$${absNotional.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        exposureColor = isLong ? 'text-emerald-500 dark:text-emerald-400 font-bold' : 'text-rose-500 dark:text-rose-400 font-bold';
+        exposureColor = isLong ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-rose-600 dark:text-rose-400 font-bold';
         const weightPct = h.weight * 100;
-        exposureBottom = `(${weightPct >= 0 ? '+' : ''}${weightPct.toFixed(2)}%)`;
+        exposureBottom = `(${weightPct >= 0 ? '+' : ''}${weightPct.toFixed(2)}% of NAV)`;
+        barWidthPct = Math.min(100, Math.max(2, Math.abs(weightPct) * 2));
       }
 
       // Column 4: Entry / Mark ($)
       let entryMarkHtml = '<span class="text-slate-500">—</span>';
       if (!isFlat) {
         entryMarkHtml = `
-          <div><span class="text-slate-400 text-[10px] mr-1">IN:</span><span class="text-slate-700 dark:text-slate-200 font-semibold">${fmtContractPrice(h.entry_price, h.symbol)}</span></div>
-          <div class="mt-0.5"><span class="text-slate-400 text-[10px] mr-1">NOW:</span><span class="text-cyan-600 dark:text-cyan-400 font-semibold">${fmtContractPrice(h.mark_price, h.symbol)}</span></div>
+          <div class="leading-tight"><span class="text-slate-400 text-[10px] mr-1">IN:</span><span class="text-slate-700 dark:text-slate-200 font-semibold">${fmtContractPrice(h.entry_price, h.symbol)}</span></div>
+          <div class="leading-tight mt-1"><span class="text-slate-400 text-[10px] mr-1">MARK:</span><span class="text-cyan-600 dark:text-cyan-400 font-semibold">${fmtContractPrice(h.mark_price, h.symbol)}</span></div>
         `;
       }
 
       // Column 5: Unrealized PnL ($ / %)
       let upnlHtml = `
         <div class="font-bold text-slate-400 dark:text-slate-500 leading-tight">$0.00</div>
-        <div class="text-[10px] text-slate-400 dark:text-slate-500 leading-tight mt-0.5">0.00%</div>
+        <div class="mt-1"><span class="inline-block px-1.5 py-0.5 rounded bg-slate-200/60 dark:bg-slate-800 text-slate-500 text-[10px] font-bold">0.00%</span></div>
       `;
       if (!isFlat) {
         if (h.upnl_usd > 0.005) {
@@ -1827,7 +1731,7 @@ if (session) {
             <div class="font-bold text-emerald-600 dark:text-emerald-400 leading-tight">
               +$${h.upnl_usd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
-            <div class="mt-0.5">
+            <div class="mt-1">
               <span class="inline-block px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">
                 +${h.upnl_pct.toFixed(2)}%
               </span>
@@ -1838,46 +1742,59 @@ if (session) {
             <div class="font-bold text-rose-600 dark:text-rose-400 leading-tight">
               -$${Math.abs(h.upnl_usd).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
-            <div class="mt-0.5">
+            <div class="mt-1">
               <span class="inline-block px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 text-[10px] font-bold">
                 ${h.upnl_pct.toFixed(2)}%
               </span>
             </div>
           `;
-        } else {
-          upnlHtml = `
-            <div class="font-bold text-slate-500 dark:text-slate-400 leading-tight">$0.00</div>
-            <div class="text-[10px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5">0.00%</div>
-          `;
         }
       }
 
       return `
-        <tr class="hover:bg-slate-200/50 dark:hover:bg-slate-800/40 transition-colors">
-          <td class="py-2.5 px-2 font-bold text-slate-900 dark:text-slate-100">
-            <div class="flex items-center space-x-1 min-w-0">
-              <span class="truncate">${ticker}</span>
-              ${badgeHtml}
+        <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-3 sm:gap-4 px-5 py-3.5 hover:bg-slate-200/40 dark:hover:bg-slate-800/40 transition-colors">
+          <!-- Col 1: Asset -->
+          <div class="sm:col-span-2 flex items-center justify-between sm:justify-start space-x-2">
+            <span class="font-bold text-slate-900 dark:text-slate-100">${h.symbol}</span>
+            ${badgeHtml}
+          </div>
+
+          <!-- Col 2: Size (Lots) -->
+          <div class="sm:col-span-2 flex justify-between sm:justify-end items-center sm:text-right">
+            <span class="sm:hidden text-slate-500 text-[10px]">SIZE:</span>
+            <span class="text-slate-700 dark:text-slate-300 font-semibold">${lotsFormatted}</span>
+          </div>
+
+          <!-- Col 3: Exposure ($ / %) -->
+          <div class="sm:col-span-3 flex justify-between sm:justify-end items-center sm:text-right">
+            <span class="sm:hidden text-slate-500 text-[10px]">EXPOSURE:</span>
+            <div class="flex flex-col items-end">
+              <div class="${exposureColor}">${exposureTop}</div>
+              <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">${exposureBottom}</div>
+              ${!isFlat ? `
+                <div class="w-20 h-1 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden mt-1">
+                  <div class="h-full ${isLong ? 'bg-emerald-500' : 'bg-rose-500'}" style="width: ${barWidthPct}%"></div>
+                </div>
+              ` : ''}
             </div>
-          </td>
-          <td class="py-2.5 px-1.5 text-right text-slate-700 dark:text-slate-300 font-medium truncate">
-            ${lotsFormatted}
-          </td>
-          <td class="py-2.5 px-1.5 text-right truncate">
-            <div class="${exposureColor} leading-tight">${exposureTop}</div>
-            <div class="text-[11px] text-slate-400 leading-tight mt-0.5">${exposureBottom}</div>
-          </td>
-          <td class="py-2.5 px-1.5 text-right truncate">
-            ${entryMarkHtml}
-          </td>
-          <td class="py-2.5 px-2 text-right truncate">
-            ${upnlHtml}
-          </td>
-        </tr>
+          </div>
+
+          <!-- Col 4: Entry / Mark -->
+          <div class="sm:col-span-3 flex justify-between sm:justify-end items-center sm:text-right">
+            <span class="sm:hidden text-slate-500 text-[10px]">ENTRY / MARK:</span>
+            <div class="text-right">${entryMarkHtml}</div>
+          </div>
+
+          <!-- Col 5: uPnL -->
+          <div class="sm:col-span-2 flex justify-between sm:justify-end items-center sm:text-right">
+            <span class="sm:hidden text-slate-500 text-[10px]">UPNL:</span>
+            <div class="text-right">${upnlHtml}</div>
+          </div>
+        </div>
       `;
     }).join('');
 
-    tbody.innerHTML = rowsHtml;
+    container.innerHTML = rowsHtml;
 
     // Update Footer Summary
     const activeLegsEl = document.getElementById('basket-active-legs');
@@ -1888,12 +1805,13 @@ if (session) {
     if (grossExpEl) grossExpEl.textContent = formatUsd(totalGrossExposure);
 
     if (totalUpnlEl) {
-      const basketUpnlPct = navUsd > 0 ? (totalBasketUpnlUsd / navUsd) * 100 : 0;
-      if (totalBasketUpnlUsd > 0.005) {
-        totalUpnlEl.textContent = `+${formatUsd(totalBasketUpnlUsd)} (+${basketUpnlPct.toFixed(2)}%)`;
+      const effectiveTotalUpnl = Math.abs(totalBasketUpnlUsd) > 1e-4 ? totalBasketUpnlUsd : totalLedgerUpnlUsd;
+      const basketUpnlPct = navUsd > 0 ? (effectiveTotalUpnl / navUsd) * 100 : 0;
+      if (effectiveTotalUpnl > 0.005) {
+        totalUpnlEl.textContent = `+${formatUsd(effectiveTotalUpnl)} (+${basketUpnlPct.toFixed(2)}%)`;
         totalUpnlEl.className = 'font-bold text-emerald-600 dark:text-emerald-400';
-      } else if (totalBasketUpnlUsd < -0.005) {
-        totalUpnlEl.textContent = `-${formatUsd(Math.abs(totalBasketUpnlUsd))} (${basketUpnlPct.toFixed(2)}%)`;
+      } else if (effectiveTotalUpnl < -0.005) {
+        totalUpnlEl.textContent = `-${formatUsd(Math.abs(effectiveTotalUpnl))} (${basketUpnlPct.toFixed(2)}%)`;
         totalUpnlEl.className = 'font-bold text-rose-600 dark:text-rose-400';
       } else {
         totalUpnlEl.textContent = `$0.00 (0.00%)`;
@@ -1909,8 +1827,12 @@ if (session) {
     const betaPath = document.getElementById('chart-beta-path');
     const gridLines = document.getElementById('chart-grid-lines');
     const yLabels = document.getElementById('chart-y-labels');
+    const highLowGuides = document.getElementById('chart-high-low-guides');
     const betaThresholdLine = document.getElementById('chart-beta-threshold-line');
     const betaThresholdLabel = document.getElementById('chart-beta-threshold-label');
+    const chartSubtitle = document.getElementById('chart-subtitle');
+    const periodReturnEl = document.getElementById('chart-period-return');
+    const periodStatsEl = document.getElementById('chart-period-stats');
 
     if (!history || history.length === 0) {
       if (emptyState) emptyState.classList.remove('hidden');
@@ -1919,42 +1841,85 @@ if (session) {
       if (betaPath) betaPath.setAttribute('d', '');
       if (gridLines) gridLines.innerHTML = '';
       if (yLabels) yLabels.innerHTML = '';
+      if (highLowGuides) highLowGuides.innerHTML = '';
+      if (periodReturnEl) periodReturnEl.textContent = '+$0.00 (+0.00%)';
+      if (periodStatsEl) periodStatsEl.textContent = 'Period High: -- • Period Low: -- • Bars in View: 0';
       return;
     }
 
     if (emptyState) emptyState.classList.add('hidden');
 
-    // Chronological order: reverse from DESC
-    const sorted = [...history].sort((a, b) => Number(a.timestamp_ms) - Number(b.timestamp_ms));
+    // Chronological order: oldest to newest
+    const sortedAll = [...history].sort((a, b) => Number(a.timestamp_ms) - Number(b.timestamp_ms));
+    let visibleBars = sortedAll;
+    if (activeTimeframe !== 'all') {
+      const count = parseInt(activeTimeframe, 10);
+      if (!isNaN(count) && count > 0) {
+        visibleBars = sortedAll.slice(-count);
+      }
+    }
 
-    const width = 900;
-    const height = 300;
-    const padLeft = 60;
-    const padRight = 50;
-    const padTop = 25;
+    if (visibleBars.length === 0) {
+      visibleBars = sortedAll.slice(-1);
+    }
+
+    // Update Subtitle
+    if (chartSubtitle) {
+      chartSubtitle.textContent = activeTimeframe === 'all'
+        ? `// MULTI-BAR TELEMETRY (ALL ${visibleBars.length} BARS)`
+        : `// MULTI-BAR TELEMETRY (LAST ${visibleBars.length} BARS)`;
+    }
+
+    // Period Return (Delta NAV & Delta %)
+    const firstNav = Number(visibleBars[0]?.nav_usd) || 100000;
+    const lastNav = Number(visibleBars[visibleBars.length - 1]?.nav_usd) || firstNav;
+    const deltaNav = lastNav - firstNav;
+    const deltaPct = firstNav > 0 ? (deltaNav / firstNav) * 100 : 0;
+
+    if (periodReturnEl) {
+      const sign = deltaNav >= 0 ? '+' : '-';
+      periodReturnEl.textContent = `${sign}${formatUsd(Math.abs(deltaNav))} (${deltaNav >= 0 ? '+' : ''}${deltaPct.toFixed(2)}%)`;
+      periodReturnEl.className = deltaNav >= 0
+        ? 'px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+        : 'px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-rose-500/10 text-rose-400 border border-rose-500/30';
+    }
+
+    // Period Stats (High, Low, Count)
+    const periodMinNav = Math.min(...visibleBars.map(d => Number(d.nav_usd) || 0));
+    const periodMaxNav = Math.max(...visibleBars.map(d => Number(d.nav_usd) || 0));
+    if (periodStatsEl) {
+      periodStatsEl.textContent = `Period High: ${formatUsd(periodMaxNav)} • Period Low: ${formatUsd(periodMinNav)} • Bars in View: ${visibleBars.length}`;
+    }
+
+    // Canvas layout dimensions
+    const width = 1100;
+    const height = 340;
+    const padLeft = 65;
+    const padRight = 65;
+    const padTop = 30;
     const padBottom = 35;
     const chartW = width - padLeft - padRight;
     const chartH = height - padTop - padBottom;
 
-    // NAV min & max
-    let minNav = Math.min(...sorted.map(d => Number(d.nav_usd) || 0));
-    let maxNav = Math.max(...sorted.map(d => Number(d.nav_usd) || 0));
+    // NAV min & max with margin
+    let minNav = periodMinNav;
+    let maxNav = periodMaxNav;
     if (minNav === maxNav) {
       minNav *= 0.98;
       maxNav *= 1.02;
     }
-    const navMargin = (maxNav - minNav) * 0.1 || 100;
+    const navMargin = (maxNav - minNav) * 0.08 || 100;
     minNav = Math.max(0, minNav - navMargin);
     maxNav = maxNav + navMargin;
 
     // Beta min & max (0.0 to 0.05 min range)
     let minBeta = 0.0;
-    let maxBeta = Math.max(0.045, ...sorted.map(d => Number(d.realized_tail_beta) || 0));
+    let maxBeta = Math.max(0.045, ...visibleBars.map(d => Number(d.realized_tail_beta) || 0));
 
-    // Coordinate scales
+    // Coordinate scale functions
     const scaleX = (idx: number) => {
-      if (sorted.length === 1) return padLeft + chartW / 2;
-      return padLeft + (idx / (sorted.length - 1)) * chartW;
+      if (visibleBars.length <= 1) return padLeft + chartW / 2;
+      return padLeft + (idx / (visibleBars.length - 1)) * chartW;
     };
 
     const scaleYNav = (val: number) => {
@@ -1965,7 +1930,7 @@ if (session) {
       return padTop + chartH - ((val - minBeta) / (maxBeta - minBeta)) * chartH;
     };
 
-    // Grid lines & labels (4 levels)
+    // Draw Grid Lines & Y-Axis Labels
     if (gridLines && yLabels) {
       let gridHtml = '';
       let labelHtml = '';
@@ -1977,86 +1942,136 @@ if (session) {
         const betaVal = minBeta + frac * (maxBeta - minBeta);
 
         gridHtml += `<line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" />`;
-        labelHtml += `<text x="${padLeft - 8}" y="${y + 3}" text-anchor="end">${formatUsd(navVal)}</text>`;
-        labelHtml += `<text x="${width - padRight + 8}" y="${y + 3}" text-anchor="start" fill="#fbbf24">${betaVal.toFixed(3)}</text>`;
+        if (showSeriesNav) {
+          labelHtml += `<text x="${padLeft - 8}" y="${y + 3}" text-anchor="end">${formatUsd(navVal)}</text>`;
+        }
+        if (showSeriesBeta) {
+          labelHtml += `<text x="${width - padRight + 8}" y="${y + 3}" text-anchor="start" fill="#fbbf24">${betaVal.toFixed(3)}</text>`;
+        }
       }
 
       gridLines.innerHTML = gridHtml;
       yLabels.innerHTML = labelHtml;
     }
 
-    // Beta threshold reference line (0.035)
-    const thresholdY = scaleYBeta(0.035);
-    if (betaThresholdLine) {
-      betaThresholdLine.setAttribute('y1', thresholdY.toString());
-      betaThresholdLine.setAttribute('y2', thresholdY.toString());
-      betaThresholdLine.setAttribute('x1', padLeft.toString());
-      betaThresholdLine.setAttribute('x2', (width - padRight).toString());
-    }
-    if (betaThresholdLabel) {
-      betaThresholdLabel.setAttribute('y', (thresholdY - 4).toString());
-      betaThresholdLabel.setAttribute('x', (width - padRight - 5).toString());
+    // Draw High / Low Guide Lines
+    if (highLowGuides) {
+      if (showSeriesNav && visibleBars.length > 0) {
+        const yHigh = scaleYNav(periodMaxNav);
+        const yLow = scaleYNav(periodMinNav);
+        highLowGuides.innerHTML = `
+          <line x1="${padLeft}" y1="${yHigh}" x2="${width - padRight}" y2="${yHigh}" stroke="#34d399" stroke-width="0.75" stroke-dasharray="3,3" opacity="0.6" />
+          <text x="${width - padRight - 6}" y="${yHigh - 4}" fill="#34d399" font-size="9" font-family="monospace" text-anchor="end">HIGH: ${formatUsd(periodMaxNav)}</text>
+          <line x1="${padLeft}" y1="${yLow}" x2="${width - padRight}" y2="${yLow}" stroke="#f87171" stroke-width="0.75" stroke-dasharray="3,3" opacity="0.6" />
+          <text x="${width - padRight - 6}" y="${yLow + 11}" fill="#f87171" font-size="9" font-family="monospace" text-anchor="end">LOW: ${formatUsd(periodMinNav)}</text>
+        `;
+      } else {
+        highLowGuides.innerHTML = '';
+      }
     }
 
-    // Build SVG paths
-    const navPoints = sorted.map((d, i) => ({
+    // Beta threshold reference line (0.035 Stop)
+    const thresholdY = scaleYBeta(0.035);
+    if (betaThresholdLine) {
+      if (showSeriesStop) {
+        betaThresholdLine.setAttribute('y1', thresholdY.toString());
+        betaThresholdLine.setAttribute('y2', thresholdY.toString());
+        betaThresholdLine.setAttribute('x1', padLeft.toString());
+        betaThresholdLine.setAttribute('x2', (width - padRight).toString());
+        betaThresholdLine.style.display = '';
+      } else {
+        betaThresholdLine.style.display = 'none';
+      }
+    }
+    if (betaThresholdLabel) {
+      if (showSeriesStop) {
+        betaThresholdLabel.setAttribute('y', (thresholdY - 4).toString());
+        betaThresholdLabel.setAttribute('x', (width - padRight - 5).toString());
+        betaThresholdLabel.style.display = '';
+      } else {
+        betaThresholdLabel.style.display = 'none';
+      }
+    }
+
+    // Build Curve Points & Paths
+    const navPoints = visibleBars.map((d, i) => ({
       x: scaleX(i),
       y: scaleYNav(Number(d.nav_usd) || 0),
       data: d,
     }));
 
-    const betaPoints = sorted.map((d, i) => ({
+    const betaPoints = visibleBars.map((d, i) => ({
       x: scaleX(i),
       y: scaleYBeta(Number(d.realized_tail_beta) || 0),
     }));
+
+    lastVisiblePoints = {
+      navPoints,
+      betaPoints,
+      firstNav,
+    };
 
     const navPathD = navPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
     const betaPathD = betaPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
 
     const baselineY = padTop + chartH;
-    const navAreaD = `${navPathD} L ${navPoints[navPoints.length - 1].x.toFixed(1)} ${baselineY} L ${navPoints[0].x.toFixed(1)} ${baselineY} Z`;
+    const navAreaD = navPoints.length > 0
+      ? `${navPathD} L ${navPoints[navPoints.length - 1].x.toFixed(1)} ${baselineY} L ${navPoints[0].x.toFixed(1)} ${baselineY} Z`
+      : '';
 
-    if (navPath) navPath.setAttribute('d', navPathD);
-    if (navArea) navArea.setAttribute('d', navAreaD);
-    if (betaPath) betaPath.setAttribute('d', betaPathD);
+    if (navPath) {
+      navPath.setAttribute('d', showSeriesNav ? navPathD : '');
+      navPath.style.display = showSeriesNav ? '' : 'none';
+    }
+    if (navArea) {
+      navArea.setAttribute('d', showSeriesNav ? navAreaD : '');
+      navArea.style.display = showSeriesNav ? '' : 'none';
+    }
+    if (betaPath) {
+      betaPath.setAttribute('d', showSeriesBeta ? betaPathD : '');
+      betaPath.style.display = showSeriesBeta ? '' : 'none';
+    }
 
-    // Interactive Hover Crosshair
+    // Interactive Hover Crosshair & HUD Tooltip Binding
     const svgEl = document.getElementById('telemetry-chart-svg');
     const crosshairGroup = document.getElementById('chart-crosshair-group');
     const crosshairV = document.getElementById('crosshair-v');
     const dotNav = document.getElementById('crosshair-nav-dot');
     const dotBeta = document.getElementById('crosshair-beta-dot');
-    const tooltip = document.getElementById('chart-floating-tooltip');
-    const tipTime = document.getElementById('tip-bar-time');
+    const hud = document.getElementById('chart-crosshair-hud');
+    const tipMeta = document.getElementById('tip-bar-meta');
     const tipNav = document.getElementById('tip-nav-val');
     const tipBeta = document.getElementById('tip-beta-val');
+    const tipLev = document.getElementById('tip-lev-val');
 
     if (svgEl && !svgEl.dataset.crosshairBound) {
       svgEl.dataset.crosshairBound = 'true';
 
-      svgEl.addEventListener('mousemove', (e: MouseEvent) => {
+      const handleMove = (e: MouseEvent | TouchEvent) => {
+        if (!lastVisiblePoints || lastVisiblePoints.navPoints.length === 0) return;
         const rect = svgEl.getBoundingClientRect();
-        const mouseX = ((e.clientX - rect.left) / rect.width) * width;
+        const clientX = 'touches' in e && e.touches.length > 0 ? e.touches[0].clientX : (e as MouseEvent).clientX;
+        const mouseX = ((clientX - rect.left) / rect.width) * width;
 
         if (mouseX < padLeft || mouseX > width - padRight) {
           if (crosshairGroup) crosshairGroup.setAttribute('opacity', '0');
-          if (tooltip) tooltip.classList.add('hidden');
+          if (hud) hud.classList.add('hidden');
           return;
         }
 
-        // Find nearest point
+        const { navPoints: pts, betaPoints: bpts, firstNav: startNav } = lastVisiblePoints;
         let nearestIdx = 0;
         let minDist = Infinity;
-        navPoints.forEach((p, idx) => {
-          const dist = Math.abs(p.x - mouseX);
+        for (let i = 0; i < pts.length; i++) {
+          const dist = Math.abs(pts[i].x - mouseX);
           if (dist < minDist) {
             minDist = dist;
-            nearestIdx = idx;
+            nearestIdx = i;
           }
-        });
+        }
 
-        const np = navPoints[nearestIdx];
-        const bp = betaPoints[nearestIdx];
+        const np = pts[nearestIdx];
+        const bp = bpts[nearestIdx];
         const record = np.data;
 
         if (crosshairGroup) crosshairGroup.setAttribute('opacity', '1');
@@ -2065,27 +2080,53 @@ if (session) {
           crosshairV.setAttribute('x2', np.x.toString());
         }
         if (dotNav) {
-          dotNav.setAttribute('cx', np.x.toString());
-          dotNav.setAttribute('cy', np.y.toString());
+          if (showSeriesNav) {
+            dotNav.setAttribute('cx', np.x.toString());
+            dotNav.setAttribute('cy', np.y.toString());
+            dotNav.style.display = '';
+          } else {
+            dotNav.style.display = 'none';
+          }
         }
         if (dotBeta) {
-          dotBeta.setAttribute('cx', bp.x.toString());
-          dotBeta.setAttribute('cy', bp.y.toString());
+          if (showSeriesBeta) {
+            dotBeta.setAttribute('cx', bp.x.toString());
+            dotBeta.setAttribute('cy', bp.y.toString());
+            dotBeta.style.display = '';
+          } else {
+            dotBeta.style.display = 'none';
+          }
         }
 
-        if (tooltip && tipTime && tipNav && tipBeta) {
+        if (hud && tipMeta && tipNav && tipBeta && tipLev) {
           const d = new Date(Number(record.timestamp_ms));
-          tipTime.textContent = `Bar #${record.bar_idx} &bull; ${d.toISOString().replace('T', ' ').substring(0, 16)} UTC`;
-          tipNav.textContent = formatUsd(Number(record.nav_usd));
-          tipBeta.textContent = Number(record.realized_tail_beta).toFixed(3);
-          tooltip.classList.remove('hidden');
-        }
-      });
+          const timeStr = d.toISOString().replace('T', ' ').substring(0, 16);
+          tipMeta.textContent = `Bar #${record.bar_idx} • ${timeStr} UTC`;
 
-      svgEl.addEventListener('mouseleave', () => {
+          const bNav = Number(record.nav_usd) || 0;
+          const diffVsStart = bNav - startNav;
+          const signVsStart = diffVsStart >= 0 ? '+' : '-';
+          tipNav.textContent = `${formatUsd(bNav)} (${signVsStart}${formatUsd(Math.abs(diffVsStart))})`;
+
+          const bBeta = Number(record.realized_tail_beta) || 0;
+          tipBeta.textContent = `${bBeta >= 0 ? '+' : ''}${bBeta.toFixed(4)}`;
+
+          const bLev = Number(record.gross_leverage ?? 0);
+          tipLev.textContent = `${bLev.toFixed(2)}x`;
+
+          hud.classList.remove('hidden');
+        }
+      };
+
+      const handleLeave = () => {
         if (crosshairGroup) crosshairGroup.setAttribute('opacity', '0');
-        if (tooltip) tooltip.classList.add('hidden');
-      });
+        if (hud) hud.classList.add('hidden');
+      };
+
+      svgEl.addEventListener('mousemove', handleMove);
+      svgEl.addEventListener('touchmove', handleMove, { passive: true });
+      svgEl.addEventListener('mouseleave', handleLeave);
+      svgEl.addEventListener('touchend', handleLeave);
     }
   }
 
@@ -2259,6 +2300,66 @@ if (session) {
         updateSatEnvButtons(nextVenue);
         await fetchAndRenderAll(accessToken, false);
       }
+    });
+
+    // Timeframe Pills
+    const tfButtons = document.querySelectorAll<HTMLButtonElement>('.chart-tf-btn');
+    tfButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tf = btn.getAttribute('data-chart-tf') as any;
+        if (!tf || tf === activeTimeframe) return;
+        activeTimeframe = tf;
+
+        tfButtons.forEach(b => {
+          b.classList.remove('active', 'font-bold', 'bg-white', 'dark:bg-slate-800', 'text-cyan-600', 'dark:text-cyan-400', 'shadow-sm');
+          b.classList.add('text-slate-500');
+        });
+        btn.classList.add('active', 'font-bold', 'bg-white', 'dark:bg-slate-800', 'text-cyan-600', 'dark:text-cyan-400', 'shadow-sm');
+        btn.classList.remove('text-slate-500');
+
+        renderChart(cachedTelemetryHistory);
+      });
+    });
+
+    // Series Toggles
+    const toggleNavBtn = document.getElementById('toggle-series-nav');
+    const toggleBetaBtn = document.getElementById('toggle-series-beta');
+    const toggleStopBtn = document.getElementById('toggle-series-stop');
+
+    toggleNavBtn?.addEventListener('click', () => {
+      showSeriesNav = !showSeriesNav;
+      if (showSeriesNav) {
+        toggleNavBtn.classList.remove('opacity-40', 'line-through');
+        toggleNavBtn.classList.add('opacity-100');
+      } else {
+        toggleNavBtn.classList.remove('opacity-100');
+        toggleNavBtn.classList.add('opacity-40', 'line-through');
+      }
+      renderChart(cachedTelemetryHistory);
+    });
+
+    toggleBetaBtn?.addEventListener('click', () => {
+      showSeriesBeta = !showSeriesBeta;
+      if (showSeriesBeta) {
+        toggleBetaBtn.classList.remove('opacity-40', 'line-through');
+        toggleBetaBtn.classList.add('opacity-100');
+      } else {
+        toggleBetaBtn.classList.remove('opacity-100');
+        toggleBetaBtn.classList.add('opacity-40', 'line-through');
+      }
+      renderChart(cachedTelemetryHistory);
+    });
+
+    toggleStopBtn?.addEventListener('click', () => {
+      showSeriesStop = !showSeriesStop;
+      if (showSeriesStop) {
+        toggleStopBtn.classList.remove('opacity-40', 'line-through');
+        toggleStopBtn.classList.add('opacity-100');
+      } else {
+        toggleStopBtn.classList.remove('opacity-100');
+        toggleStopBtn.classList.add('opacity-40', 'line-through');
+      }
+      renderChart(cachedTelemetryHistory);
     });
 
     // Calculator Inputs

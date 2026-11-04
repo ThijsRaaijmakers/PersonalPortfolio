@@ -16,6 +16,56 @@ export interface CoreDiagnosticContext {
 const SATELLITE_ASSETS = ['BTCUSDC', 'ETHUSDC', 'SOLUSDC', 'SUIUSDT', 'XRPUSDC', 'DOGEUSDC'] as const;
 const CORE_TICKERS = ['AAPL', 'NVDA', 'TSLA', 'LLY', 'JPM', 'GLD'] as const;
 
+const BINANCE_FUTURES_TICKER_URL = 'https://fapi.binance.com/fapi/v1/ticker/price';
+let cachedLivePrices: Record<string, number> = {};
+let lastPriceFetchTs = 0;
+const PRICE_CACHE_TTL_MS = 10_000;
+
+export async function fetchLiveBinanceFuturesPrices(
+  forceRefresh = false
+): Promise<Record<string, number>> {
+  if (typeof window === 'undefined') return cachedLivePrices;
+  const now = Date.now();
+  if (!forceRefresh && now - lastPriceFetchTs < PRICE_CACHE_TTL_MS && Object.keys(cachedLivePrices).length > 0) {
+    return cachedLivePrices;
+  }
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3500);
+    // Belangrijk: roep /fapi/v1/ticker/price ZONDER ?symbols= parameter aan om HTTP 400 (-1100) op Futures te voorkomen
+    const res = await fetch(BINANCE_FUTURES_TICKER_URL, {
+      signal: controller.signal,
+      cache: 'no-store',
+    });
+    clearTimeout(timeoutId);
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        const nextMap: Record<string, number> = {};
+        for (const item of data) {
+          if (item && typeof item.symbol === 'string') {
+            const p = Number(item.price);
+            if (Number.isFinite(p) && p > 0) {
+              nextMap[item.symbol.toUpperCase()] = p;
+            }
+          }
+        }
+        if (Object.keys(nextMap).length > 0) {
+          cachedLivePrices = nextMap;
+          lastPriceFetchTs = now;
+        }
+      }
+    }
+  } catch {
+    // Gebruik laatst bekende cache of fallback bij netwerk-/adblock-restricties
+  }
+  return cachedLivePrices;
+}
+
+export function getCachedBinanceFuturesPrices(): Record<string, number> {
+  return cachedLivePrices;
+}
+
 function num(val: unknown, fallback = 0): number {
   const n = Number(val);
   return Number.isFinite(n) ? n : fallback;
@@ -102,7 +152,9 @@ export interface EnrichedAssetHolding {
 export function computeAssetHoldingMetrics(
   symbol: string,
   rawEntry: any,
-  navUsd: number
+  navUsd: number,
+  livePricesMap?: Record<string, number>,
+  fallbackUpnlUsd = 0
 ): EnrichedAssetHolding {
   let qtyLots = 0;
   let notionalUsd = 0;
@@ -115,10 +167,10 @@ export function computeAssetHoldingMetrics(
     qtyLots = num(rawEntry.qty_lots ?? rawEntry.qty ?? rawEntry.lots, 0);
     notionalUsd = num(rawEntry.notional_usd ?? rawEntry.notional, 0);
     weight = num(rawEntry.weight ?? (navUsd > 0 ? notionalUsd / navUsd : 0), 0);
-    entryPrice = num(rawEntry.entry_price ?? rawEntry.avg_entry_price ?? rawEntry.mark_price, 0);
+    entryPrice = num(rawEntry.entry_price ?? rawEntry.avg_entry_price ?? 0, 0);
   }
 
-  const isFlat = Math.abs(qtyLots) <= 1e-9 || Math.abs(notionalUsd) <= 1e-2;
+  const isFlat = Math.abs(qtyLots) <= 1e-9 && Math.abs(notionalUsd) <= 1e-2;
   const direction: 'LONG' | 'SHORT' | 'FLAT' = isFlat
     ? 'FLAT'
     : qtyLots > 0 || notionalUsd > 0
@@ -141,27 +193,93 @@ export function computeAssetHoldingMetrics(
 
   const sign = direction === 'LONG' ? 1 : -1;
   const absQty = Math.abs(qtyLots);
-  const absNotional = Math.abs(notionalUsd);
-  const signedNotional = sign * absNotional;
   const signedQty = sign * absQty;
+  const costBasisUsd = entryPrice > 0 ? absQty * entryPrice : Math.abs(notionalUsd);
+  if (entryPrice <= 0 && absQty > 1e-12) {
+    entryPrice = Math.abs(notionalUsd) / absQty;
+  }
 
-  const markPrice = absQty > 1e-12 ? absNotional / absQty : entryPrice;
-  const costBasisUsd = absQty * entryPrice;
-  const upnlUsd = entryPrice > 0 ? signedNotional - signedQty * entryPrice : 0;
+  // 1. Bepaal Mark Price: eerst uit livePricesMap (of USDT-equivalent), anders uit expliciet payload-veld of fallbackUpnlUsd
+  const symUpper = symbol.toUpperCase();
+  const usdtFallbackSym = symUpper.replace('USDC', 'USDT');
+  const liveTickerPrice =
+    livePricesMap?.[symUpper] ?? livePricesMap?.[usdtFallbackSym] ?? 0;
+  const payloadMarkPrice =
+    typeof rawEntry === 'object' && rawEntry !== null
+      ? num(rawEntry.mark_price ?? rawEntry.current_price, 0)
+      : 0;
+
+  let markPrice = entryPrice;
+  let upnlUsd = 0;
+
+  if (liveTickerPrice > 0) {
+    markPrice = liveTickerPrice;
+    upnlUsd = signedQty * (markPrice - entryPrice);
+  } else if (
+    payloadMarkPrice > 0 &&
+    Math.abs(payloadMarkPrice - entryPrice) / Math.max(entryPrice, 1e-9) > 1e-5
+  ) {
+    markPrice = payloadMarkPrice;
+    upnlUsd = signedQty * (markPrice - entryPrice);
+  } else if (Math.abs(fallbackUpnlUsd) > 1e-4 && absQty > 1e-12) {
+    upnlUsd = fallbackUpnlUsd;
+    markPrice = Math.max(0, entryPrice + upnlUsd / signedQty);
+  }
+
+  const liveNotionalUsd = signedQty * markPrice;
   const upnlPct = costBasisUsd > 1e-6 ? (upnlUsd / costBasisUsd) * 100 : 0;
-  const effectiveWeight = navUsd > 0 ? signedNotional / navUsd : weight;
+  const effectiveWeight = navUsd > 0 ? liveNotionalUsd / navUsd : weight;
 
   return {
     symbol,
     direction,
     qty_lots: signedQty,
-    notional_usd: signedNotional,
+    notional_usd: liveNotionalUsd,
     weight: effectiveWeight,
     entry_price: entryPrice,
     mark_price: markPrice,
     upnl_usd: upnlUsd,
     upnl_pct: upnlPct,
   };
+}
+
+export function computeAllBasketHoldings(
+  rawPositions: Record<string, any>,
+  navUsd: number,
+  totalLedgerUpnlUsd: number,
+  livePricesMap?: Record<string, number>
+): EnrichedAssetHolding[] {
+  const parsed = SATELLITE_ASSETS.map((symbol) => {
+    const rawEntry = rawPositions[symbol] ?? rawPositions[symbol.replace('USDC', '')] ?? 0;
+    let qtyLots = 0;
+    let notionalUsd = 0;
+    let entryPrice = 0;
+    if (typeof rawEntry === 'number') {
+      qtyLots = num(rawEntry, 0);
+    } else if (typeof rawEntry === 'object' && rawEntry !== null) {
+      qtyLots = num(rawEntry.qty_lots ?? rawEntry.qty ?? rawEntry.lots, 0);
+      notionalUsd = num(rawEntry.notional_usd ?? rawEntry.notional, 0);
+      entryPrice = num(rawEntry.entry_price ?? rawEntry.avg_entry_price ?? 0, 0);
+    }
+    const absQty = Math.abs(qtyLots);
+    if (entryPrice <= 0 && absQty > 1e-12) {
+      entryPrice = Math.abs(notionalUsd) / absQty;
+    }
+    const isFlat = absQty <= 1e-9 && Math.abs(notionalUsd) <= 1e-2;
+    const costBasis = !isFlat ? (entryPrice > 0 ? absQty * entryPrice : Math.abs(notionalUsd)) : 0;
+    return { symbol, rawEntry, isFlat, costBasis };
+  });
+
+  const totalActiveCost = parsed.reduce((sum, p) => sum + p.costBasis, 0);
+  const hasLivePrices = Boolean(livePricesMap && Object.keys(livePricesMap).length > 0);
+
+  return parsed.map((p) => {
+    let fallbackUpnl = 0;
+    if (!hasLivePrices && !p.isFlat && totalActiveCost > 1e-6) {
+      fallbackUpnl = (p.costBasis / totalActiveCost) * totalLedgerUpnlUsd;
+    }
+    return computeAssetHoldingMetrics(p.symbol, p.rawEntry, navUsd, livePricesMap, fallbackUpnl);
+  });
 }
 
 export function normalizeSatelliteSnapshot(ctx: SatelliteDiagnosticContext) {
@@ -247,10 +365,13 @@ export function normalizeSatelliteSnapshot(ctx: SatelliteDiagnosticContext) {
       ? [`bars_evaluated (${barsEvaluated}) < ${targetBars}`]
       : [];
 
-  const holdings: EnrichedAssetHolding[] = SATELLITE_ASSETS.map((symbol) => {
-    const rawEntry = rawPositions[symbol] ?? rawPositions[symbol.replace('USDC', '')] ?? 0;
-    return computeAssetHoldingMetrics(symbol, rawEntry, navUsd);
-  });
+  const livePrices = getCachedBinanceFuturesPrices();
+  const holdings: EnrichedAssetHolding[] = computeAllBasketHoldings(
+    rawPositions,
+    navUsd,
+    unrealizedPnlUsd,
+    livePrices
+  );
 
   return {
     captured_at_utc: now.toISOString(),
