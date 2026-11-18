@@ -60,6 +60,22 @@ if (session) {
           </span>
 
           <span 
+            id="binance-ws-badge"
+            class="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/30 font-mono text-[10px] font-bold shadow-sm"
+          >
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+            <span id="binance-ws-label">BINANCE CLOB WS: VERBINDEN...</span>
+          </span>
+
+          <span 
+            id="vps-realtime-badge"
+            class="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded bg-slate-200/80 dark:bg-slate-800/80 text-slate-500 border border-slate-300 dark:border-slate-700 font-mono text-[10px] font-bold shadow-sm"
+          >
+            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+            <span id="vps-realtime-label">TOKYO VPS: VERBINDEN...</span>
+          </span>
+
+          <span 
             id="sync-status-badge"
             class="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded bg-slate-200/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700 font-mono text-[10px]"
           >
@@ -444,78 +460,44 @@ if (session) {
         </div>
       </div>
 
-      <!-- Card 6: Core-Satellite Split Calculator -->
+      <!-- Card 6: Pool & Performance Fee Ledger -->
       <div class="p-5 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl flex flex-col justify-between space-y-3">
         <div>
           <div class="flex items-center justify-between gap-2 mb-2">
             <div class="flex items-center space-x-1.5">
-              <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// CORE-SATELLITE 90/10</span>
+              <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// POOL &amp; HWM PRESTATIEVERGOEDINGEN</span>
               <div class="group relative inline-flex items-center cursor-help">
                 <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-slate-200 dark:bg-slate-800 text-[9px] font-mono font-bold text-slate-500 hover:text-cyan-400 hover:bg-slate-700 transition-colors">?</span>
                 <div class="pointer-events-none absolute bottom-full left-0 mb-2 w-64 p-2.5 rounded-lg bg-slate-900/95 border border-slate-700 text-[11px] leading-relaxed text-slate-200 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity z-50 font-sans font-normal normal-case">
-                  Bewaakt dynamisch het evenwicht tussen 90% Alpaca Core en 10% Crypto Satellite, met bijstortingen binnen de [7,0%, 13,5%] bandbreedte.
+                  Berekent de participatiewaarde over samengevoegd kapitaal, met continue registratie van individuele high-water-marks (HWM) en opgebouwde managervergoedingen.
                 </div>
               </div>
             </div>
-            <span id="band-status-badge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
-              OPTIMAL [7.0%, 13.5%]
+            <span id="pool-active-partitions-count" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30">
+              1 ACTIEVE NODE
             </span>
           </div>
-          <div class="flex items-baseline justify-between">
-            <span class="text-xs font-mono text-slate-400">Satellite Weight:</span>
-            <span id="calc-sat-pct" class="text-xl font-extrabold text-cyan-600 dark:text-cyan-400 font-mono">10.0%</span>
-          </div>
-        </div>
-
-        <!-- Interactive Calculator Inputs -->
-        <div class="space-y-2 font-mono text-xs">
-          <div class="flex items-center justify-between gap-2">
-            <div class="flex items-center space-x-1.5 min-w-0">
-              <label for="core-balance-input" class="text-[11px] text-slate-500 truncate">Alpaca Core ($):</label>
-              <button 
-                id="reset-core-live-btn" 
-                type="button" 
-                title="Reset to live Alpaca Core portfolio value"
-                class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-500 hover:bg-cyan-500/20 border border-cyan-500/30 transition-colors hidden cursor-pointer shrink-0"
-              >
-                LIVE: <span id="core-live-val">$0.00</span> ↺
-              </button>
+          <div class="flex items-baseline space-x-2">
+            <div id="pool-gross-unit-price" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-mono tracking-tight">
+              $1.0000
             </div>
-            <input 
-              type="number" 
-              id="core-balance-input" 
-              value="100000" 
-              min="0" 
-              step="100"
-              class="w-28 px-2 py-1 rounded bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-right font-mono text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-cyan-500"
-            />
-          </div>
-          <div class="flex items-center justify-between gap-2">
-            <label for="salary-deposit-input" class="text-[11px] text-slate-500">Monthly Deposit C_new ($):</label>
-            <input 
-              type="number" 
-              id="salary-deposit-input" 
-              value="1500" 
-              min="0" 
-              step="100"
-              class="w-28 px-2 py-1 rounded bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-right font-mono text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-cyan-500"
-            />
+            <span class="text-xs font-mono text-slate-500">/ participatie NAV</span>
           </div>
         </div>
 
-        <!-- Split Output -->
-        <div class="pt-2 border-t border-slate-200 dark:border-slate-800/80 font-mono text-[11px] space-y-1">
-          <div class="flex justify-between text-slate-600 dark:text-slate-400">
-            <span>Deposit to Core (90%):</span>
-            <span id="calc-deposit-core" class="font-bold text-slate-200">+$1,350.00</span>
+        <!-- Pool Sub-Metrics -->
+        <div class="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 font-mono text-xs">
+          <div class="flex justify-between items-center text-slate-600 dark:text-slate-400">
+            <span>Opgebouwde Managerfee (Thijs):</span>
+            <span id="pool-thijs-accrued-fees" class="font-bold text-emerald-500 dark:text-emerald-400">+$0.00</span>
           </div>
-          <div class="flex justify-between text-slate-600 dark:text-slate-400">
-            <span>Deposit to Satellite (10%):</span>
-            <span id="calc-deposit-sat" class="font-bold text-cyan-400">+$150.00</span>
+          <div class="flex justify-between items-center text-slate-600 dark:text-slate-400">
+            <span>Totale Netto Poolwaarde:</span>
+            <span id="pool-total-net-val" class="font-bold text-slate-900 dark:text-slate-200">$2,750.00</span>
           </div>
-          <div class="flex justify-between text-slate-500 pt-0.5 text-[10px]">
-            <span>Combined Total NAV:</span>
-            <span id="calc-total-nav" class="font-bold text-slate-400">$100,000.00</span>
+          <div class="flex justify-between items-center text-[11px] text-slate-500 pt-0.5">
+            <span>Eigendomsaandeel Master Node:</span>
+            <span id="pool-master-share-pct" class="font-bold text-cyan-400">100.0%</span>
           </div>
         </div>
       </div>
@@ -553,11 +535,12 @@ if (session) {
             <div class="flex flex-wrap items-center gap-3 shrink-0">
               <!-- Timeframe Pills -->
               <div class="inline-flex p-1 rounded-xl bg-slate-200/80 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-xs font-mono">
-                <button type="button" data-chart-tf="50" title="~4 Uur (50 Bars)" class="chart-tf-btn px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer">50B</button>
-                <button type="button" data-chart-tf="150" title="~12 Uur (150 Bars)" class="chart-tf-btn px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer">150B</button>
-                <button type="button" data-chart-tf="288" title="24 Uur (288 Bars)" class="chart-tf-btn px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer">288B</button>
-                <button type="button" data-chart-tf="500" title="Standaard Venster (500 Bars)" class="chart-tf-btn active px-2.5 py-1 rounded-lg font-bold bg-white dark:bg-slate-800 text-cyan-600 dark:text-cyan-400 shadow-sm transition-colors cursor-pointer">500B</button>
-                <button type="button" data-chart-tf="all" title="Alle Geladen Sessie-Bars" class="chart-tf-btn px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer">ALL</button>
+                <button type="button" data-chart-window="1h" title="1 Uur (12 Bars)" class="chart-tf-btn px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer">1H</button>
+                <button type="button" data-chart-window="6h" title="6 Uur (72 Bars)" class="chart-tf-btn px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer">6H</button>
+                <button type="button" data-chart-window="24h" title="24 Uur (288 Bars)" class="chart-tf-btn px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer">24H</button>
+                <button type="button" data-chart-window="3d" title="3 Dagen (864 Bars)" class="chart-tf-btn px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer">3D</button>
+                <button type="button" data-chart-window="1w" title="1 Week (2.016 Bars)" class="chart-tf-btn px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer">1W</button>
+                <button type="button" data-chart-window="all" title="Alle Geladen Sessie-Bars (>1.000)" class="chart-tf-btn active px-2.5 py-1 rounded-lg font-bold bg-white dark:bg-slate-800 text-cyan-600 dark:text-cyan-400 shadow-sm transition-colors cursor-pointer">ALL</button>
               </div>
 
               <!-- Interactive Series Toggles -->
@@ -668,6 +651,16 @@ if (session) {
               <span id="tip-lev-val" class="font-bold">--</span>
             </div>
           </div>
+
+          <!-- Floating Jump to Live Button -->
+          <button
+            id="chart-jump-live-btn"
+            type="button"
+            class="absolute bottom-3 right-4 z-20 px-3 py-1.5 rounded-lg bg-cyan-600/90 hover:bg-cyan-500 text-white font-mono text-xs font-bold shadow-lg shadow-cyan-900/40 backdrop-blur-sm transition-all duration-200 flex items-center space-x-1.5 cursor-pointer hidden"
+          >
+            <span>Spring naar Live</span>
+            <span>&rarr;</span>
+          </button>
         </div>
 
         <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 pt-1">
@@ -892,6 +885,92 @@ if (session) {
 
     </div>
 
+    <!-- ============================================================== -->
+    <!-- SECTION 5: MULTI-PARTITIE SUB-LEDGER & HWM FEE ENGINE        -->
+    <!-- ============================================================== -->
+    <div class="rounded-2xl p-5 sm:p-6 bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl space-y-6">
+      
+      <!-- Section Header with Title & Action Buttons -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
+        <div class="space-y-1">
+          <div class="flex items-center space-x-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+            <span class="text-xs font-mono font-bold text-cyan-600 dark:text-cyan-400 tracking-wider uppercase">
+              // MULTI-PARTITIE SUB-LEDGER &amp; HIGH-WATER-MARK PRESTATIEVERGOEDING ENGINE
+            </span>
+          </div>
+          <p class="text-xs font-mono text-slate-500">
+            Poolkapitaal-waardering, geproportioneerde participatie-aandelen en perpetuele high-water-mark fee-kristallisatie.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button
+            id="crystallize-fees-btn"
+            type="button"
+            class="px-3.5 py-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-mono text-xs font-bold transition-all flex items-center space-x-1.5 shadow-sm cursor-pointer"
+          >
+            <svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span id="crystallize-btn-label">Kristalliseer HWM Vergoedingen</span>
+          </button>
+          <button
+            id="add-partition-btn"
+            type="button"
+            class="px-3.5 py-2 rounded-xl border border-cyan-500/40 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 font-mono text-xs font-bold transition-all flex items-center space-x-1.5 shadow-sm cursor-pointer"
+          >
+            <svg class="w-3.5 h-3.5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Deelnemer Toevoegen</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Partitions Responsive Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full font-mono text-xs text-left">
+          <thead>
+            <tr class="text-[10px] text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
+              <th class="py-2.5 pr-3">Deelnemer &amp; Rol</th>
+              <th class="py-2.5 px-3 text-right">Participaties</th>
+              <th class="py-2.5 px-3 text-right">Netto Ingelegd</th>
+              <th class="py-2.5 px-3 text-right">Huidige Nettowaarde</th>
+              <th class="py-2.5 px-3 text-right">Pool Aandeel</th>
+              <th class="py-2.5 px-3 text-right">Rendement (ROI%)</th>
+              <th class="py-2.5 px-3 text-right">HWM Koers</th>
+              <th class="py-2.5 px-3 text-right">Fee %</th>
+              <th class="py-2.5 px-3 text-right">Opgebouwde Fee ($)</th>
+              <th class="py-2.5 pl-3 text-center">Acties</th>
+            </tr>
+          </thead>
+          <tbody id="partitions-table-body" class="divide-y divide-slate-200 dark:divide-slate-800/60">
+            <tr class="text-slate-500">
+              <td colspan="10" class="py-4 text-center text-xs">
+                Multi-partitie pool ledger laden...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Sub-Ledger Summary Metrics Footer -->
+      <div id="partitions-table-footer" class="border-t border-slate-200 dark:border-slate-800 pt-3 flex flex-wrap items-center justify-between gap-4 font-mono text-xs text-slate-500">
+        <div class="flex items-center space-x-4 flex-wrap gap-y-1">
+          <span>Totale Participaties: <span id="pool-footer-total-units" class="font-bold text-slate-800 dark:text-slate-200">2.750,00</span></span>
+          <span>&bull;</span>
+          <span>Bruto Pool NAV: <span id="pool-footer-gross-nav" class="font-bold text-slate-800 dark:text-slate-200">$2.750,00</span></span>
+          <span>&bull;</span>
+          <span>Netto Poolwaarde: <span id="pool-footer-net-equity" class="font-bold text-slate-800 dark:text-slate-200">$2.750,00</span></span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <span>Totale Niet-Gekristalliseerde Managervergoeding:</span>
+          <span id="pool-footer-total-fees" class="font-bold text-emerald-500 dark:text-emerald-400">+$0,00</span>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- ============================================================== -->
@@ -959,6 +1038,103 @@ if (session) {
     </div>
   </div>
 
+  <!-- ============================================================== -->
+  <!-- PARTITION MANAGEMENT MODAL                                    -->
+  <!-- ============================================================== -->
+  <div 
+    id="partition-modal" 
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden animate-fade-in"
+  >
+    <div class="w-full max-w-md p-6 rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl space-y-4 font-mono">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center space-x-2 text-cyan-400">
+          <span id="partition-modal-title" class="font-bold text-sm">// DEELNEMER TOEVOEGEN</span>
+        </div>
+        <button id="partition-modal-close-btn" class="text-slate-400 hover:text-slate-200 cursor-pointer text-lg">&times;</button>
+      </div>
+
+      <form id="partition-form" class="space-y-3.5 text-xs">
+        <input type="hidden" id="partition-modal-action" value="CREATE_PARTITION" />
+        <input type="hidden" id="partition-modal-id" value="" />
+
+        <div id="partition-name-group" class="space-y-1">
+          <label for="partition-name-input" class="text-slate-400">Deelnemersnaam:</label>
+          <input
+            type="text"
+            id="partition-name-input"
+            placeholder="bijv., Deelnemer Node B"
+            required
+            class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-500"
+          />
+        </div>
+
+        <div id="partition-relation-group" class="space-y-1">
+          <label for="partition-relation-input" class="text-slate-400">Relatie / Rol:</label>
+          <input
+            type="text"
+            id="partition-relation-input"
+            placeholder="bijv., Familie / Vriend / Investeerder"
+            class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-500"
+          />
+        </div>
+
+        <div class="space-y-1">
+          <label id="partition-amount-label" for="partition-amount-input" class="text-slate-400">Inleg ($):</label>
+          <input
+            type="number"
+            id="partition-amount-input"
+            placeholder="bijv., 500.00"
+            step="0.01"
+            required
+            class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-500"
+          />
+        </div>
+
+        <div id="partition-fee-group" class="space-y-1">
+          <label for="partition-fee-input" class="text-slate-400">Prestatievergoeding % (Boven HWM):</label>
+          <input
+            type="number"
+            id="partition-fee-input"
+            placeholder="bijv., 20.0"
+            value="20.0"
+            min="0"
+            max="50"
+            step="0.1"
+            class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-500"
+          />
+        </div>
+
+        <div id="partition-notes-group" class="space-y-1">
+          <label for="partition-notes-input" class="text-slate-400">Notities / Auditkenmerk:</label>
+          <input
+            type="text"
+            id="partition-notes-input"
+            placeholder="Optionele toelichting"
+            class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-500"
+          />
+        </div>
+
+        <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-800">
+          <button
+            id="partition-modal-cancel-btn"
+            type="button"
+            class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold cursor-pointer transition-colors"
+          >
+            Annuleren
+          </button>
+          <button
+            id="partition-modal-submit-btn"
+            type="submit"
+            class="px-5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold shadow-lg shadow-cyan-600/30 flex items-center space-x-1.5 cursor-pointer transition-all"
+          >
+            <span id="partition-modal-spinner" class="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin hidden"></span>
+            <span id="partition-modal-submit-label">Bevestigen &amp; Opslaan</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
 </Layout>
 
 <script>
@@ -969,6 +1145,8 @@ if (session) {
     normalizeSatelliteSnapshot,
     computeAllBasketHoldings,
     fetchLiveBinanceFuturesPrices,
+    computePoolPartitionValuations,
+    type PoolValuationResult,
     fmtContractPrice,
     copyTextToClipboard,
     triggerJsonDownload,
@@ -978,20 +1156,39 @@ if (session) {
   let pollingInterval: any = null;
   let cachedTelemetryHistory: any[] = [];
   let pendingTargetState = '';
-  let liveAlpacaCoreNav: number | null = null;
   let latestTelemetryRow: Record<string, any> | null = null;
   let telemetryHistoryRows: Array<Record<string, any>> = [];
   let latestCoreRow: Record<string, any> | null = null;
   let recentCommands: Array<Record<string, any>> = [];
 
-  // Broker Charting State
-  let activeTimeframe: '50' | '150' | '288' | '500' | 'all' = '500';
+  // Partition Sub-Ledger State
+  let currentPartitions: any[] = [];
+  let latestValuationResult: PoolValuationResult | null = null;
+
+  // Real-Time Triangular Connectivity
+  let binanceWs: WebSocket | null = null;
+  let liveMidPrices: Record<string, number> = {};
+  let wsReconnectTimer: any = null;
+  let realtimeChannel: any = null;
+  let tickPending = false;
+  let lastTickTime = 0;
+
+  // Broker Charting State (TradingView Drag-to-Pan, Zoom, & Timeframes)
+  let activeChartWindow: '1h' | '6h' | '24h' | '3d' | '1w' | 'all' = 'all';
+  let viewStartIdx = 0;
+  let viewEndIdx = 0;
+  let isPinnedToLive = true;
   let showSeriesNav = true;
   let showSeriesBeta = true;
   let showSeriesStop = true;
   let lastVisiblePoints: { navPoints: any[]; betaPoints: any[]; firstNav: number } | null = null;
 
-  // Format lots met basis-asset naam en zonder afkapping
+  let isDragging = false;
+  let dragStartX = 0;
+  let dragStartViewStart = 0;
+  let dragStartViewEnd = 0;
+
+  // Format lots with base asset name and non-truncating precision
   function formatLotsWithAsset(lots: number, symbol: string): string {
     if (Math.abs(lots) <= 1e-9) return '0.0000';
     const symUpper = symbol.toUpperCase();
@@ -1120,37 +1317,26 @@ if (session) {
     }
   }
 
-  async function fetchLiveAlpacaCoreNav() {
-    try {
+  // Paginated telemetry fetcher ensuring all >1,000 bars load cleanly
+  async function fetchAllTelemetryHistory(venue: TradingVenue): Promise<any[]> {
+    let allRows: any[] = [];
+    let from = 0;
+    const chunkSize = 1000;
+
+    while (true) {
       const { data, error } = await supabase
-        .from('trading_telemetry')
+        .from('quant_satellite_telemetry')
         .select('*')
-        .order('run_timestamp', { ascending: false })
-        .limit(1);
+        .eq('venue', venue)
+        .order('timestamp_ms', { ascending: true })
+        .range(from, from + chunkSize - 1);
 
-      if (!error && data && data.length > 0) {
-        latestCoreRow = data[0];
-        if (data[0].portfolio_value != null) {
-          const val = Number(data[0].portfolio_value);
-          if (!isNaN(val) && val > 0) {
-            liveAlpacaCoreNav = val;
-            const coreInput = document.getElementById('core-balance-input') as HTMLInputElement | null;
-            const liveBtn = document.getElementById('reset-core-live-btn');
-            const liveValSpan = document.getElementById('core-live-val');
-
-            if (liveValSpan) liveValSpan.textContent = formatUsd(val);
-            if (liveBtn) liveBtn.classList.remove('hidden');
-
-            if (coreInput && !coreInput.dataset.userEdited) {
-              coreInput.value = val.toFixed(2);
-              updateCalculatorOutputs();
-            }
-          }
-        }
-      }
-    } catch (e) {
-      console.warn('Unable to query live Alpaca core NAV:', e);
+      if (error || !data || data.length === 0) break;
+      allRows = allRows.concat(data);
+      if (data.length < chunkSize) break;
+      from += chunkSize;
     }
+    return allRows;
   }
 
   async function loadQuantSatelliteDashboard() {
@@ -1171,7 +1357,7 @@ if (session) {
     }
 
     if (!session || !isAdmin) {
-      window.location.href = '/nl/login?redirect=/nl/quant-satellite';
+      window.location.href = '/login?redirect=/quant-satellite';
       return;
     }
 
@@ -1189,13 +1375,15 @@ if (session) {
     const activeVenue = getActiveVenue();
     updateSatEnvButtons(activeVenue);
 
-    // Fetch live Alpaca Core NAV from trading_telemetry
-    await fetchLiveAlpacaCoreNav();
+    // Initialize Realtime Triangle Connections
+    initBinanceWebSocket();
+    initSupabaseRealtime(session.access_token);
+    setupChartInteractions();
 
     // Fetch and render initial data
     await fetchAndRenderAll(session.access_token);
 
-    // Setup 15-second polling loop
+    // Setup 15-second polling fallback loop
     if (pollingInterval) clearInterval(pollingInterval);
     pollingInterval = setInterval(async () => {
       const { data: { session: currentSession } } = await supabase.auth.getSession();
@@ -1217,43 +1405,30 @@ if (session) {
     }
 
     try {
-      // 1. Fetch Telemetry (via API or direct client)
       const currentVenue = getActiveVenue();
-      let telemetryData: any = null;
-      try {
-        const res = await fetch(`/api/quant/telemetry?venue=${currentVenue}&limit=2000&_t=${Date.now()}`, {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          },
-        });
-        if (res.ok) {
-          telemetryData = await res.json();
+
+      // 1. Paginated Telemetry Fetching (>1,000 bars support)
+      let allRows: any[] = await fetchAllTelemetryHistory(currentVenue);
+
+      // Fallback to API endpoint if client query returns empty
+      if (allRows.length === 0) {
+        try {
+          const res = await fetch(`/api/quant/telemetry?venue=${currentVenue}&limit=2000&_t=${Date.now()}`, {
+            headers: { 'Authorization': `Bearer ${accessToken}` },
+          });
+          if (res.ok) {
+            const json = await res.json();
+            if (json.history && Array.isArray(json.history)) {
+              allRows = [...json.history].sort((a: any, b: any) => Number(a.timestamp_ms) - Number(b.timestamp_ms));
+            }
+          }
+        } catch (e) {
+          console.warn('API route fallback error:', e);
         }
-      } catch (e) {
-        console.warn('API route error, falling back to direct supabase query:', e);
       }
 
-      if (!telemetryData || !telemetryData.success) {
-        const { data: directData } = await supabase
-          .from('quant_satellite_telemetry')
-          .select('*')
-          .eq('venue', currentVenue)
-          .order('timestamp_ms', { ascending: false })
-          .limit(2000);
-
-        const rows = directData || [];
-        telemetryData = {
-          success: true,
-          latest: rows[0] || null,
-          history: rows,
-        };
-      }
-
-      const allRows: any[] = telemetryData?.history || [];
-      cachedTelemetryHistory = allRows.filter((r: any) => (r.venue || 'paper') === currentVenue);
-      const latest = (telemetryData?.latest && (telemetryData.latest.venue || 'paper') === currentVenue)
-        ? telemetryData.latest
-        : (cachedTelemetryHistory[0] || null);
+      cachedTelemetryHistory = allRows;
+      const latest = allRows.length > 0 ? allRows[allRows.length - 1] : null;
 
       latestTelemetryRow = latest;
       telemetryHistoryRows = cachedTelemetryHistory;
@@ -1264,41 +1439,24 @@ if (session) {
       // Render Section 2: 6 KPI Cards
       renderSection2(latest);
 
-      // Fetch live Binance Futures prices for real-time Mark Price & uPnL
-      const livePrices = await fetchLiveBinanceFuturesPrices();
+      // Initial Binance Prices (REST fallback if WS not yet ready)
+      if (Object.keys(liveMidPrices).length === 0) {
+        liveMidPrices = await fetchLiveBinanceFuturesPrices();
+      }
+
+      // Re-calibrate chart view window if pinned to live
+      if (isPinnedToLive) {
+        recalcViewWindowToLive();
+      }
 
       // Render Section 3: SVG Chart & Basket Table
-      renderSection3(latest, cachedTelemetryHistory, livePrices);
+      renderSection3(latest, cachedTelemetryHistory, liveMidPrices);
 
-      // 2. Fetch C2 Commands
-      let commands: any[] = [];
-      try {
-        const cmdRes = await fetch('/api/quant/command', {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          },
-        });
-        if (cmdRes.ok) {
-          const json = await cmdRes.json();
-          commands = json.commands || [];
-        }
-      } catch (e) {
-        console.warn('API error fetching commands, falling back to direct supabase query:', e);
-      }
+      // 2. Fetch & Render Multi-Partition Sub-Ledger
+      await fetchAndRenderPartitions(accessToken);
 
-      if (commands.length === 0) {
-        const { data: directCmds } = await supabase
-          .from('quant_satellite_commands')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(10);
-        commands = directCmds || [];
-      }
-
-      recentCommands = commands;
-
-      // Render Section 4: Commands Table
-      renderCommandsTable(commands);
+      // 3. Fetch C2 Commands Queue
+      await fetchAndRenderCommands(accessToken);
 
       if (syncTimerLabel) {
         const now = new Date();
@@ -1488,8 +1646,6 @@ if (session) {
       if (takerFillsVal) takerFillsVal.textContent = '0';
       if (gtxRejectsVal) gtxRejectsVal.textContent = '0 (Protected)';
       if (card5FeesVal) card5FeesVal.textContent = '$0.00';
-
-      updateCalculatorOutputs(0);
       return;
     }
 
@@ -1590,58 +1746,6 @@ if (session) {
     if (takerFillsVal) takerFillsVal.textContent = String(norm.takerFills);
     if (gtxRejectsVal) gtxRejectsVal.textContent = `${norm.gtxRejects} (Protected)`;
     if (card5FeesVal) card5FeesVal.textContent = formatUsd(fees);
-
-    // Card 6: Core-Satellite Split Calculator calculation
-    updateCalculatorOutputs(nav);
-  }
-
-  // ==========================================
-  // CORE-SATELLITE CALCULATOR
-  // ==========================================
-  function updateCalculatorOutputs(currentSatNav?: number) {
-    const coreInput = document.getElementById('core-balance-input') as HTMLInputElement | null;
-    const salaryInput = document.getElementById('salary-deposit-input') as HTMLInputElement | null;
-    const satPctLabel = document.getElementById('calc-sat-pct');
-    const bandBadge = document.getElementById('band-status-badge');
-    const depCoreLabel = document.getElementById('calc-deposit-core');
-    const depSatLabel = document.getElementById('calc-deposit-sat');
-    const totalNavLabel = document.getElementById('calc-total-nav');
-
-    const coreNav = Math.max(0, Number(coreInput?.value) || 0);
-    const cNew = Math.max(0, Number(salaryInput?.value) || 0);
-    const satNav = currentSatNav !== undefined 
-      ? currentSatNav 
-      : Math.max(0, Number(document.getElementById('nav-usd-val')?.textContent?.replace(/[^0-9.-]+/g, '')) || 0);
-
-    const totalNav = coreNav + satNav;
-    const combinedTotal = totalNav + cNew;
-
-    // Current satellite allocation %
-    const satPct = totalNav > 0 ? (satNav / totalNav) * 100 : 10.0;
-
-    if (satPctLabel) satPctLabel.textContent = `${satPct.toFixed(2)}%`;
-    if (totalNavLabel) totalNavLabel.textContent = formatUsd(combinedTotal);
-
-    // 90/10 Split of new deposit C_new
-    const depCore = cNew * 0.90;
-    const depSat = cNew * 0.10;
-
-    if (depCoreLabel) depCoreLabel.textContent = `+${formatUsd(depCore)}`;
-    if (depSatLabel) depSatLabel.textContent = `+${formatUsd(depSat)}`;
-
-    // Tolerance band [7.0%, 13.5%]
-    if (bandBadge) {
-      if (satPct >= 7.0 && satPct <= 13.5) {
-        bandBadge.textContent = 'OPTIMAL [7.0%, 13.5%]';
-        bandBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30';
-      } else if (satPct < 7.0) {
-        bandBadge.textContent = 'UNDER-ALLOCATED (< 7.0%)';
-        bandBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-400 border border-amber-500/40';
-      } else {
-        bandBadge.textContent = 'OVER-ALLOCATED (> 13.5%)';
-        bandBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-500/20 text-rose-400 border border-rose-500/50';
-      }
-    }
   }
 
   // ==========================================
@@ -1697,7 +1801,7 @@ if (session) {
 
       // Column 3: Exposure ($ / %)
       let exposureTop = '$0.00';
-      let exposureBottom = '(0.00% van NAV)';
+      let exposureBottom = '(0.00% of NAV)';
       let exposureColor = 'text-slate-400';
       let barWidthPct = 0;
 
@@ -1707,7 +1811,7 @@ if (session) {
         exposureTop = `${signNotional}$${absNotional.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         exposureColor = isLong ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-rose-600 dark:text-rose-400 font-bold';
         const weightPct = h.weight * 100;
-        exposureBottom = `(${weightPct >= 0 ? '+' : ''}${weightPct.toFixed(2)}% van NAV)`;
+        exposureBottom = `(${weightPct >= 0 ? '+' : ''}${weightPct.toFixed(2)}% of NAV)`;
         barWidthPct = Math.min(100, Math.max(2, Math.abs(weightPct) * 2));
       }
 
@@ -1716,7 +1820,7 @@ if (session) {
       if (!isFlat) {
         entryMarkHtml = `
           <div class="leading-tight"><span class="text-slate-400 text-[10px] mr-1">IN:</span><span class="text-slate-700 dark:text-slate-200 font-semibold">${fmtContractPrice(h.entry_price, h.symbol)}</span></div>
-          <div class="leading-tight mt-1"><span class="text-slate-400 text-[10px] mr-1">MARKT:</span><span class="text-cyan-600 dark:text-cyan-400 font-semibold">${fmtContractPrice(h.mark_price, h.symbol)}</span></div>
+          <div class="leading-tight mt-1"><span class="text-slate-400 text-[10px] mr-1">MARK:</span><span class="text-cyan-600 dark:text-cyan-400 font-semibold">${fmtContractPrice(h.mark_price, h.symbol)}</span></div>
         `;
       }
 
@@ -1761,13 +1865,13 @@ if (session) {
 
           <!-- Col 2: Size (Lots) -->
           <div class="sm:col-span-2 flex justify-between sm:justify-end items-center sm:text-right">
-            <span class="sm:hidden text-slate-500 text-[10px]">GROOTTE:</span>
+            <span class="sm:hidden text-slate-500 text-[10px]">SIZE:</span>
             <span class="text-slate-700 dark:text-slate-300 font-semibold">${lotsFormatted}</span>
           </div>
 
           <!-- Col 3: Exposure ($ / %) -->
           <div class="sm:col-span-3 flex justify-between sm:justify-end items-center sm:text-right">
-            <span class="sm:hidden text-slate-500 text-[10px]">POSITIE:</span>
+            <span class="sm:hidden text-slate-500 text-[10px]">EXPOSURE:</span>
             <div class="flex flex-col items-end">
               <div class="${exposureColor}">${exposureTop}</div>
               <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">${exposureBottom}</div>
@@ -1781,13 +1885,13 @@ if (session) {
 
           <!-- Col 4: Entry / Mark -->
           <div class="sm:col-span-3 flex justify-between sm:justify-end items-center sm:text-right">
-            <span class="sm:hidden text-slate-500 text-[10px]">INSTAP / MARKT:</span>
+            <span class="sm:hidden text-slate-500 text-[10px]">ENTRY / MARK:</span>
             <div class="text-right">${entryMarkHtml}</div>
           </div>
 
           <!-- Col 5: uPnL -->
           <div class="sm:col-span-2 flex justify-between sm:justify-end items-center sm:text-right">
-            <span class="sm:hidden text-slate-500 text-[10px]">ONGEREALISEERDE PNL:</span>
+            <span class="sm:hidden text-slate-500 text-[10px]">UPNL:</span>
             <div class="text-right">${upnlHtml}</div>
           </div>
         </div>
@@ -1820,6 +1924,38 @@ if (session) {
     }
   }
 
+  // Recalibrate chart window when active window changes or pinning to live
+  function recalcViewWindowToLive() {
+    const total = cachedTelemetryHistory.length;
+    if (total === 0) {
+      viewStartIdx = 0;
+      viewEndIdx = 0;
+      return;
+    }
+    let windowBars = total;
+    if (activeChartWindow === '1h') windowBars = 12;
+    else if (activeChartWindow === '6h') windowBars = 72;
+    else if (activeChartWindow === '24h') windowBars = 288;
+    else if (activeChartWindow === '3d') windowBars = 864;
+    else if (activeChartWindow === '1w') windowBars = 2016;
+    else if (activeChartWindow === 'all') windowBars = total;
+
+    viewEndIdx = total;
+    viewStartIdx = Math.max(0, total - windowBars);
+    isPinnedToLive = true;
+    updateJumpToLiveBtn();
+  }
+
+  function updateJumpToLiveBtn() {
+    const jumpBtn = document.getElementById('chart-jump-live-btn');
+    if (!jumpBtn) return;
+    if (!isPinnedToLive && cachedTelemetryHistory.length > 0) {
+      jumpBtn.classList.remove('hidden');
+    } else {
+      jumpBtn.classList.add('hidden');
+    }
+  }
+
   function renderChart(history: any[]) {
     const emptyState = document.getElementById('chart-empty-state');
     const navArea = document.getElementById('chart-nav-area');
@@ -1843,31 +1979,24 @@ if (session) {
       if (yLabels) yLabels.innerHTML = '';
       if (highLowGuides) highLowGuides.innerHTML = '';
       if (periodReturnEl) periodReturnEl.textContent = '+$0.00 (+0.00%)';
-      if (periodStatsEl) periodStatsEl.textContent = 'Periode Hoogste: -- • Periode Laagste: -- • Bars in Beeld: 0';
+      if (periodStatsEl) periodStatsEl.textContent = 'Period High: -- • Period Low: -- • Bars in View: 0';
       return;
     }
 
     if (emptyState) emptyState.classList.add('hidden');
 
-    // Chronological order: oldest to newest
-    const sortedAll = [...history].sort((a, b) => Number(a.timestamp_ms) - Number(b.timestamp_ms));
-    let visibleBars = sortedAll;
-    if (activeTimeframe !== 'all') {
-      const count = parseInt(activeTimeframe, 10);
-      if (!isNaN(count) && count > 0) {
-        visibleBars = sortedAll.slice(-count);
-      }
-    }
+    // Slice according to drag-to-pan & timeframe view bounds
+    const end = Math.min(history.length, Math.max(1, viewEndIdx || history.length));
+    const start = Math.max(0, Math.min(end - 1, viewStartIdx));
+    let visibleBars = history.slice(start, end);
 
     if (visibleBars.length === 0) {
-      visibleBars = sortedAll.slice(-1);
+      visibleBars = history.slice(-1);
     }
 
     // Update Subtitle
     if (chartSubtitle) {
-      chartSubtitle.textContent = activeTimeframe === 'all'
-        ? `// MULTI-BAR TELEMETRIE (ALLE ${visibleBars.length} BARS)`
-        : `// MULTI-BAR TELEMETRIE (LAATSTE ${visibleBars.length} BARS)`;
+      chartSubtitle.textContent = `// MULTI-BAR TELEMETRY (${visibleBars.length} BARS IN VIEW • TOTAL LOADED: ${history.length})`;
     }
 
     // Period Return (Delta NAV & Delta %)
@@ -1888,7 +2017,7 @@ if (session) {
     const periodMinNav = Math.min(...visibleBars.map(d => Number(d.nav_usd) || 0));
     const periodMaxNav = Math.max(...visibleBars.map(d => Number(d.nav_usd) || 0));
     if (periodStatsEl) {
-      periodStatsEl.textContent = `Periode Hoogste: ${formatUsd(periodMaxNav)} • Periode Laagste: ${formatUsd(periodMinNav)} • Bars in Beeld: ${visibleBars.length}`;
+      periodStatsEl.textContent = `Period High: ${formatUsd(periodMaxNav)} • Period Low: ${formatUsd(periodMinNav)} • Bars in View: ${visibleBars.length}`;
     }
 
     // Canvas layout dimensions
@@ -1961,9 +2090,9 @@ if (session) {
         const yLow = scaleYNav(periodMinNav);
         highLowGuides.innerHTML = `
           <line x1="${padLeft}" y1="${yHigh}" x2="${width - padRight}" y2="${yHigh}" stroke="#34d399" stroke-width="0.75" stroke-dasharray="3,3" opacity="0.6" />
-          <text x="${width - padRight - 6}" y="${yHigh - 4}" fill="#34d399" font-size="9" font-family="monospace" text-anchor="end">HOOG: ${formatUsd(periodMaxNav)}</text>
+          <text x="${width - padRight - 6}" y="${yHigh - 4}" fill="#34d399" font-size="9" font-family="monospace" text-anchor="end">HIGH: ${formatUsd(periodMaxNav)}</text>
           <line x1="${padLeft}" y1="${yLow}" x2="${width - padRight}" y2="${yLow}" stroke="#f87171" stroke-width="0.75" stroke-dasharray="3,3" opacity="0.6" />
-          <text x="${width - padRight - 6}" y="${yLow + 11}" fill="#f87171" font-size="9" font-family="monospace" text-anchor="end">LAAG: ${formatUsd(periodMinNav)}</text>
+          <text x="${width - padRight - 6}" y="${yLow + 11}" fill="#f87171" font-size="9" font-family="monospace" text-anchor="end">LOW: ${formatUsd(periodMinNav)}</text>
         `;
       } else {
         highLowGuides.innerHTML = '';
@@ -2031,8 +2160,131 @@ if (session) {
       betaPath.setAttribute('d', showSeriesBeta ? betaPathD : '');
       betaPath.style.display = showSeriesBeta ? '' : 'none';
     }
+  }
 
-    // Interactive Hover Crosshair & HUD Tooltip Binding
+  // TradingView Drag-to-Pan and Mouse Wheel Zoom interaction handler
+  function setupChartInteractions() {
+    const svgEl = document.getElementById('telemetry-chart-svg');
+    if (!svgEl || svgEl.dataset.interactionsBound) return;
+    svgEl.dataset.interactionsBound = 'true';
+
+    const width = 1100;
+    const padLeft = 65;
+    const padRight = 65;
+    const chartW = width - padLeft - padRight;
+
+    const getSvgX = (clientX: number) => {
+      const rect = svgEl.getBoundingClientRect();
+      return ((clientX - rect.left) / rect.width) * width;
+    };
+
+    // Mousedown
+    const onPointerDown = (e: MouseEvent | TouchEvent) => {
+      if (cachedTelemetryHistory.length <= 1) return;
+      const clientX = 'touches' in e ? e.touches[0].clientX : (e as MouseEvent).clientX;
+      const svgX = getSvgX(clientX);
+      if (svgX < padLeft || svgX > width - padRight) return;
+
+      isDragging = true;
+      dragStartX = clientX;
+      dragStartViewStart = viewStartIdx;
+      dragStartViewEnd = viewEndIdx;
+      svgEl.style.cursor = 'grabbing';
+    };
+
+    // Mousemove / Drag
+    const onPointerMove = (e: MouseEvent | TouchEvent) => {
+      const clientX = 'touches' in e ? e.touches[0].clientX : (e as MouseEvent).clientX;
+
+      if (isDragging) {
+        const deltaX = clientX - dragStartX;
+        const rect = svgEl.getBoundingClientRect();
+        const deltaRatio = deltaX / rect.width;
+        const currentSpan = Math.max(5, dragStartViewEnd - dragStartViewStart);
+        const deltaBars = Math.round(deltaRatio * currentSpan);
+
+        let newStart = dragStartViewStart - deltaBars;
+        let newEnd = dragStartViewEnd - deltaBars;
+
+        if (newStart < 0) {
+          newStart = 0;
+          newEnd = Math.min(cachedTelemetryHistory.length, currentSpan);
+        }
+        if (newEnd > cachedTelemetryHistory.length) {
+          newEnd = cachedTelemetryHistory.length;
+          newStart = Math.max(0, newEnd - currentSpan);
+        }
+
+        viewStartIdx = newStart;
+        viewEndIdx = newEnd;
+        isPinnedToLive = (viewEndIdx >= cachedTelemetryHistory.length);
+        updateJumpToLiveBtn();
+        renderChart(cachedTelemetryHistory);
+        return;
+      }
+
+      handleChartHover(clientX);
+    };
+
+    const onPointerUp = () => {
+      if (isDragging) {
+        isDragging = false;
+        svgEl.style.cursor = 'crosshair';
+      }
+    };
+
+    // Wheel zoom
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      if (cachedTelemetryHistory.length <= 5) return;
+
+      const zoomFactor = e.deltaY > 0 ? 1.2 : 0.8;
+      const span = Math.max(5, viewEndIdx - viewStartIdx);
+      const newSpan = Math.max(10, Math.min(cachedTelemetryHistory.length, Math.round(span * zoomFactor)));
+
+      const svgX = getSvgX(e.clientX);
+      const frac = Math.max(0, Math.min(1, (svgX - padLeft) / chartW));
+      const centerBar = viewStartIdx + frac * span;
+
+      let newStart = Math.round(centerBar - frac * newSpan);
+      let newEnd = newStart + newSpan;
+
+      if (newStart < 0) {
+        newStart = 0;
+        newEnd = Math.min(cachedTelemetryHistory.length, newSpan);
+      }
+      if (newEnd > cachedTelemetryHistory.length) {
+        newEnd = cachedTelemetryHistory.length;
+        newStart = Math.max(0, newEnd - newSpan);
+      }
+
+      viewStartIdx = newStart;
+      viewEndIdx = newEnd;
+      isPinnedToLive = (viewEndIdx >= cachedTelemetryHistory.length);
+      updateJumpToLiveBtn();
+      renderChart(cachedTelemetryHistory);
+    };
+
+    svgEl.addEventListener('mousedown', onPointerDown);
+    svgEl.addEventListener('touchstart', onPointerDown, { passive: true });
+
+    window.addEventListener('mousemove', onPointerMove);
+    window.addEventListener('touchmove', onPointerMove, { passive: true });
+
+    window.addEventListener('mouseup', onPointerUp);
+    window.addEventListener('touchend', onPointerUp);
+
+    svgEl.addEventListener('wheel', onWheel, { passive: false });
+
+    // Jump to live button
+    const jumpBtn = document.getElementById('chart-jump-live-btn');
+    jumpBtn?.addEventListener('click', () => {
+      recalcViewWindowToLive();
+      renderChart(cachedTelemetryHistory);
+    });
+  }
+
+  function handleChartHover(clientX: number) {
     const svgEl = document.getElementById('telemetry-chart-svg');
     const crosshairGroup = document.getElementById('chart-crosshair-group');
     const crosshairV = document.getElementById('crosshair-v');
@@ -2044,95 +2296,465 @@ if (session) {
     const tipBeta = document.getElementById('tip-beta-val');
     const tipLev = document.getElementById('tip-lev-val');
 
-    if (svgEl && !svgEl.dataset.crosshairBound) {
-      svgEl.dataset.crosshairBound = 'true';
-
-      const handleMove = (e: MouseEvent | TouchEvent) => {
-        if (!lastVisiblePoints || lastVisiblePoints.navPoints.length === 0) return;
-        const rect = svgEl.getBoundingClientRect();
-        const clientX = 'touches' in e && e.touches.length > 0 ? e.touches[0].clientX : (e as MouseEvent).clientX;
-        const mouseX = ((clientX - rect.left) / rect.width) * width;
-
-        if (mouseX < padLeft || mouseX > width - padRight) {
-          if (crosshairGroup) crosshairGroup.setAttribute('opacity', '0');
-          if (hud) hud.classList.add('hidden');
-          return;
-        }
-
-        const { navPoints: pts, betaPoints: bpts, firstNav: startNav } = lastVisiblePoints;
-        let nearestIdx = 0;
-        let minDist = Infinity;
-        for (let i = 0; i < pts.length; i++) {
-          const dist = Math.abs(pts[i].x - mouseX);
-          if (dist < minDist) {
-            minDist = dist;
-            nearestIdx = i;
-          }
-        }
-
-        const np = pts[nearestIdx];
-        const bp = bpts[nearestIdx];
-        const record = np.data;
-
-        if (crosshairGroup) crosshairGroup.setAttribute('opacity', '1');
-        if (crosshairV) {
-          crosshairV.setAttribute('x1', np.x.toString());
-          crosshairV.setAttribute('x2', np.x.toString());
-        }
-        if (dotNav) {
-          if (showSeriesNav) {
-            dotNav.setAttribute('cx', np.x.toString());
-            dotNav.setAttribute('cy', np.y.toString());
-            dotNav.style.display = '';
-          } else {
-            dotNav.style.display = 'none';
-          }
-        }
-        if (dotBeta) {
-          if (showSeriesBeta) {
-            dotBeta.setAttribute('cx', bp.x.toString());
-            dotBeta.setAttribute('cy', bp.y.toString());
-            dotBeta.style.display = '';
-          } else {
-            dotBeta.style.display = 'none';
-          }
-        }
-
-        if (hud && tipMeta && tipNav && tipBeta && tipLev) {
-          const d = new Date(Number(record.timestamp_ms));
-          const timeStr = d.toISOString().replace('T', ' ').substring(0, 16);
-          tipMeta.textContent = `Bar #${record.bar_idx} • ${timeStr} UTC`;
-
-          const bNav = Number(record.nav_usd) || 0;
-          const diffVsStart = bNav - startNav;
-          const signVsStart = diffVsStart >= 0 ? '+' : '-';
-          tipNav.textContent = `${formatUsd(bNav)} (${signVsStart}${formatUsd(Math.abs(diffVsStart))})`;
-
-          const bBeta = Number(record.realized_tail_beta) || 0;
-          tipBeta.textContent = `${bBeta >= 0 ? '+' : ''}${bBeta.toFixed(4)}`;
-
-          const bLev = Number(record.gross_leverage ?? 0);
-          tipLev.textContent = `${bLev.toFixed(2)}x`;
-
-          hud.classList.remove('hidden');
-        }
-      };
-
-      const handleLeave = () => {
-        if (crosshairGroup) crosshairGroup.setAttribute('opacity', '0');
-        if (hud) hud.classList.add('hidden');
-      };
-
-      svgEl.addEventListener('mousemove', handleMove);
-      svgEl.addEventListener('touchmove', handleMove, { passive: true });
-      svgEl.addEventListener('mouseleave', handleLeave);
-      svgEl.addEventListener('touchend', handleLeave);
+    if (!svgEl || !lastVisiblePoints || lastVisiblePoints.navPoints.length === 0) {
+      if (crosshairGroup) crosshairGroup.setAttribute('opacity', '0');
+      if (hud) hud.classList.add('hidden');
+      return;
     }
+
+    const rect = svgEl.getBoundingClientRect();
+    const width = 1100;
+    const padLeft = 65;
+    const padRight = 65;
+    const mouseX = ((clientX - rect.left) / rect.width) * width;
+
+    if (mouseX < padLeft || mouseX > width - padRight) {
+      if (crosshairGroup) crosshairGroup.setAttribute('opacity', '0');
+      if (hud) hud.classList.add('hidden');
+      return;
+    }
+
+    const { navPoints: pts, betaPoints: bpts, firstNav: startNav } = lastVisiblePoints;
+    let nearestIdx = 0;
+    let minDist = Infinity;
+    for (let i = 0; i < pts.length; i++) {
+      const dist = Math.abs(pts[i].x - mouseX);
+      if (dist < minDist) {
+        minDist = dist;
+        nearestIdx = i;
+      }
+    }
+
+    const np = pts[nearestIdx];
+    const bp = bpts[nearestIdx];
+    const record = np.data;
+
+    if (crosshairGroup) crosshairGroup.setAttribute('opacity', '1');
+    if (crosshairV) {
+      crosshairV.setAttribute('x1', np.x.toString());
+      crosshairV.setAttribute('x2', np.x.toString());
+    }
+    if (dotNav) {
+      if (showSeriesNav) {
+        dotNav.setAttribute('cx', np.x.toString());
+        dotNav.setAttribute('cy', np.y.toString());
+        dotNav.style.display = '';
+      } else {
+        dotNav.style.display = 'none';
+      }
+    }
+    if (dotBeta) {
+      if (showSeriesBeta) {
+        dotBeta.setAttribute('cx', bp.x.toString());
+        dotBeta.setAttribute('cy', bp.y.toString());
+        dotBeta.style.display = '';
+      } else {
+        dotBeta.style.display = 'none';
+      }
+    }
+
+    if (hud && tipMeta && tipNav && tipBeta && tipLev) {
+      const d = new Date(Number(record.timestamp_ms));
+      const timeStr = d.toISOString().replace('T', ' ').substring(0, 16);
+      tipMeta.textContent = `Bar #${record.bar_idx} • ${timeStr} UTC`;
+
+      const bNav = Number(record.nav_usd) || 0;
+      const diffVsStart = bNav - startNav;
+      const signVsStart = diffVsStart >= 0 ? '+' : '-';
+      tipNav.textContent = `${formatUsd(bNav)} (${signVsStart}${formatUsd(Math.abs(diffVsStart))})`;
+
+      const bBeta = Number(record.realized_tail_beta) || 0;
+      tipBeta.textContent = `${bBeta >= 0 ? '+' : ''}${bBeta.toFixed(4)}`;
+
+      const bLev = Number(record.gross_leverage ?? 0);
+      tipLev.textContent = `${bLev.toFixed(2)}x`;
+
+      hud.classList.remove('hidden');
+    }
+  }
+
+  // ==========================================
+  // REAL-TIME CONNECTIVITY TRIANGLE
+  // ==========================================
+  function initBinanceWebSocket() {
+    if (typeof window === 'undefined') return;
+    if (binanceWs) {
+      try { binanceWs.close(); } catch {}
+      binanceWs = null;
+    }
+    if (wsReconnectTimer) {
+      clearTimeout(wsReconnectTimer);
+      wsReconnectTimer = null;
+    }
+
+    const badge = document.getElementById('binance-ws-badge');
+    const label = document.getElementById('binance-ws-label');
+
+    try {
+      const streamUrl = 'wss://fstream.binance.com/stream?streams=btcusdc@bookTicker/ethusdc@bookTicker/solusdc@bookTicker/suiusdt@bookTicker/xrpusdc@bookTicker/dogeusdc@bookTicker';
+      binanceWs = new WebSocket(streamUrl);
+
+      binanceWs.onopen = () => {
+        if (badge && label) {
+          badge.className = 'inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-mono text-[10px] font-bold shadow-sm';
+          badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span><span id="binance-ws-label">BINANCE CLOB WS: LIVE (&lt;50ms)</span>';
+        }
+      };
+
+      binanceWs.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          const d = payload?.data;
+          if (d && d.s && d.b && d.a) {
+            const mid = (parseFloat(d.b) + parseFloat(d.a)) / 2;
+            if (!isNaN(mid) && mid > 0) {
+              liveMidPrices[d.s.toUpperCase()] = mid;
+              scheduleThrottledUpdate();
+            }
+          }
+        } catch {}
+      };
+
+      binanceWs.onerror = () => handleWsDisconnect();
+      binanceWs.onclose = () => handleWsDisconnect();
+    } catch {
+      handleWsDisconnect();
+    }
+  }
+
+  function handleWsDisconnect() {
+    const badge = document.getElementById('binance-ws-badge');
+    if (badge) {
+      badge.className = 'inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/30 font-mono text-[10px] font-bold shadow-sm';
+      badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span><span id="binance-ws-label">BINANCE CLOB WS: RECONNECTING...</span>';
+    }
+    if (!wsReconnectTimer) {
+      wsReconnectTimer = setTimeout(() => {
+        wsReconnectTimer = null;
+        initBinanceWebSocket();
+      }, 4000);
+    }
+  }
+
+  function scheduleThrottledUpdate() {
+    const now = Date.now();
+    if (now - lastTickTime >= 150) {
+      lastTickTime = now;
+      fastTick();
+    } else if (!tickPending) {
+      tickPending = true;
+      setTimeout(() => {
+        tickPending = false;
+        lastTickTime = Date.now();
+        fastTick();
+      }, 150 - (now - lastTickTime));
+    }
+  }
+
+  function fastTick() {
+    if (!latestTelemetryRow) return;
+
+    const positions = latestTelemetryRow.positions_lots || latestTelemetryRow.positions || {};
+    const ledgerUpnl = Number(latestTelemetryRow.unrealized_pnl_usd) || 0;
+    const walletBalance = Number(latestTelemetryRow.wallet_balance_usd) || 0;
+    const navUsdInitial = Number(latestTelemetryRow.nav_usd) || 100000;
+
+    // Recompute basket holdings with liveMidPrices
+    const holdings = computeAllBasketHoldings(positions, navUsdInitial, ledgerUpnl, liveMidPrices);
+
+    let activeLegs = 0;
+    let totalGrossExposure = 0;
+    let totalBasketUpnl = 0;
+
+    for (const h of holdings) {
+      if (h.direction !== 'FLAT') {
+        activeLegs++;
+        totalGrossExposure += Math.abs(h.notional_usd);
+        totalBasketUpnl += h.upnl_usd;
+      }
+    }
+
+    const effectiveUpnl = (activeLegs > 0 && Math.abs(totalBasketUpnl) > 0.001) ? totalBasketUpnl : ledgerUpnl;
+    const liveNav = walletBalance + effectiveUpnl;
+
+    // Update Card 1: NAV and Unrealized PnL
+    const navVal = document.getElementById('nav-usd-val');
+    const upnlVal = document.getElementById('unrealized-pnl-val');
+    if (navVal) navVal.textContent = formatUsd(liveNav);
+    if (upnlVal) {
+      upnlVal.textContent = `${effectiveUpnl >= 0 ? '+' : ''}${formatUsd(effectiveUpnl)}`;
+      upnlVal.className = effectiveUpnl >= 0 ? 'font-bold text-emerald-400' : 'font-bold text-rose-400';
+    }
+
+    // Update 6-Asset Basket Table
+    renderBasketTable(positions, liveNav, effectiveUpnl, liveMidPrices);
+
+    // Update Card 6 & Multi-Partition Ledger
+    updatePoolSubLedger(liveNav);
+  }
+
+  function initSupabaseRealtime(accessToken: string) {
+    if (realtimeChannel) {
+      try { supabase.removeChannel(realtimeChannel); } catch {}
+      realtimeChannel = null;
+    }
+
+    const vpsBadge = document.getElementById('vps-realtime-badge');
+
+    realtimeChannel = supabase
+      .channel('quant-telemetry-triangle')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'quant_satellite_telemetry' }, (payload) => {
+        const row = payload.new as any;
+        if (row && (row.venue || 'paper') === getActiveVenue()) {
+          latestTelemetryRow = row;
+          const idx = cachedTelemetryHistory.findIndex(r => r.id === row.id || (r.bar_idx === row.bar_idx && r.timestamp_ms === row.timestamp_ms));
+          if (idx >= 0) {
+            cachedTelemetryHistory[idx] = row;
+          } else {
+            cachedTelemetryHistory.push(row);
+            cachedTelemetryHistory.sort((a, b) => Number(a.timestamp_ms) - Number(b.timestamp_ms));
+          }
+          telemetryHistoryRows = cachedTelemetryHistory;
+
+          renderSection1(latestTelemetryRow);
+          renderSection2(latestTelemetryRow);
+
+          if (isPinnedToLive) {
+            recalcViewWindowToLive();
+          }
+          renderSection3(latestTelemetryRow, cachedTelemetryHistory, liveMidPrices);
+          updatePoolSubLedger();
+        }
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'quant_satellite_commands' }, async () => {
+        await fetchAndRenderCommands(accessToken);
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'quant_pool_partitions' }, async () => {
+        await fetchAndRenderPartitions(accessToken);
+      })
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          if (vpsBadge) {
+            vpsBadge.className = 'inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 font-mono text-[10px] font-bold shadow-sm';
+            vpsBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span><span id="vps-realtime-label">TOKYO VPS REALTIME: CONNECTED</span>';
+          }
+        } else {
+          if (vpsBadge) {
+            vpsBadge.className = 'inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded bg-slate-200/80 dark:bg-slate-800/80 text-slate-500 border border-slate-300 dark:border-slate-700 font-mono text-[10px] font-bold shadow-sm';
+            vpsBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span><span id="vps-realtime-label">TOKYO VPS: CONNECTING...</span>';
+          }
+        }
+      });
+  }
+
+  // ==========================================
+  // MULTI-PARTITION & HWM SUB-LEDGER
+  // ==========================================
+  async function fetchAndRenderPartitions(accessToken: string) {
+    try {
+      const res = await fetch('/api/quant/partitions', {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.ok && Array.isArray(json.partitions)) {
+          currentPartitions = json.partitions;
+          updatePoolSubLedger();
+        }
+      }
+    } catch (e) {
+      console.warn('Error fetching pool partitions:', e);
+    }
+  }
+
+  function updatePoolSubLedger(liveNavOverride?: number) {
+    if (currentPartitions.length === 0) return;
+
+    const liveNav = liveNavOverride !== undefined
+      ? liveNavOverride
+      : (latestTelemetryRow ? Number(latestTelemetryRow.nav_usd) : 2750) || 2750;
+
+    const valResult = computePoolPartitionValuations(currentPartitions, liveNav);
+    latestValuationResult = valResult;
+
+    // Update Card 6 Metrics
+    const unitPriceEl = document.getElementById('pool-gross-unit-price');
+    const partitionsCountEl = document.getElementById('pool-active-partitions-count');
+    const thijsFeesEl = document.getElementById('pool-thijs-accrued-fees');
+    const totalNetValEl = document.getElementById('pool-total-net-val');
+    const masterShareEl = document.getElementById('pool-master-share-pct');
+
+    if (unitPriceEl) {
+      unitPriceEl.textContent = `$${valResult.grossUnitPrice.toFixed(4)}`;
+    }
+    if (partitionsCountEl) {
+      const activeCount = valResult.valuations.filter(v => v.status === 'ACTIVE').length;
+      partitionsCountEl.textContent = `${activeCount} ACTIVE ${activeCount === 1 ? 'NODE' : 'NODES'}`;
+    }
+    if (thijsFeesEl) {
+      thijsFeesEl.textContent = `+$${valResult.totalAccruedFeesFromOthers.toFixed(2)}`;
+    }
+    if (totalNetValEl) {
+      totalNetValEl.textContent = formatUsd(valResult.totalNetPoolUsd);
+    }
+    if (masterShareEl) {
+      const masterVal = valResult.valuations.find(v => v.is_master);
+      masterShareEl.textContent = `${(masterVal?.pool_share_pct || 100).toFixed(1)}%`;
+    }
+
+    // Update Section 5 Table & Footer
+    renderPartitionsTable(valResult);
+  }
+
+  function renderPartitionsTable(valResult: PoolValuationResult) {
+    const tbody = document.getElementById('partitions-table-body');
+    const footerUnits = document.getElementById('pool-footer-total-units');
+    const footerGross = document.getElementById('pool-footer-gross-nav');
+    const footerNet = document.getElementById('pool-footer-net-equity');
+    const footerFees = document.getElementById('pool-footer-total-fees');
+
+    if (footerUnits) footerUnits.textContent = valResult.totalUnits.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (footerGross) footerGross.textContent = formatUsd(valResult.totalGrossUsd);
+    if (footerNet) footerNet.textContent = formatUsd(valResult.totalNetPoolUsd);
+    if (footerFees) footerFees.textContent = `+$${valResult.totalAccruedFeesFromOthers.toFixed(2)}`;
+
+    if (!tbody) return;
+
+    if (valResult.valuations.length === 0) {
+      tbody.innerHTML = `
+        <tr class="text-slate-500">
+          <td colspan="10" class="py-4 text-center text-xs">
+            No active pool partitions found. Click "+ Add Participant" to initialize.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = valResult.valuations.map(val => {
+      const isMaster = val.is_master;
+      const roleBadge = isMaster
+        ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">MASTER NODE</span>'
+        : `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-800 text-slate-300 border border-slate-700">${val.relation_label || 'PARTICIPANT'}</span>`;
+
+      const roiColor = val.net_roi_pct > 0.005 ? 'text-emerald-400' : (val.net_roi_pct < -0.005 ? 'text-rose-400' : 'text-slate-400');
+      const roiSign = val.net_roi_pct > 0.005 ? '+' : '';
+      const feeDisplay = isMaster ? '<span class="text-slate-500">0.0% (Exempt)</span>' : `${val.performance_fee_pct.toFixed(1)}%`;
+      const accruedDisplay = isMaster
+        ? `<span class="text-emerald-400 font-bold">+$${valResult.totalAccruedFeesFromOthers.toFixed(2)} (Claim)</span>`
+        : (val.accrued_fee_usd > 0.005 ? `<span class="text-amber-400 font-bold">+$${val.accrued_fee_usd.toFixed(2)}</span>` : '<span class="text-slate-500">$0.00</span>');
+
+      const actionsHtml = `
+        <div class="flex items-center justify-center space-x-1.5">
+          <button
+            type="button"
+            data-action="adjust-capital"
+            data-id="${val.id}"
+            data-name="${val.participant_name}"
+            title="Deposit or withdraw capital"
+            class="partition-action-btn px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-semibold border border-slate-700 transition-colors cursor-pointer"
+          >
+            Adjust
+          </button>
+          ${!isMaster ? `
+            <button
+              type="button"
+              data-action="update-fee"
+              data-id="${val.id}"
+              data-name="${val.participant_name}"
+              data-fee="${val.performance_fee_pct}"
+              title="Update performance fee percentage"
+              class="partition-action-btn px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-semibold border border-slate-700 transition-colors cursor-pointer"
+            >
+              Fee%
+            </button>
+            <button
+              type="button"
+              data-action="delete"
+              data-id="${val.id}"
+              data-name="${val.participant_name}"
+              title="Remove participant partition"
+              class="partition-action-btn px-2 py-1 rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-[10px] font-semibold border border-rose-500/30 transition-colors cursor-pointer"
+            >
+              &times;
+            </button>
+          ` : ''}
+        </div>
+      `;
+
+      return `
+        <tr class="hover:bg-slate-200/50 dark:hover:bg-slate-800/40 transition-colors">
+          <td class="py-2.5 pr-3">
+            <div class="flex items-center space-x-2">
+              <span class="font-bold text-slate-900 dark:text-slate-100">${val.participant_name}</span>
+              ${roleBadge}
+            </div>
+            ${val.notes ? `<div class="text-[10px] text-slate-500 truncate max-w-xs">${val.notes}</div>` : ''}
+          </td>
+          <td class="py-2.5 px-3 text-right text-slate-700 dark:text-slate-300">
+            ${val.units_owned.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </td>
+          <td class="py-2.5 px-3 text-right text-slate-700 dark:text-slate-300">
+            ${formatUsd(val.net_invested_usd)}
+          </td>
+          <td class="py-2.5 px-3 text-right font-bold text-slate-900 dark:text-slate-100">
+            ${formatUsd(val.net_value_usd)}
+          </td>
+          <td class="py-2.5 px-3 text-right text-cyan-600 dark:text-cyan-400 font-semibold">
+            ${val.pool_share_pct.toFixed(2)}%
+          </td>
+          <td class="py-2.5 px-3 text-right font-bold ${roiColor}">
+            ${roiSign}${val.net_roi_pct.toFixed(2)}%
+          </td>
+          <td class="py-2.5 px-3 text-right text-slate-400">
+            $${val.high_water_mark_unit_price.toFixed(4)}
+          </td>
+          <td class="py-2.5 px-3 text-right text-slate-300">
+            ${feeDisplay}
+          </td>
+          <td class="py-2.5 px-3 text-right">
+            ${accruedDisplay}
+          </td>
+          <td class="py-2.5 pl-3 text-center">
+            ${actionsHtml}
+          </td>
+        </tr>
+      `;
+    }).join('');
   }
 
   // ==========================================
   // SECTION 4 RENDERER (COMMANDS QUEUE TABLE)
   // ==========================================
+  async function fetchAndRenderCommands(accessToken: string) {
+    let commands: any[] = [];
+    try {
+      const cmdRes = await fetch('/api/quant/command', {
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+      });
+      if (cmdRes.ok) {
+        const json = await cmdRes.json();
+        commands = json.commands || [];
+      }
+    } catch (e) {
+      console.warn('API error fetching commands, falling back to direct supabase query:', e);
+    }
+
+    if (commands.length === 0) {
+      const { data: directCmds } = await supabase
+        .from('quant_satellite_commands')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(10);
+      commands = directCmds || [];
+    }
+
+    recentCommands = commands;
+    renderCommandsTable(commands);
+  }
+
   function renderCommandsTable(commands: any[]) {
     const tbody = document.getElementById('commands-table-body');
     if (!tbody) return;
@@ -2248,11 +2870,11 @@ if (session) {
       if (ok) {
         if (copySatLabel) copySatLabel.textContent = 'Gekopieerd!';
         setTimeout(() => {
-          if (copySatLabel) copySatLabel.textContent = 'Kopieer AI Snapshot';
+          if (copySatLabel) copySatLabel.textContent = 'Copy AI Snapshot';
         }, 2000);
         showDiagnosticToast('[OK] Quant-Satellite AI Snapshot gekopieerd naar klembord!');
       } else {
-        showDiagnosticToast('[FOUT] Kopiëren naar klembord mislukt', true);
+        showDiagnosticToast('[ERROR] Failed to copy to clipboard', true);
       }
     });
 
@@ -2270,7 +2892,7 @@ if (session) {
 
       const barIdx = latestTelemetryRow?.bar_idx ?? 0;
       triggerJsonDownload(`quant_satellite_audit_bar_${barIdx}.json`, auditJson);
-      showDiagnosticToast(`[OK] quant_satellite_audit_bar_${barIdx}.json gedownload!`);
+      showDiagnosticToast(`[OK] quant_satellite_audit_bar_${barIdx}.json downloaded!`);
     });
 
     // Environment Switchers (Paper / Live)
@@ -2302,13 +2924,13 @@ if (session) {
       }
     });
 
-    // Timeframe Pills
+    // Timeframe Pills (1H, 6H, 24H, 3D, 1W, ALL)
     const tfButtons = document.querySelectorAll<HTMLButtonElement>('.chart-tf-btn');
     tfButtons.forEach(btn => {
       btn.addEventListener('click', () => {
-        const tf = btn.getAttribute('data-chart-tf') as any;
-        if (!tf || tf === activeTimeframe) return;
-        activeTimeframe = tf;
+        const windowAttr = btn.getAttribute('data-chart-window') as any;
+        if (!windowAttr || windowAttr === activeChartWindow) return;
+        activeChartWindow = windowAttr;
 
         tfButtons.forEach(b => {
           b.classList.remove('active', 'font-bold', 'bg-white', 'dark:bg-slate-800', 'text-cyan-600', 'dark:text-cyan-400', 'shadow-sm');
@@ -2317,6 +2939,7 @@ if (session) {
         btn.classList.add('active', 'font-bold', 'bg-white', 'dark:bg-slate-800', 'text-cyan-600', 'dark:text-cyan-400', 'shadow-sm');
         btn.classList.remove('text-slate-500');
 
+        recalcViewWindowToLive();
         renderChart(cachedTelemetryHistory);
       });
     });
@@ -2362,29 +2985,7 @@ if (session) {
       renderChart(cachedTelemetryHistory);
     });
 
-    // Calculator Inputs
-    const coreInput = document.getElementById('core-balance-input') as HTMLInputElement | null;
-    const salaryInput = document.getElementById('salary-deposit-input') as HTMLInputElement | null;
-    const resetCoreLiveBtn = document.getElementById('reset-core-live-btn');
-
-    coreInput?.addEventListener('input', () => {
-      if (coreInput) coreInput.dataset.userEdited = 'true';
-      updateCalculatorOutputs();
-    });
-
-    salaryInput?.addEventListener('input', () => {
-      updateCalculatorOutputs();
-    });
-
-    resetCoreLiveBtn?.addEventListener('click', () => {
-      if (liveAlpacaCoreNav != null && coreInput) {
-        delete coreInput.dataset.userEdited;
-        coreInput.value = liveAlpacaCoreNav.toFixed(2);
-        updateCalculatorOutputs();
-      }
-    });
-
-    // Reason length counter
+    // C2 Reason length counter
     const reasonInput = document.getElementById('c2-reason-input') as HTMLInputElement | null;
     const charCount = document.getElementById('reason-char-count');
     reasonInput?.addEventListener('input', () => {
@@ -2400,7 +3001,7 @@ if (session) {
       fbBanner?.classList.add('hidden');
     });
 
-    // Modal elements
+    // C2 Modal elements
     const modal = document.getElementById('c2-modal');
     const modalStateBadge = document.getElementById('modal-target-state-badge');
     const modalTargetNav = document.getElementById('modal-target-nav');
@@ -2431,7 +3032,7 @@ if (session) {
               reasonInput.classList.remove('border-rose-500', 'ring-2', 'ring-rose-500/30');
             }, 3000);
           }
-          showFeedback('Please provide a Reason / Audit Note before dispatching a state transition.', 'error');
+          showFeedback('Vul een reden / auditnotitie in voordat je een statusovergang verzendt.', 'error');
           return;
         }
 
@@ -2460,7 +3061,7 @@ if (session) {
       });
     });
 
-    // Confirm button in modal -> POST /api/quant/command
+    // Confirm button in C2 modal -> POST /api/quant/command
     modalConfirmBtn?.addEventListener('click', async () => {
       if (!pendingTargetState) return;
 
@@ -2468,9 +3069,8 @@ if (session) {
       const targetNavInput = document.getElementById('c2-target-nav-input') as HTMLInputElement | null;
       const targetNavVal = targetNavInput?.value ? Number(targetNavInput.value) : null;
 
-      // Loading state in modal
       modalConfirmSpinner?.classList.remove('hidden');
-      if (modalConfirmLabel) modalConfirmLabel.textContent = 'Transmitting...';
+      if (modalConfirmLabel) modalConfirmLabel.textContent = 'Verzenden...';
       if (modalConfirmBtn) (modalConfirmBtn as HTMLButtonElement).disabled = true;
 
       try {
@@ -2494,21 +3094,228 @@ if (session) {
         }
 
         closeModal();
-        showFeedback(`Successfully dispatched ${pendingTargetState} (Command ID: ${data.command_id.substring(0, 8)}...). Written to audit log.`, 'success');
+        showFeedback(`Succesvol ${pendingTargetState} verzonden (Commando-ID: ${data.command_id.substring(0, 8)}...). Weggeschreven naar auditlogboek.`, 'success');
 
-        // Clear input fields
         if (reasonInput) reasonInput.value = '';
         if (targetNavInput) targetNavInput.value = '';
         if (charCount) charCount.textContent = '0 / 250';
 
-        // Refresh dashboard
         await fetchAndRenderAll(accessToken, false);
       } catch (err: any) {
-        showFeedback(`Error dispatching C2 command: ${err.message}`, 'error');
+        showFeedback(`Fout bij verzenden C2-commando: ${err.message}`, 'error');
       } finally {
         modalConfirmSpinner?.classList.add('hidden');
-        if (modalConfirmLabel) modalConfirmLabel.textContent = 'Confirm & Transmit';
+        if (modalConfirmLabel) modalConfirmLabel.textContent = 'Bevestigen & Verzenden';
         if (modalConfirmBtn) (modalConfirmBtn as HTMLButtonElement).disabled = false;
+      }
+    });
+
+    // Multi-Partition Console Listeners
+    const addPartitionBtn = document.getElementById('add-partition-btn');
+    const partitionModal = document.getElementById('partition-modal');
+    const partModalTitle = document.getElementById('partition-modal-title');
+    const partModalAction = document.getElementById('partition-modal-action') as HTMLInputElement | null;
+    const partModalId = document.getElementById('partition-modal-id') as HTMLInputElement | null;
+    const partNameInput = document.getElementById('partition-name-input') as HTMLInputElement | null;
+    const partRelationInput = document.getElementById('partition-relation-input') as HTMLInputElement | null;
+    const partAmountLabel = document.getElementById('partition-amount-label');
+    const partAmountInput = document.getElementById('partition-amount-input') as HTMLInputElement | null;
+    const partFeeInput = document.getElementById('partition-fee-input') as HTMLInputElement | null;
+    const partNotesInput = document.getElementById('partition-notes-input') as HTMLInputElement | null;
+    const partNameGroup = document.getElementById('partition-name-group');
+    const partRelationGroup = document.getElementById('partition-relation-group');
+    const partFeeGroup = document.getElementById('partition-fee-group');
+    const partNotesGroup = document.getElementById('partition-notes-group');
+
+    addPartitionBtn?.addEventListener('click', () => {
+      if (partModalAction) partModalAction.value = 'CREATE_PARTITION';
+      if (partModalId) partModalId.value = '';
+      if (partModalTitle) partModalTitle.textContent = '// ADD POOL PARTICIPANT';
+      if (partNameGroup) partNameGroup.classList.remove('hidden');
+      if (partRelationGroup) partRelationGroup.classList.remove('hidden');
+      if (partFeeGroup) partFeeGroup.classList.remove('hidden');
+      if (partNotesGroup) partNotesGroup.classList.remove('hidden');
+      if (partAmountLabel) partAmountLabel.textContent = 'Initial Capital Deposit ($):';
+      if (partAmountInput) {
+        partAmountInput.placeholder = 'e.g., 500.00';
+        partAmountInput.value = '';
+        partAmountInput.closest('div')?.classList.remove('hidden');
+      }
+      if (partNameInput) partNameInput.value = '';
+      if (partRelationInput) partRelationInput.value = '';
+      if (partFeeInput) partFeeInput.value = '20.0';
+      if (partNotesInput) partNotesInput.value = '';
+      partitionModal?.classList.remove('hidden');
+    });
+
+    const partCloseBtn = document.getElementById('partition-modal-close-btn');
+    const partCancelBtn = document.getElementById('partition-modal-cancel-btn');
+    const closePartModal = () => { partitionModal?.classList.add('hidden'); };
+    [partCloseBtn, partCancelBtn].forEach(b => b?.addEventListener('click', closePartModal));
+
+    const partForm = document.getElementById('partition-form') as HTMLFormElement | null;
+    const partSubmitBtn = document.getElementById('partition-modal-submit-btn');
+    const partSpinner = document.getElementById('partition-modal-spinner');
+    const partSubmitLabel = document.getElementById('partition-modal-submit-label');
+
+    partForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const action = partModalAction?.value || 'CREATE_PARTITION';
+      const curUnitPrice = latestValuationResult?.grossUnitPrice || 1.0;
+
+      partSpinner?.classList.remove('hidden');
+      if (partSubmitLabel) partSubmitLabel.textContent = 'Saving...';
+      if (partSubmitBtn) (partSubmitBtn as HTMLButtonElement).disabled = true;
+
+      try {
+        let payload: any = { action };
+        if (action === 'CREATE_PARTITION') {
+          payload.participant_name = partNameInput?.value.trim();
+          payload.relation_label = partRelationInput?.value.trim() || 'Investor';
+          payload.initial_capital_usd = Number(partAmountInput?.value) || 0;
+          payload.performance_fee_pct = Number(partFeeInput?.value) || 0;
+          payload.current_unit_price = curUnitPrice;
+        } else if (action === 'ADJUST_CAPITAL') {
+          payload.partition_id = partModalId?.value;
+          payload.delta_capital_usd = Number(partAmountInput?.value) || 0;
+          payload.current_unit_price = curUnitPrice;
+        } else if (action === 'UPDATE_FEE_PCT') {
+          payload.partition_id = partModalId?.value;
+          payload.performance_fee_pct = Number(partFeeInput?.value) || 0;
+        }
+
+        const res = await fetch('/api/quant/partitions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const json = await res.json();
+        if (!res.ok || !json.ok) {
+          throw new Error(json.error || 'Failed to process partition action');
+        }
+
+        closePartModal();
+        showDiagnosticToast(`[OK] Partition action ${action} executed successfully!`);
+        await fetchAndRenderPartitions(accessToken);
+      } catch (err: any) {
+        alert(`Partition Error: ${err.message}`);
+      } finally {
+        partSpinner?.classList.add('hidden');
+        if (partSubmitLabel) partSubmitLabel.textContent = 'Confirm & Save';
+        if (partSubmitBtn) (partSubmitBtn as HTMLButtonElement).disabled = false;
+      }
+    });
+
+    // Table Actions (Adjust Capital, Fee%, Remove)
+    const partTableBody = document.getElementById('partitions-table-body');
+    partTableBody?.addEventListener('click', async (e) => {
+      const target = (e.target as HTMLElement).closest('.partition-action-btn') as HTMLButtonElement | null;
+      if (!target) return;
+      const action = target.getAttribute('data-action');
+      const id = target.getAttribute('data-id');
+      const name = target.getAttribute('data-name') || 'Participant';
+
+      if (action === 'adjust-capital' && id) {
+        if (partModalAction) partModalAction.value = 'ADJUST_CAPITAL';
+        if (partModalId) partModalId.value = id;
+        if (partModalTitle) partModalTitle.textContent = `// ADJUST CAPITAL: ${name.toUpperCase()}`;
+        if (partNameGroup) partNameGroup.classList.add('hidden');
+        if (partRelationGroup) partRelationGroup.classList.add('hidden');
+        if (partFeeGroup) partFeeGroup.classList.add('hidden');
+        if (partNotesGroup) partNotesGroup.classList.add('hidden');
+        if (partAmountLabel) partAmountLabel.textContent = 'Capital Delta ($) (+ deposit, - withdrawal):';
+        if (partAmountInput) {
+          partAmountInput.placeholder = 'e.g., 250.00 or -100.00';
+          partAmountInput.value = '';
+          partAmountInput.closest('div')?.classList.remove('hidden');
+        }
+        partitionModal?.classList.remove('hidden');
+      } else if (action === 'update-fee' && id) {
+        const curFee = target.getAttribute('data-fee') || '20.0';
+        if (partModalAction) partModalAction.value = 'UPDATE_FEE_PCT';
+        if (partModalId) partModalId.value = id;
+        if (partModalTitle) partModalTitle.textContent = `// UPDATE FEE %: ${name.toUpperCase()}`;
+        if (partNameGroup) partNameGroup.classList.add('hidden');
+        if (partRelationGroup) partRelationGroup.classList.add('hidden');
+        if (partFeeGroup) partFeeGroup.classList.remove('hidden');
+        if (partNotesGroup) partNotesGroup.classList.add('hidden');
+        if (partAmountInput) {
+          partAmountInput.value = '0';
+          partAmountInput.closest('div')?.classList.add('hidden');
+        }
+        if (partFeeInput) partFeeInput.value = curFee;
+        partitionModal?.classList.remove('hidden');
+      } else if (action === 'delete' && id) {
+        if (!confirm(`Are you sure you want to permanently remove partition "${name}"?`)) return;
+        try {
+          const res = await fetch('/api/quant/partitions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({
+              action: 'DELETE_PARTITION',
+              partition_id: id,
+            }),
+          });
+          const json = await res.json();
+          if (!res.ok || !json.ok) throw new Error(json.error || 'Failed to remove partition');
+          showDiagnosticToast(`[OK] Partition "${name}" removed`);
+          await fetchAndRenderPartitions(accessToken);
+        } catch (err: any) {
+          alert(`Error: ${err.message}`);
+        }
+      }
+    });
+
+    // Crystallize Accrued HWM Fees
+    const crystallizeBtn = document.getElementById('crystallize-fees-btn');
+    const crystallizeLabel = document.getElementById('crystallize-btn-label');
+
+    crystallizeBtn?.addEventListener('click', async () => {
+      const curUnitPrice = latestValuationResult?.grossUnitPrice || 1.0;
+      const accrued = latestValuationResult?.totalAccruedFeesFromOthers || 0;
+
+      if (accrued <= 0.005) {
+        showDiagnosticToast('[INFO] No accrued HWM fees to crystallize at this time.');
+        return;
+      }
+
+      if (!confirm(`Crystallize $${accrued.toFixed(2)} in accrued high-water-mark performance fees? This will allocate fee units to the Master Node and reset participant HWM thresholds.`)) {
+        return;
+      }
+
+      if (crystallizeLabel) crystallizeLabel.textContent = 'Crystallizing...';
+      if (crystallizeBtn) (crystallizeBtn as HTMLButtonElement).disabled = true;
+
+      try {
+        const res = await fetch('/api/quant/partitions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            action: 'CRYSTALLIZE_FEES',
+            current_unit_price: curUnitPrice,
+          }),
+        });
+
+        const json = await res.json();
+        if (!res.ok || !json.ok) throw new Error(json.error || 'Failed to crystallize fees');
+
+        showDiagnosticToast(`[SUCCESS] Crystallized $${json.total_crystallized_usd.toFixed(2)} in fees! ${json.fee_units_credited.toFixed(4)} units credited to Master Node.`);
+        await fetchAndRenderPartitions(accessToken);
+      } catch (err: any) {
+        alert(`Crystallization Error: ${err.message}`);
+      } finally {
+        if (crystallizeLabel) crystallizeLabel.textContent = 'Crystallize Accrued HWM Fees';
+        if (crystallizeBtn) (crystallizeBtn as HTMLButtonElement).disabled = false;
       }
     });
   }

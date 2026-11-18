@@ -707,3 +707,159 @@ export function showDiagnosticToast(message: string, isError = false): void {
   }, 3200);
 }
 
+export interface PoolPartitionValuation {
+  id: string;
+  participant_name: string;
+  relation_label: string;
+  is_master: boolean;
+  performance_fee_pct: number;
+  initial_capital_usd: number;
+  net_invested_usd: number;
+  units_owned: number;
+  entry_unit_price: number;
+  high_water_mark_unit_price: number;
+  crystallized_fees_paid_usd: number;
+  status: string;
+  notes?: string;
+  gross_value_usd: number;
+  gross_pnl_usd: number;
+  above_hwm_per_unit: number;
+  accrued_fee_usd: number;
+  net_value_usd: number;
+  net_pnl_usd: number;
+  net_roi_pct: number;
+  pool_share_pct: number;
+}
+
+export interface PoolValuationResult {
+  grossUnitPrice: number;
+  totalUnits: number;
+  totalGrossUsd: number;
+  totalAccruedFeesFromOthers: number;
+  totalNetPoolUsd: number;
+  valuations: PoolPartitionValuation[];
+}
+
+export function computePoolPartitionValuations(
+  partitions: any[],
+  livePoolNavUsd: number
+): PoolValuationResult {
+  if (!Array.isArray(partitions) || partitions.length === 0) {
+    return {
+      grossUnitPrice: 1.0,
+      totalUnits: 0,
+      totalGrossUsd: 0,
+      totalAccruedFeesFromOthers: 0,
+      totalNetPoolUsd: 0,
+      valuations: [],
+    };
+  }
+
+  const totalUnits = partitions.reduce((sum, p) => sum + num(p?.units_owned, 0), 0);
+
+  // Unit Price Calculation:
+  // Normalized ReturnRatio mode: If VPS runs on nominal $100k test balance while pool seed is ~$2,750:
+  // ReturnRatio = livePoolNavUsd / 100,000 -> grossUnitPrice = 1.0 * ReturnRatio
+  // Otherwise in direct capital parity mode: grossUnitPrice = livePoolNavUsd / totalUnits
+  let grossUnitPrice = 1.0;
+  if (totalUnits > 0) {
+    if (livePoolNavUsd >= 50000 && totalUnits < 20000) {
+      grossUnitPrice = Math.max(0.0001, livePoolNavUsd / 100000.0);
+    } else {
+      grossUnitPrice = Math.max(0.0001, livePoolNavUsd / totalUnits);
+    }
+  }
+
+  let totalAccruedFeesFromOthers = 0;
+  const intermediate = partitions.map((p) => {
+    const units = num(p?.units_owned, 0);
+    const netInvested = num(p?.net_invested_usd, num(p?.initial_capital_usd, 0));
+    const hwm = num(p?.high_water_mark_unit_price, 1.0);
+    const feePct = num(p?.performance_fee_pct, 0);
+    const isMaster = Boolean(p?.is_master);
+
+    const grossVal = units * grossUnitPrice;
+    const grossPnl = grossVal - netInvested;
+    const aboveHwm = Math.max(0, grossUnitPrice - hwm);
+    const accruedFee = isMaster ? 0 : (feePct / 100.0) * units * aboveHwm;
+
+    if (!isMaster) {
+      totalAccruedFeesFromOthers += accruedFee;
+    }
+
+    return {
+      p,
+      units,
+      netInvested,
+      hwm,
+      feePct,
+      isMaster,
+      grossVal,
+      grossPnl,
+      aboveHwm,
+      accruedFee,
+    };
+  });
+
+  let totalGrossUsd = 0;
+  let totalNetPoolUsd = 0;
+
+  const valuationsWithoutShares = intermediate.map((item) => {
+    const { p, units, netInvested, hwm, feePct, isMaster, grossVal, grossPnl, aboveHwm, accruedFee } = item;
+
+    totalGrossUsd += grossVal;
+
+    let netVal: number;
+    if (isMaster) {
+      netVal = grossVal + totalAccruedFeesFromOthers;
+    } else {
+      netVal = grossVal - accruedFee;
+    }
+
+    totalNetPoolUsd += netVal;
+    const netPnl = netVal - netInvested;
+    const netRoi = netInvested > 0 ? (netPnl / netInvested) * 100.0 : 0;
+
+    return {
+      id: String(p?.id || ''),
+      participant_name: String(p?.participant_name || 'Participant'),
+      relation_label: String(p?.relation_label || 'Family / Friend'),
+      is_master: isMaster,
+      performance_fee_pct: feePct,
+      initial_capital_usd: num(p?.initial_capital_usd, netInvested),
+      net_invested_usd: netInvested,
+      units_owned: units,
+      entry_unit_price: num(p?.entry_unit_price, 1.0),
+      high_water_mark_unit_price: hwm,
+      crystallized_fees_paid_usd: num(p?.crystallized_fees_paid_usd, 0),
+      status: String(p?.status || 'ACTIVE'),
+      notes: p?.notes ? String(p.notes) : '',
+      gross_value_usd: grossVal,
+      gross_pnl_usd: grossPnl,
+      above_hwm_per_unit: aboveHwm,
+      accrued_fee_usd: accruedFee,
+      net_value_usd: netVal,
+      net_pnl_usd: netPnl,
+      net_roi_pct: netRoi,
+    };
+  });
+
+  const valuations: PoolPartitionValuation[] = valuationsWithoutShares.map((val) => {
+    const poolShare = totalNetPoolUsd > 0 ? (val.net_value_usd / totalNetPoolUsd) * 100.0 : 0;
+    return {
+      ...val,
+      pool_share_pct: poolShare,
+    };
+  });
+
+  return {
+    grossUnitPrice,
+    totalUnits,
+    totalGrossUsd,
+    totalAccruedFeesFromOthers,
+    totalNetPoolUsd,
+    valuations,
+  };
+}
+
+
