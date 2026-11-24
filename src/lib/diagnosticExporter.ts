@@ -13,7 +13,13 @@ export interface CoreDiagnosticContext {
   venue?: string;
 }
 
-const SATELLITE_ASSETS = ['BTCUSDC', 'ETHUSDC', 'SOLUSDC', 'SUIUSDT', 'XRPUSDC', 'DOGEUSDC'] as const;
+export const V31_TRADABLE_SYMBOLS: readonly string[] = [
+  'SOLUSDC', 'XRPUSDC', 'BNBUSDC', 'NEARUSDC', 'ENAUSDC', 'DOGEUSDC',
+  '1000PEPEUSDC', 'AVAXUSDC', 'UNIUSDC', 'FILUSDC', 'ADAUSDC', 'SUIUSDC',
+  'WLDUSDC', 'AAVEUSDC', 'LINKUSDC', 'BCHUSDC', 'ARBUSDC', 'LTCUSDC',
+] as const;
+
+export const SATELLITE_ASSETS = ['BTCUSDC', 'ETHUSDC', 'SOLUSDC', 'SUIUSDT', 'XRPUSDC', 'DOGEUSDC'] as const;
 const CORE_TICKERS = ['AAPL', 'NVDA', 'TSLA', 'LLY', 'JPM', 'GLD'] as const;
 
 const BINANCE_FUTURES_TICKER_URL = 'https://fapi.binance.com/fapi/v1/ticker/price';
@@ -126,15 +132,281 @@ export function fmtContractPrice(price: unknown, symbol = ''): string {
   if (p === 0) return '$0.00';
   const sym = symbol.toUpperCase();
   let decimals = 2;
-  if (sym.includes('DOGE') || p < 0.1) {
+  if (p < 0.02 || sym.includes('PEPE')) {
+    decimals = 6;
+  } else if (p < 0.1 || sym.includes('DOGE')) {
     decimals = 5;
-  } else if (sym.includes('SUI') || sym.includes('XRP') || p < 10) {
+  } else if (p < 10) {
     decimals = 4;
+  } else {
+    decimals = 2;
   }
   return `$${p.toLocaleString('en-US', {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   })}`;
+}
+
+export interface V31PositionItem {
+  symbol: string;
+  direction: 'LONG' | 'SHORT';
+  qty_lots: number;
+  signed_qty: number;
+  notional_usd: number;
+  weight: number;
+  entry_price: number;
+  mark_price: number;
+  upnl_usd: number;
+  upnl_pct: number; // al in procentpunten (bijv. +5.0 betekent +5.00%)
+}
+
+export interface V31RankedCoin {
+  symbol: string;
+  score: number;
+  weight: number;
+}
+
+export interface V31FactorsPayload {
+  bar_mode: string;
+  model_name: string;
+  eligible_count: number;
+  active_k: number;
+  target_leverage: number;
+  aci_multiplier: number;
+  expected_beta_post: number;
+  expected_dollar_post: number;
+  top_longs: V31RankedCoin[];
+  bottom_shorts: V31RankedCoin[];
+}
+
+export interface V31ExecAuditPayload {
+  rebalances_completed: number;
+  avg_is_p0_bps: number;
+  avg_cost_wt_bps: number;
+  avg_implied_rt_cost_bps: number;
+  avg_maker_fill_ratio_pct: number;
+  beats_regime_a_ratio: number;
+  total_aborts: number;
+  total_timeouts: number;
+  total_repegs: number;
+  total_traded_notional_usd: number;
+  total_fees_usd: number;
+}
+
+export interface V31MetaResult {
+  isV31: boolean;
+  engineVersion: string;
+  initialNavUsd: number;
+  navUsd: number;
+  walletBalanceUsd: number;
+  realizedPnlUsd: number;
+  unrealizedPnlUsd: number;
+  reservedVaultUsd: number;
+  totalFeesUsd: number;
+  cumulativeFundingUsd: number;
+  hwmUsd: number;
+  eligibleCount: number;
+  factors: V31FactorsPayload;
+  execAudit: V31ExecAuditPayload;
+  positionsV31: V31PositionItem[];
+  rawGonogoReport: Record<string, any>;
+}
+
+export function safeParseObj(val: unknown): Record<string, any> {
+  if (!val) return {};
+  if (typeof val === 'object' && val !== null) return val as Record<string, any>;
+  if (typeof val === 'string') {
+    try {
+      const parsed = JSON.parse(val);
+      if (typeof parsed === 'object' && parsed !== null) return parsed;
+    } catch {
+      return {};
+    }
+  }
+  return {};
+}
+
+export function extractV31Meta(
+  latestRow: Record<string, any> | null | undefined,
+  historyRows: Array<Record<string, any>> = []
+): V31MetaResult {
+  const g = safeParseObj(latestRow?.gonogo_report);
+  const isV31 =
+    g?.engine_version === 'v3.1' ||
+    Boolean(g?.factors) ||
+    Boolean(g?.exec_audit) ||
+    Array.isArray(g?.positions_v31);
+
+  const factorsRaw = safeParseObj(g?.factors);
+  const execAuditRaw = safeParseObj(g?.exec_audit);
+
+  const eligibleCount = num(
+    factorsRaw?.eligible_count,
+    num(g?.eligible_count, 18)
+  );
+
+  // Reject legacy dummy test balance (100k) from older test DB runs
+  const isLegacyNominal100k = (val: number) => Math.abs(val - 1e5) < 0.01;
+
+  // Initial NAV determination:
+  // 1. g.initial_nav_usd (if > 0 and !== 1e5)
+  // 2. Oldest history row nav_usd (if > 0 and !== 1e5)
+  // 3. latestRow nav_usd (if > 0 and !== 1e5)
+  // 4. Fallback 2750.0
+  let oldestHistoryNav = 0;
+  if (Array.isArray(historyRows) && historyRows.length > 0) {
+    let oldestRow = historyRows[0];
+    for (const r of historyRows) {
+      const tCurr = num(r?.timestamp_ms ?? r?.bar_idx, 0);
+      const tOld = num(oldestRow?.timestamp_ms ?? oldestRow?.bar_idx, 0);
+      if (tCurr > 0 && (tOld === 0 || tCurr < tOld)) {
+        oldestRow = r;
+      }
+    }
+    const oNav = num(oldestRow?.nav_usd, 0);
+    if (oNav > 0 && !isLegacyNominal100k(oNav)) {
+      oldestHistoryNav = oNav;
+    } else {
+      const h0 = num(historyRows[0]?.nav_usd, 0);
+      if (h0 > 0 && !isLegacyNominal100k(h0)) oldestHistoryNav = h0;
+    }
+  }
+
+  const gInit = num(g?.initial_nav_usd, 0);
+  let initialNavUsd = 2750.0;
+  if (gInit > 0 && !isLegacyNominal100k(gInit)) {
+    initialNavUsd = gInit;
+  } else if (oldestHistoryNav > 0) {
+    initialNavUsd = oldestHistoryNav;
+  } else {
+    const latNav = num(latestRow?.nav_usd, 0);
+    if (latNav > 0 && !isLegacyNominal100k(latNav)) {
+      initialNavUsd = latNav;
+    } else {
+      initialNavUsd = 2750.0;
+    }
+  }
+
+  const navUsd = num(latestRow?.nav_usd, initialNavUsd);
+  const walletBalanceUsd = num(
+    g?.wallet_balance_usd ?? latestRow?.cash_usd ?? latestRow?.wallet_balance_usd,
+    navUsd
+  );
+  const realizedPnlUsd =
+    g?.realized_pnl_usd != null
+      ? num(g.realized_pnl_usd, 0)
+      : walletBalanceUsd - initialNavUsd;
+  const unrealizedPnlUsd =
+    g?.unrealized_pnl_usd != null
+      ? num(g.unrealized_pnl_usd, 0)
+      : navUsd - walletBalanceUsd;
+  const reservedVaultUsd = num(g?.reserved_vault_usd, 0);
+  const totalFeesUsd = num(
+    g?.total_fees_usd ?? latestRow?.fees_paid_bar_usd ?? latestRow?.total_fees_usd,
+    0
+  );
+  const cumulativeFundingUsd = num(g?.cumulative_funding_usd, 0);
+
+  let histMaxNav = navUsd;
+  if (Array.isArray(historyRows) && historyRows.length > 0) {
+    for (const r of historyRows) {
+      const hn = num(r?.nav_usd, 0);
+      if (hn > 0 && !isLegacyNominal100k(hn) && hn > histMaxNav) {
+        histMaxNav = hn;
+      }
+    }
+  }
+  const hwmUsd = Math.max(histMaxNav, num(g?.high_water_mark_usd, 0), navUsd, initialNavUsd);
+
+  const factors: V31FactorsPayload = {
+    bar_mode: String(factorsRaw?.bar_mode ?? g?.bar_mode ?? 'SYNTHETIC_2352_UTC_CLOSE'),
+    model_name: String(factorsRaw?.model_name ?? g?.model_name ?? 'M2'),
+    eligible_count: eligibleCount,
+    active_k: num(factorsRaw?.active_k ?? g?.active_k, 4),
+    target_leverage: num(factorsRaw?.target_leverage ?? g?.target_leverage, 0.5),
+    aci_multiplier: num(factorsRaw?.aci_multiplier ?? g?.aci_multiplier, 1.0),
+    expected_beta_post: num(factorsRaw?.expected_beta_post ?? g?.expected_beta_post, 0.0),
+    expected_dollar_post: num(factorsRaw?.expected_dollar_post ?? g?.expected_dollar_post, 0.0),
+    top_longs: Array.isArray(factorsRaw?.top_longs)
+      ? factorsRaw.top_longs.map((c: any) => ({
+          symbol: String(c?.symbol || '').toUpperCase(),
+          score: num(c?.score, 0),
+          weight: num(c?.weight, 0),
+        }))
+      : [],
+    bottom_shorts: Array.isArray(factorsRaw?.bottom_shorts)
+      ? factorsRaw.bottom_shorts.map((c: any) => ({
+          symbol: String(c?.symbol || '').toUpperCase(),
+          score: num(c?.score, 0),
+          weight: num(c?.weight, 0),
+        }))
+      : [],
+  };
+
+  const execAudit: V31ExecAuditPayload = {
+    rebalances_completed: num(execAuditRaw?.rebalances_completed ?? g?.rebalances_completed, 0),
+    avg_is_p0_bps: num(execAuditRaw?.avg_is_p0_bps ?? g?.avg_is_p0_bps, 0),
+    avg_cost_wt_bps: num(execAuditRaw?.avg_cost_wt_bps ?? g?.avg_cost_wt_bps, 0),
+    avg_implied_rt_cost_bps: num(execAuditRaw?.avg_implied_rt_cost_bps ?? g?.avg_implied_rt_cost_bps, 0),
+    avg_maker_fill_ratio_pct: num(execAuditRaw?.avg_maker_fill_ratio_pct ?? g?.avg_maker_fill_ratio_pct, 0),
+    beats_regime_a_ratio: num(execAuditRaw?.beats_regime_a_ratio ?? g?.beats_regime_a_ratio, 0),
+    total_aborts: num(execAuditRaw?.total_aborts ?? g?.total_aborts, 0),
+    total_timeouts: num(execAuditRaw?.total_timeouts ?? g?.total_timeouts, 0),
+    total_repegs: num(execAuditRaw?.total_repegs ?? g?.total_repegs, 0),
+    total_traded_notional_usd: num(execAuditRaw?.total_traded_notional_usd ?? g?.total_traded_notional_usd, 0),
+    total_fees_usd: num(execAuditRaw?.total_fees_usd ?? g?.total_fees_usd, 0),
+  };
+
+  const rawPositionsV31 = Array.isArray(g?.positions_v31) ? g.positions_v31 : [];
+  const positionsV31: V31PositionItem[] = rawPositionsV31.map((p: any) => {
+    const symbol = String(p?.symbol || '').toUpperCase();
+    const direction: 'LONG' | 'SHORT' =
+      p?.direction === 'SHORT' || num(p?.signed_qty ?? p?.qty_lots, 0) < 0 ? 'SHORT' : 'LONG';
+    const qty_lots = Math.abs(num(p?.qty_lots ?? p?.qty, 0));
+    const signed_qty =
+      p?.signed_qty != null
+        ? num(p.signed_qty, 0)
+        : direction === 'SHORT'
+          ? -qty_lots
+          : qty_lots;
+    const entry_price = num(p?.entry_price ?? p?.avg_entry_price, 0);
+    const mark_price = num(p?.mark_price ?? p?.current_price, entry_price);
+    const notional_usd = num(p?.notional_usd, Math.abs(signed_qty) * mark_price);
+    const weight = num(p?.weight, navUsd > 0 ? (notional_usd / navUsd) * (direction === 'SHORT' ? -1 : 1) : 0);
+    const upnl_usd = num(p?.upnl_usd, signed_qty * (mark_price - entry_price));
+    const upnl_pct = num(p?.upnl_pct, 0);
+    return {
+      symbol,
+      direction,
+      qty_lots,
+      signed_qty,
+      notional_usd,
+      weight,
+      entry_price,
+      mark_price,
+      upnl_usd,
+      upnl_pct,
+    };
+  });
+
+  return {
+    isV31,
+    engineVersion: String(g?.engine_version || (isV31 ? 'v3.1' : 'v2.5')),
+    initialNavUsd,
+    navUsd,
+    walletBalanceUsd,
+    realizedPnlUsd,
+    unrealizedPnlUsd,
+    reservedVaultUsd,
+    totalFeesUsd,
+    cumulativeFundingUsd,
+    hwmUsd,
+    eligibleCount,
+    factors,
+    execAudit,
+    positionsV31,
+    rawGonogoReport: g,
+  };
 }
 
 export interface EnrichedAssetHolding {
@@ -244,47 +516,164 @@ export function computeAssetHoldingMetrics(
 }
 
 export function computeAllBasketHoldings(
-  rawPositions: Record<string, any>,
+  rawPositions: Record<string, any> | any[] | undefined,
   navUsd: number,
-  totalLedgerUpnlUsd: number,
-  livePricesMap?: Record<string, number>
+  _totalLedgerUpnlUsd = 0,
+  livePricesMap?: Record<string, number> | Map<string, number>
 ): EnrichedAssetHolding[] {
-  const parsed = SATELLITE_ASSETS.map((symbol) => {
-    const rawEntry = rawPositions[symbol] ?? rawPositions[symbol.replace('USDC', '')] ?? 0;
+  function lookupPrice(sym: string): number {
+    if (!livePricesMap) return 0;
+    const s = sym.toUpperCase();
+    if (livePricesMap instanceof Map) {
+      return livePricesMap.get(s) ?? livePricesMap.get(s.replace('USDC', 'USDT')) ?? 0;
+    }
+    return (livePricesMap as Record<string, number>)[s] ?? (livePricesMap as Record<string, number>)[s.replace('USDC', 'USDT')] ?? 0;
+  }
+
+  // Case 1: An explicit array of positions or object containing positions_v31
+  let v31Array: any[] | null = null;
+  if (Array.isArray(rawPositions)) {
+    v31Array = rawPositions;
+  } else if (rawPositions && Array.isArray((rawPositions as any).positions_v31)) {
+    v31Array = (rawPositions as any).positions_v31;
+  } else if (rawPositions && typeof (rawPositions as any).gonogo_report === 'object') {
+    const g = safeParseObj((rawPositions as any).gonogo_report);
+    if (Array.isArray(g.positions_v31)) {
+      v31Array = g.positions_v31;
+    }
+  }
+
+  if (v31Array && v31Array.length > 0) {
+    const results: EnrichedAssetHolding[] = [];
+    for (const item of v31Array) {
+      if (!item || typeof item !== 'object') continue;
+      const symbol = String(item.symbol || '').toUpperCase();
+      if (!symbol) continue;
+      const rawQty = num(item.qty_lots ?? item.qty, 0);
+      const rawSigned = item.signed_qty != null ? num(item.signed_qty, 0) : undefined;
+      const dirStr = String(item.direction || '').toUpperCase();
+      const direction: 'LONG' | 'SHORT' =
+        dirStr === 'SHORT' || (rawSigned !== undefined && rawSigned < 0) || (rawSigned === undefined && rawQty < 0)
+          ? 'SHORT'
+          : 'LONG';
+      const signedQty =
+        rawSigned !== undefined
+          ? rawSigned
+          : direction === 'SHORT'
+            ? -Math.abs(rawQty)
+            : Math.abs(rawQty);
+
+      if (Math.abs(signedQty) <= 1e-9) continue;
+
+      const livePrice = lookupPrice(symbol);
+      const entryPrice = num(item.entry_price ?? item.avg_entry_price, 0);
+      const itemMark = num(item.mark_price ?? item.current_price, entryPrice);
+      const liveMark = livePrice > 0 ? livePrice : itemMark;
+
+      const notionalUsd = Math.abs(signedQty) * liveMark;
+      let upnlUsd = 0;
+      let upnlPct = 0;
+
+      if (livePrice > 0) {
+        upnlUsd = entryPrice > 0 ? signedQty * (liveMark - entryPrice) : 0;
+        const costBasis = Math.abs(signedQty) * entryPrice;
+        upnlPct = costBasis > 1e-12 ? (upnlUsd / costBasis) * 100.0 : 0.0;
+      } else {
+        upnlUsd = item.upnl_usd != null ? num(item.upnl_usd, 0) : (entryPrice > 0 ? signedQty * (liveMark - entryPrice) : 0);
+        upnlPct = num(item.upnl_pct, 0); // already in percentage points!
+      }
+
+      const weight = navUsd > 0 ? (notionalUsd / navUsd) * (direction === 'SHORT' ? -1 : 1) : num(item.weight, 0);
+
+      results.push({
+        symbol,
+        direction,
+        qty_lots: signedQty,
+        notional_usd: notionalUsd,
+        weight,
+        entry_price: entryPrice,
+        mark_price: liveMark,
+        upnl_usd: upnlUsd,
+        upnl_pct: upnlPct,
+      });
+    }
+
+    const active = results.filter((h) => Math.abs(h.qty_lots) > 1e-9);
+    active.sort((a, b) => {
+      if (a.direction !== b.direction) {
+        return a.direction === 'LONG' ? -1 : 1;
+      }
+      return Math.abs(b.notional_usd) - Math.abs(a.notional_usd);
+    });
+    return active;
+  }
+
+  // Case 2: Legacy rawPositions Record<string, any>
+  const posObj = (rawPositions && typeof rawPositions === 'object' ? rawPositions : {}) as Record<string, any>;
+  const symbols = Array.from(
+    new Set([
+      ...V31_TRADABLE_SYMBOLS,
+      ...SATELLITE_ASSETS,
+      ...Object.keys(posObj).map((s) => s.toUpperCase()),
+    ])
+  );
+
+  const activeHoldings: EnrichedAssetHolding[] = [];
+
+  for (const sym of symbols) {
+    const rawEntry = posObj[sym] ?? posObj[sym.replace('USDC', '')] ?? posObj[sym.replace('USDT', '')];
+    if (rawEntry === undefined || rawEntry === null) continue;
+
     let qtyLots = 0;
-    let notionalUsd = 0;
+    let notional = 0;
     let entryPrice = 0;
     if (typeof rawEntry === 'number') {
       qtyLots = num(rawEntry, 0);
-    } else if (typeof rawEntry === 'object' && rawEntry !== null) {
+    } else if (typeof rawEntry === 'object') {
       qtyLots = num(rawEntry.qty_lots ?? rawEntry.qty ?? rawEntry.lots, 0);
-      notionalUsd = num(rawEntry.notional_usd ?? rawEntry.notional, 0);
-      entryPrice = num(rawEntry.entry_price ?? rawEntry.avg_entry_price ?? 0, 0);
+      notional = num(rawEntry.notional_usd ?? rawEntry.notional, 0);
+      entryPrice = num(rawEntry.entry_price ?? rawEntry.avg_entry_price, 0);
     }
-    const absQty = Math.abs(qtyLots);
-    if (entryPrice <= 0 && absQty > 1e-12) {
-      entryPrice = Math.abs(notionalUsd) / absQty;
+
+    if (Math.abs(qtyLots) <= 1e-9 && Math.abs(notional) <= 1e-2) continue;
+
+    const direction: 'LONG' | 'SHORT' = qtyLots < 0 || notional < 0 ? 'SHORT' : 'LONG';
+    const signedQty = direction === 'SHORT' ? -Math.abs(qtyLots) : Math.abs(qtyLots);
+    const livePrice = lookupPrice(sym);
+    const markPrice = livePrice > 0 ? livePrice : (entryPrice > 0 ? entryPrice : (Math.abs(signedQty) > 0 ? Math.abs(notional) / Math.abs(signedQty) : 0));
+    const liveNotional = Math.abs(signedQty) * markPrice;
+    const upnlUsd = entryPrice > 0 ? signedQty * (markPrice - entryPrice) : 0;
+    const costBasis = Math.abs(signedQty) * entryPrice;
+    const upnlPct = costBasis > 1e-12 ? (upnlUsd / costBasis) * 100.0 : 0.0;
+    const weight = navUsd > 0 ? (liveNotional / navUsd) * (direction === 'SHORT' ? -1 : 1) : 0;
+
+    activeHoldings.push({
+      symbol: sym,
+      direction,
+      qty_lots: signedQty,
+      notional_usd: liveNotional,
+      weight,
+      entry_price: entryPrice,
+      mark_price: markPrice,
+      upnl_usd: upnlUsd,
+      upnl_pct: upnlPct,
+    });
+  }
+
+  activeHoldings.sort((a, b) => {
+    if (a.direction !== b.direction) {
+      return a.direction === 'LONG' ? -1 : 1;
     }
-    const isFlat = absQty <= 1e-9 && Math.abs(notionalUsd) <= 1e-2;
-    const costBasis = !isFlat ? (entryPrice > 0 ? absQty * entryPrice : Math.abs(notionalUsd)) : 0;
-    return { symbol, rawEntry, isFlat, costBasis };
+    return Math.abs(b.notional_usd) - Math.abs(a.notional_usd);
   });
 
-  const totalActiveCost = parsed.reduce((sum, p) => sum + p.costBasis, 0);
-  const hasLivePrices = Boolean(livePricesMap && Object.keys(livePricesMap).length > 0);
-
-  return parsed.map((p) => {
-    let fallbackUpnl = 0;
-    if (!hasLivePrices && !p.isFlat && totalActiveCost > 1e-6) {
-      fallbackUpnl = (p.costBasis / totalActiveCost) * totalLedgerUpnlUsd;
-    }
-    return computeAssetHoldingMetrics(p.symbol, p.rawEntry, navUsd, livePricesMap, fallbackUpnl);
-  });
+  return activeHoldings;
 }
 
 export function normalizeSatelliteSnapshot(ctx: SatelliteDiagnosticContext) {
   const row = ctx.latestRow || {};
   const history = Array.isArray(ctx.historyRows) && ctx.historyRows.length > 0 ? ctx.historyRows : [row];
+  const v31 = extractV31Meta(row, history);
   const csd = typeof row.csd_status === 'object' && row.csd_status !== null ? row.csd_status : {};
   const exec =
     typeof row.execution_quality === 'object' && row.execution_quality !== null
@@ -293,22 +682,26 @@ export function normalizeSatelliteSnapshot(ctx: SatelliteDiagnosticContext) {
   const gonogo =
     typeof row.gonogo_progress === 'object' && row.gonogo_progress !== null ? row.gonogo_progress : {};
   const rawPositions =
-    typeof row.positions_lots === 'object' && row.positions_lots !== null
-      ? row.positions_lots
-      : typeof row.positions === 'object' && row.positions !== null
-        ? row.positions
-        : {};
+    v31.positionsV31.length > 0
+      ? v31.positionsV31
+      : typeof row.positions_lots === 'object' && row.positions_lots !== null
+        ? row.positions_lots
+        : typeof row.positions === 'object' && row.positions !== null
+          ? row.positions
+          : {};
 
   const barIdx = Math.round(num(row.bar_idx, 0));
   const timestampMs = num(row.timestamp_ms, Date.now());
   const barDate = new Date(timestampMs);
   const now = new Date();
 
-  const navUsd = num(row.nav_usd, 100000);
-  const walletUsd = num(row.wallet_balance_usd, navUsd);
-  const unrealizedPnlUsd = num(row.unrealized_pnl_usd, navUsd - walletUsd);
-  const realizedPnlUsd = num(row.realized_pnl_usd, walletUsd - 100000);
-  const totalFeesUsd = num(row.total_fees_usd, 0);
+  const navUsd = v31.navUsd;
+  const walletUsd = v31.walletBalanceUsd;
+  const unrealizedPnlUsd = v31.unrealizedPnlUsd;
+  const realizedPnlUsd = v31.realizedPnlUsd;
+  const initialNavUsd = v31.initialNavUsd;
+  const totalFeesUsd = v31.totalFeesUsd;
+  const cumulativeFundingUsd = v31.cumulativeFundingUsd;
   const drawdownRatio = num(row.drawdown_pct, 0);
   const grossLeverage = num(row.gross_leverage, 0);
   const netDollarExp = num(row.net_dollar_exposure, 0);
@@ -319,10 +712,7 @@ export function normalizeSatelliteSnapshot(ctx: SatelliteDiagnosticContext) {
   const rhoConc = num(csd.concordance_rho_h12 ?? row.concordance_rho_h12, 0.0);
   const activeSniperGate = Boolean(csd.active_sniper_gate ?? grossLeverage < 0.001);
 
-  const histMaxNav = history.reduce((m, r) => Math.max(m, num(r?.nav_usd, 0)), navUsd);
-  const impliedHwm = drawdownRatio > 0 && drawdownRatio < 0.99 ? navUsd / (1 - drawdownRatio) : navUsd;
-  const hwmUsd = Math.max(histMaxNav, impliedHwm, 100000);
-
+  const hwmUsd = v31.hwmUsd;
   const histMaxDd = history.reduce((m, r) => Math.max(m, num(r?.drawdown_pct, 0)), drawdownRatio);
   const maxDrawdownRatio = Math.max(num(gonogo.max_drawdown, 0), histMaxDd, drawdownRatio);
 
@@ -382,10 +772,12 @@ export function normalizeSatelliteSnapshot(ctx: SatelliteDiagnosticContext) {
     runtime_state: String(row.runtime_state || 'STATE_RUNNING'),
     bar_idx: barIdx,
     financials: {
+      initial_nav_usd: initialNavUsd,
       nav_usd: navUsd,
       wallet_balance_usd: walletUsd,
       unrealized_pnl_usd: unrealizedPnlUsd,
       realized_pnl_usd: realizedPnlUsd,
+      cumulative_funding_usd: cumulativeFundingUsd,
       total_fees_usd: totalFeesUsd,
       fee_drag_bps: navUsd > 0 ? (totalFeesUsd / navUsd) * 10000 : 0,
       high_water_mark_usd: hwmUsd,
@@ -414,6 +806,9 @@ export function normalizeSatelliteSnapshot(ctx: SatelliteDiagnosticContext) {
       mean_quantization_l1_error: l1QuantErr,
     },
     holdings,
+    factors: v31.factors,
+    exec_audit: v31.execAudit,
+    is_v31: v31.isV31,
     gonogo_protocol: {
       bars_evaluated: barsEvaluated,
       target_bars: targetBars,
@@ -445,9 +840,9 @@ export function buildSatelliteMarkdownSnapshot(ctx: SatelliteDiagnosticContext):
   const g = s.gonogo_protocol;
 
   const postureLabel =
-    f.gross_leverage < 0.001 ? 'SNIPER STANDBY (100% CASH)' : 'COUPLED BASKET DEPLOYED';
-  const netReturnUsd = f.nav_usd - 100000;
-  const netReturnPct = f.nav_usd / 100000 - 1;
+    f.gross_leverage < 0.001 ? 'SNIPER STANDBY (100% CASH)' : '18-ASSET BASKET DEPLOYED';
+  const netReturnUsd = f.nav_usd - f.initial_nav_usd;
+  const netReturnPct = f.initial_nav_usd > 0 ? f.nav_usd / f.initial_nav_usd - 1 : 0;
 
   const holdingsRows = s.holdings
     .map(
@@ -471,7 +866,7 @@ export function buildSatelliteMarkdownSnapshot(ctx: SatelliteDiagnosticContext):
   const invViol = g.invariant_violations_count === 0 ? '[PASS]' : '[FAIL]';
 
   return [
-    `# QUANT-SATELLITE v2.5 — AI DIAGNOSTIC SNAPSHOT (SLEEVE A: CRYPTO CLOB)`,
+    `# QUANT-SATELLITE v3.1 — AI DIAGNOSTIC SNAPSHOT (SLEEVE A: CRYPTO CLOB)`,
     `- **Captured At (UTC):** ${s.captured_at_utc}`,
     `- **Captured At (CET):** ${s.captured_at_cet}`,
     `- **Last Bar Timestamp:** ${s.last_bar_utc} (\`${s.timestamp_ms}\`)`,
@@ -481,9 +876,11 @@ export function buildSatelliteMarkdownSnapshot(ctx: SatelliteDiagnosticContext):
     `## 1. Financials, NAV & Leverage Decomposition`,
     `| Metric | Value | Invariant / Note |`,
     `| :--- | :--- | :--- |`,
+    `| **Initial NAV Baseline** | \`${fmtUsd(f.initial_nav_usd)}\` | Seed capital baseline |`,
     `| **Mark-to-Market NAV** | \`${fmtUsd(f.nav_usd)}\` | Net return: \`${fmtSignedUsd(netReturnUsd)}\` (\`${fmtSignedPct(netReturnPct, 4)}\`) |`,
     `| **Wallet Balance (Cash)** | \`${fmtUsd(f.wallet_balance_usd)}\` | Realized PnL: \`${fmtSignedUsd(f.realized_pnl_usd)}\` |`,
     `| **Unrealized PnL** | \`${fmtSignedUsd(f.unrealized_pnl_usd)}\` | Open basket MTM delta |`,
+    `| **Cumulative Funding PnL** | \`${fmtSignedUsd(f.cumulative_funding_usd)}\` | Perpetual funding cashflow |`,
     `| **Cumulative Exchange Fees** | \`${fmtUsd(f.total_fees_usd)}\` | Fee drag: \`${f.fee_drag_bps.toFixed(2)} bps\` of NAV |`,
     `| **High Water Mark (HWM)** | \`${fmtUsd(f.high_water_mark_usd)}\` | Peak MTM NAV |`,
     `| **Trailing Drawdown** | \`${fmtPct(f.trailing_drawdown_ratio, 4)}\` | Max Historical DD: \`${fmtPct(f.max_drawdown_ratio, 4)}\` (Limit \`<= 8.00%\`) |`,
@@ -503,12 +900,25 @@ export function buildSatelliteMarkdownSnapshot(ctx: SatelliteDiagnosticContext):
     `- **GTX Post-Only Cross Rejects:** \`${eq.gtx_rejects_count}\` (Threshold \`== 0\` ${eq.gtx_rejects_count === 0 ? '[PASS]' : '[WARN]'})`,
     `- **Mean Lot Quantization L1 Error:** \`${fmtPct(eq.mean_quantization_l1_error, 2)}\` (\`${eq.mean_quantization_l1_error.toFixed(4)}\`)`,
     ``,
-    `## 4. 6-Asset Coupled Basket Holdings`,
+    `## 4. 18-Asset All-USDC Basket Holdings`,
     `| Asset | Direction | Quantity (Lots) | Notional (USD) | Weight (%) | Entry -> Mark | Unrealized PnL |`,
     `| :--- | :--- | :--- | :--- | :--- | :--- | :--- |`,
-    holdingsRows,
+    holdingsRows || '| *No active positions* | 100% CASH / FLAT | -- | $0.00 | 0.00% | -- | $0.00 |',
     ``,
-    `## 5. N=2,000 Go/No-Go Protocol Invariants (8-Point Check)`,
+    `## 5. Slow-Alpha (M2) Factor Engine & 30-Day Execution Audit`,
+    `- **Model / Bar Mode:** \`${s.factors.model_name}\` | \`${s.factors.bar_mode}\``,
+    `- **PIT Eligible:** \`${s.factors.eligible_count} / 18\` | **Active K:** \`${s.factors.active_k}\` Long / \`${s.factors.active_k}\` Short`,
+    `- **Target Leverage:** \`${s.factors.target_leverage.toFixed(2)}x\` | **ACI Multiplier:** \`${s.factors.aci_multiplier.toFixed(2)}\``,
+    `- **Expected Post Neutrality:** \`Beta ${s.factors.expected_beta_post.toExponential(2)}\` | \`Dollar $${s.factors.expected_dollar_post.toExponential(2)}\``,
+    `- **30D Rebalances Completed:** \`${s.exec_audit.rebalances_completed} / 30\``,
+    `- **Avg Implied Round-Trip Cost:** \`${s.exec_audit.avg_implied_rt_cost_bps.toFixed(2)} bps RT\` (Target <= 5.50 bps)`,
+    `- **Avg Maker Fill Ratio:** \`${s.exec_audit.avg_maker_fill_ratio_pct.toFixed(1)}%\``,
+    `- **Beats Regime A Ratio:** \`${(s.exec_audit.beats_regime_a_ratio * 100).toFixed(0)}%\``,
+    `- **Circuit Breakers (Aborts / Timeouts):** \`${s.exec_audit.total_aborts} / ${s.exec_audit.total_timeouts}\``,
+    `- **15s BBO Re-Pegs:** \`${s.exec_audit.total_repegs}\``,
+    `- **Traded Volume / Fees:** \`$${s.exec_audit.total_traded_notional_usd.toLocaleString('en-US', { maximumFractionDigits: 0 })} / $${s.exec_audit.total_fees_usd.toFixed(2)}\``,
+    ``,
+    `## 6. N=2,000 Go/No-Go Protocol Invariants (8-Point Check)`,
     `1. **Sample Depth ($N \\ge 2000$):** \`${g.bars_evaluated} / ${g.target_bars}\` -> \`${invSample}\``,
     `2. **Net Annualized Sharpe ($\\ge 1.50$):** \`${g.net_annual_sharpe.toFixed(2)}\` -> \`${invSharpe}\``,
     `3. **Probabilistic Sharpe Ratio $\\text{PSR}(1.0) \\ge 0.95$:** \`${g.psr_vs_1_0.toFixed(3)}\` -> \`${invPsr}\``,
@@ -659,7 +1069,7 @@ export async function copyTextToClipboard(text: string): Promise<boolean> {
     document.body.appendChild(textArea);
     textArea.focus();
     textArea.select();
-    const ok = document.execCommand('copy');
+    const ok = (document as any).execCommand('copy');
     document.body.removeChild(textArea);
     return ok;
   } catch {
@@ -742,7 +1152,8 @@ export interface PoolValuationResult {
 
 export function computePoolPartitionValuations(
   partitions: any[],
-  livePoolNavUsd: number
+  livePoolNavUsd: number,
+  initialVpsBaselineUsd: number = 2750.0
 ): PoolValuationResult {
   if (!Array.isArray(partitions) || partitions.length === 0) {
     return {
@@ -756,18 +1167,15 @@ export function computePoolPartitionValuations(
   }
 
   const totalUnits = partitions.reduce((sum, p) => sum + num(p?.units_owned, 0), 0);
+  const baseline = initialVpsBaselineUsd > 0 && Math.abs(initialVpsBaselineUsd - 1e5) >= 0.01 ? initialVpsBaselineUsd : 2750.0;
 
   // Unit Price Calculation:
-  // Normalized ReturnRatio mode: If VPS runs on nominal $100k test balance while pool seed is ~$2,750:
-  // ReturnRatio = livePoolNavUsd / 100,000 -> grossUnitPrice = 1.0 * ReturnRatio
-  // Otherwise in direct capital parity mode: grossUnitPrice = livePoolNavUsd / totalUnits
+  // In unitized equity mode: grossUnitPrice = livePoolNavUsd / totalUnits (or baseline if totalUnits === 0)
   let grossUnitPrice = 1.0;
   if (totalUnits > 0) {
-    if (livePoolNavUsd >= 50000 && totalUnits < 20000) {
-      grossUnitPrice = Math.max(0.0001, livePoolNavUsd / 100000.0);
-    } else {
-      grossUnitPrice = Math.max(0.0001, livePoolNavUsd / totalUnits);
-    }
+    grossUnitPrice = Math.max(0.0001, livePoolNavUsd / totalUnits);
+  } else if (baseline > 0) {
+    grossUnitPrice = Math.max(0.0001, livePoolNavUsd / baseline);
   }
 
   let totalAccruedFeesFromOthers = 0;

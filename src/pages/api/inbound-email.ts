@@ -116,7 +116,7 @@ export const POST: APIRoute = async ({ request }) => {
       if (rdwData?.rdw_model && combinedName.includes('niet bekend')) finalModel = toTitleCase(rdwData.rdw_model);
     }
 
-    const { rdw_make, rdw_model, ...cleanRdwData } = rdwData || {};
+    const { rdw_make, rdw_model, ...cleanRdwData }: any = rdwData || {};
 
     // Peak HP extraction logic
     let finalHp = cleanRdwData.rdw_power_hp;

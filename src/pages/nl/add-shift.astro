@@ -189,7 +189,7 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
             if (rdwData?.rdw_model && combinedName.includes('niet bekend')) finalModel = toTitleCase(rdwData.rdw_model);
           }
 
-          const { rdw_make, rdw_model, ...cleanRdwData } = rdwData || {};
+          const { rdw_make, rdw_model, ...cleanRdwData }: any = rdwData || {};
 
           let finalHp = cleanRdwData.rdw_power_hp;
           const pkMatch = finalModel.match(/(\d+)\s*pk/i);

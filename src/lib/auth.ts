@@ -56,7 +56,7 @@ export async function resendOtp(email: string) {
 export async function updatePassword(currentPassword: string, newPassword: string) {
   const { data, error } = await supabase.auth.updateUser({
     password: newPassword,
-    currentPassword: currentPassword,
+    current_password: currentPassword,
   });
   return { data, error };
 }

@@ -25,8 +25,8 @@ if (session) {
 ---
 
 <Layout 
-  description="Autonomous Quant Satellite v2.5 Telemetry Dashboard and Tokyo VPS Command & Control Enclave." 
-  title="Quant Satellite v2.5 | Autonomous Telemetry & C2 Console"
+  description="Autonomous Quant Satellite v3.1 Telemetry Dashboard and Tokyo VPS Command & Control Enclave." 
+  title="Quant Satellite v3.1 | Autonomous Telemetry & C2 Console"
 >
   <div id="secure-enclave" class="max-w-7xl mx-auto py-8 sm:py-12 space-y-8 animate-fade-in-up opacity-0 pointer-events-none transition-opacity duration-300">
     
@@ -35,7 +35,7 @@ if (session) {
       items={[
         { label: 'Home', href: '/' },
         { label: 'Dashboard', href: '/dashboard' },
-        { label: 'Quant Satellite v2.5' }
+        { label: 'Quant Satellite v3.1' }
       ]} 
     />
 
@@ -48,8 +48,14 @@ if (session) {
         <div class="flex items-center space-x-2.5 flex-wrap gap-y-1">
           <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-950/10 dark:bg-cyan-950/60 border border-cyan-500/30 font-mono text-xs text-cyan-600 dark:text-cyan-400">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>QUANT SATELLITE v2.5 &bull; TOKYO VPS C2</span>
+            <span>v3.1 SLOW-ALPHA (M2)</span>
           </div>
+
+          <span 
+            class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-mono text-[10px] font-bold tracking-wider uppercase shadow-sm"
+          >
+            <span>ALL-USDC 0.0 BPS MAKER</span>
+          </span>
 
           <span 
             id="admin-badge" 
@@ -85,7 +91,7 @@ if (session) {
         </div>
 
         <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-sans tracking-tight">
-          Quant Satellite v2.5 Telemetry & C2 Cockpit
+          Quant Satellite v3.1 Telemetry & C2 Cockpit
         </h1>
         <p id="user-identity" class="text-xs font-mono text-slate-500 dark:text-slate-400">
           {userEmail ? `// Identity: ${userEmail} (Clearance Level: QUANT_ADMIN)` : '// Identity: Authenticating...'}
@@ -256,6 +262,9 @@ if (session) {
           </div>
           <div id="nav-usd-val" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-mono tracking-tight">
             $0.00
+          </div>
+          <div class="text-[11px] font-mono text-slate-500 mt-1">
+            Net Return: <span id="card1-net-return-usd" class="font-bold text-slate-400">$0.00</span> (<span id="card1-net-return-pct" class="font-bold text-slate-400">0.00%</span>)
           </div>
         </div>
 
@@ -665,22 +674,22 @@ if (session) {
 
         <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 pt-1">
           <span>// Left Axis: NAV ($) &bull; Period High / Low Guides</span>
-          <span>Tokyo VPS 5-Min Master Bars</span>
+          <span>Tokyo VPS &bull; 23:52 UTC Daily Rebalance</span>
           <span>// Right Axis: Tail &beta;</span>
         </div>
       </div>
 
-      <!-- Panel 2: 6-Asset Basket Exposure Table (100% Full Width) -->
+      <!-- Panel 2: 18-Asset Basket Exposure Table (100% Full Width) -->
       <div class="w-full p-5 sm:p-6 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl space-y-4">
         <div class="flex items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
           <div class="space-y-0.5">
-            <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// 6-ASSET SATELLITE BASKET</span>
+            <span class="text-xs font-mono text-slate-500 uppercase tracking-wider">// 18-ASSET ALL-USDC BASKET (K=4 LONG / K=4 SHORT)</span>
             <div class="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 font-sans tracking-tight">
               Real-Time Holdings &amp; Exposure
             </div>
           </div>
           <span class="px-2.5 py-1 rounded text-[10px] font-mono font-bold bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30">
-            DIRICHLET 6
+            ALL-USDC K=4
           </span>
         </div>
 
@@ -703,9 +712,11 @@ if (session) {
           <!-- Basket Summary Footer -->
           <div id="basket-table-footer" class="border-t border-slate-300 dark:border-slate-800 bg-slate-100/70 dark:bg-slate-950/70 px-5 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
             <div class="flex items-center space-x-4 text-slate-500 dark:text-slate-400">
-              <span>Active Legs: <span id="basket-active-legs" class="font-bold text-slate-800 dark:text-slate-200">0 / 6</span></span>
+              <span>Active Legs: <span id="basket-active-legs" class="font-bold text-slate-800 dark:text-slate-200">0 / 8</span></span>
               <span>&bull;</span>
-              <span>Gross Exposure: <span id="basket-gross-exposure" class="font-bold text-slate-800 dark:text-slate-200">$0.00</span></span>
+              <span>Gross Exposure: <span id="basket-gross-exposure" class="font-bold text-slate-800 dark:text-slate-200">$0.00 (0.00x)</span></span>
+              <span>&bull;</span>
+              <span>Funding PnL: <span id="basket-funding-pnl" class="font-bold text-emerald-500">+$0.00</span></span>
             </div>
             <div class="flex items-center space-x-2">
               <span class="text-slate-500 dark:text-slate-400">Basket Unrealized PnL:</span>
@@ -715,10 +726,183 @@ if (session) {
         </div>
 
         <div class="text-[11px] font-mono text-slate-500 pt-1">
-          // 6-Asset Orthogonal Core Basket &bull; Binance USD&Scy;-M Futures Mark Resolution &bull; Auto-Hedging Active
+          // 18-Asset All-USDC Universe &bull; Binance USD&Scy;-M Futures Mark Resolution &bull; Guarded Hybrid Execution
         </div>
       </div>
 
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- SECTION 3B: v3.1 SLOW-ALPHA (M2) FACTOR ENGINE & 30-DAY EXECUTION AUDIT   -->
+    <!-- ========================================================================= -->
+    <div class="w-full space-y-4">
+      <div class="flex items-center space-x-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+        <span class="text-xs font-mono font-bold text-cyan-600 dark:text-cyan-400 tracking-wider uppercase">
+          // v3.1 SLOW-ALPHA (M2) FACTOR ENGINE &amp; 30-DAY EXECUTION AUDIT
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        
+        <!-- LEFT CARD: Slow-Alpha Factor Ranking (M2: S1 ResMom + S2 Skew/MAX) -->
+        <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl flex flex-col justify-between space-y-5">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+              <div>
+                <span class="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">FACTOR ARCHITECTURE</span>
+                <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100 font-sans">
+                  Slow-Alpha Factor Ranking (M2: S1 ResMom + S2 Skew/MAX)
+                </h3>
+              </div>
+              <span id="v31-factors-model-badge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">
+                MODEL: M2
+              </span>
+            </div>
+
+            <!-- Status Strip -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3 rounded-xl bg-slate-100/70 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 font-mono text-[11px]">
+              <div>
+                <span class="text-slate-500 text-[10px] block">BAR MODE:</span>
+                <span id="v31-factors-bar-mode" class="font-bold text-slate-800 dark:text-slate-200 truncate block">SYNTHETIC_2352_UTC_CLOSE</span>
+              </div>
+              <div>
+                <span class="text-slate-500 text-[10px] block">PIT ELIGIBLE:</span>
+                <span id="v31-factors-eligible-count" class="font-bold text-emerald-400">18 / 18</span>
+              </div>
+              <div>
+                <span class="text-slate-500 text-[10px] block">ACTIVE K / LEV / ACI:</span>
+                <span id="v31-factors-k-lev" class="font-bold text-cyan-400">K=4 &bull; 0.50x &bull; ACI 1.00</span>
+              </div>
+              <div>
+                <span class="text-slate-500 text-[10px] block">POST NEUTRALITY:</span>
+                <span id="v31-factors-neutrality" class="font-bold text-emerald-400">&beta; 0.00e+0 &bull; $ 0.00e+0</span>
+              </div>
+            </div>
+
+            <!-- Two-Column Ranking (TOP LONGS vs BOTTOM SHORTS) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+              <!-- Column 1: Top Longs -->
+              <div class="space-y-2 rounded-xl p-3.5 bg-emerald-950/10 dark:bg-emerald-950/20 border border-emerald-500/20">
+                <div class="flex items-center justify-between text-[11px] font-mono font-bold text-emerald-400 border-b border-emerald-500/20 pb-1.5">
+                  <span class="flex items-center space-x-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    <span>TOP LONGS (M2 ALPHA)</span>
+                  </span>
+                  <span class="text-[10px] text-emerald-500/80">SCORE / WEIGHT</span>
+                </div>
+                <div id="v31-top-longs-container" class="space-y-1.5 text-xs font-mono">
+                  <div class="text-slate-500 py-2 text-center">Awaiting telemetry...</div>
+                </div>
+              </div>
+
+              <!-- Column 2: Bottom Shorts -->
+              <div class="space-y-2 rounded-xl p-3.5 bg-rose-950/10 dark:bg-rose-950/20 border border-rose-500/20">
+                <div class="flex items-center justify-between text-[11px] font-mono font-bold text-rose-400 border-b border-rose-500/20 pb-1.5">
+                  <span class="flex items-center space-x-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+                    <span>BOTTOM SHORTS (M2 ALPHA)</span>
+                  </span>
+                  <span class="text-[10px] text-rose-500/80">SCORE / WEIGHT</span>
+                </div>
+                <div id="v31-bottom-shorts-container" class="space-y-1.5 text-xs font-mono">
+                  <div class="text-slate-500 py-2 text-center">Awaiting telemetry...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-[11px] font-mono text-slate-500 pt-1 border-t border-slate-200 dark:border-slate-800">
+            // Cross-Sectional Orthogonal Residual Momentum (S1) + Idiosyncratic Skew/MAX (S2)
+          </div>
+        </div>
+
+        <!-- RIGHT CARD: 30-Day Guarded Hybrid Execution Audit -->
+        <div class="p-5 sm:p-6 rounded-2xl bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl flex flex-col justify-between space-y-5">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+              <div>
+                <span class="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">EXECUTION QUALITY BENCHMARK</span>
+                <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100 font-sans">
+                  30-Day Guarded Hybrid Execution Audit (Target &le; 5.50 bps RT)
+                </h3>
+              </div>
+              <span id="v31-audit-regime-badge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-800 text-slate-400 border border-slate-700">
+                AWAITING FIRST 23:52 UTC REBALANCE (0 / 30)
+              </span>
+            </div>
+
+            <!-- Benchmark Header Metric & Visual Cost Scale -->
+            <div class="p-3.5 rounded-xl bg-slate-100/70 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 space-y-2.5">
+              <div class="flex flex-wrap items-baseline justify-between gap-2">
+                <div class="flex items-baseline space-x-2">
+                  <span id="v31-audit-implied-cost-val" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 font-mono tracking-tight">
+                    0.00 bps RT
+                  </span>
+                  <span class="text-xs font-mono text-slate-500">Avg Round-Trip Cost</span>
+                </div>
+                <div class="text-xs font-mono text-slate-500 dark:text-slate-400">
+                  Regime A Target: <span class="font-bold text-emerald-400">&le; 5.50 bps</span> &bull; Taker Cap: <span class="text-slate-400">10.20 bps</span>
+                </div>
+              </div>
+
+              <!-- Cost progress bar with Regime A target line (5.50 / 10.20 = ~53.9%) -->
+              <div class="relative pt-2">
+                <div class="h-2 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden relative">
+                  <div id="v31-audit-cost-progress-bar" class="h-full bg-emerald-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <div class="absolute top-0 bottom-0 left-[53.9%] w-0.5 bg-cyan-400/80 z-10" title="Regime A Target: 5.50 bps"></div>
+                <div class="flex justify-between text-[9px] font-mono text-slate-500 mt-1">
+                  <span>0 bps (Pure Maker)</span>
+                  <span class="text-cyan-400 font-bold">5.50 bps Target</span>
+                  <span>10.20 bps (Taker Cap)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Audit KPI-Grid (2x4 Tiles) -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 font-mono text-xs">
+              <div class="p-2.5 rounded-lg bg-slate-100/50 dark:bg-slate-950/40 border border-slate-200/80 dark:border-slate-800/80">
+                <span class="text-slate-500 text-[10px] block">Rebalances:</span>
+                <span id="v31-audit-rebalances-val" class="font-bold text-slate-800 dark:text-slate-200">0 / 30</span>
+              </div>
+              <div class="p-2.5 rounded-lg bg-slate-100/50 dark:bg-slate-950/40 border border-slate-200/80 dark:border-slate-800/80">
+                <span class="text-slate-500 text-[10px] block">Maker Fill Ratio:</span>
+                <span id="v31-audit-maker-ratio-val" class="font-bold text-emerald-400">0.0%</span>
+              </div>
+              <div class="p-2.5 rounded-lg bg-slate-100/50 dark:bg-slate-950/40 border border-slate-200/80 dark:border-slate-800/80">
+                <span class="text-slate-500 text-[10px] block">Cost_WT (End-Win):</span>
+                <span id="v31-audit-cost-wt-val" class="font-bold text-slate-800 dark:text-slate-200">0.00 bps</span>
+              </div>
+              <div class="p-2.5 rounded-lg bg-slate-100/50 dark:bg-slate-950/40 border border-slate-200/80 dark:border-slate-800/80">
+                <span class="text-slate-500 text-[10px] block">IS_P0 (Dec. Mid):</span>
+                <span id="v31-audit-is-p0-val" class="font-bold text-slate-800 dark:text-slate-200">0.00 bps</span>
+              </div>
+              <div class="p-2.5 rounded-lg bg-slate-100/50 dark:bg-slate-950/40 border border-slate-200/80 dark:border-slate-800/80">
+                <span class="text-slate-500 text-[10px] block">Beats 5.50 bps:</span>
+                <span id="v31-audit-beats-ratio-val" class="font-bold text-cyan-400">0%</span>
+              </div>
+              <div class="p-2.5 rounded-lg bg-slate-100/50 dark:bg-slate-950/40 border border-slate-200/80 dark:border-slate-800/80">
+                <span class="text-slate-500 text-[10px] block">Aborts / Timeouts:</span>
+                <span id="v31-audit-breakers-val" class="font-bold text-slate-800 dark:text-slate-200">0 / 0</span>
+              </div>
+              <div class="p-2.5 rounded-lg bg-slate-100/50 dark:bg-slate-950/40 border border-slate-200/80 dark:border-slate-800/80">
+                <span class="text-slate-500 text-[10px] block">15s BBO Re-Pegs:</span>
+                <span id="v31-audit-repegs-val" class="font-bold text-slate-800 dark:text-slate-200">0</span>
+              </div>
+              <div class="p-2.5 rounded-lg bg-slate-100/50 dark:bg-slate-950/40 border border-slate-200/80 dark:border-slate-800/80">
+                <span class="text-slate-500 text-[10px] block">Traded Vol / Fees:</span>
+                <span id="v31-audit-vol-fees-val" class="font-bold text-slate-800 dark:text-slate-200">$0 / $0.00</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-[11px] font-mono text-slate-500 pt-1 border-t border-slate-200 dark:border-slate-800">
+            // Guarded Hybrid Execution: 15s Continuous BBO Maker Re-Pegging with Microsecond Cancel-Replace
+          </div>
+        </div>
+
+      </div>
     </div>
 
     <!-- ============================================================== -->
@@ -1151,6 +1335,9 @@ if (session) {
     copyTextToClipboard,
     triggerJsonDownload,
     showDiagnosticToast,
+    V31_TRADABLE_SYMBOLS,
+    extractV31Meta,
+    type V31MetaResult,
   } from '../lib/diagnosticExporter';
 
   let pollingInterval: any = null;
@@ -1197,14 +1384,61 @@ if (session) {
     const absVal = Math.abs(lots);
     let formattedNumber = '';
 
-    if (symUpper.includes('DOGE') && absVal >= 1000) {
+    if ((symUpper.includes('PEPE') || symUpper.includes('DOGE')) && absVal >= 1000) {
       formattedNumber = Math.round(absVal).toLocaleString('en-US');
-    } else if (symUpper.includes('SUI') || symUpper.includes('XRP')) {
+    } else if (
+      symUpper.includes('SUI') ||
+      symUpper.includes('XRP') ||
+      symUpper.includes('ARB') ||
+      symUpper.includes('FIL') ||
+      symUpper.includes('ADA') ||
+      symUpper.includes('ENA') ||
+      symUpper.includes('WLD')
+    ) {
       formattedNumber = absVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    } else if (
+      symUpper.includes('SOL') ||
+      symUpper.includes('AVAX') ||
+      symUpper.includes('LINK') ||
+      symUpper.includes('BNB') ||
+      symUpper.includes('AAVE') ||
+      symUpper.includes('LTC') ||
+      symUpper.includes('BCH')
+    ) {
+      formattedNumber = absVal.toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 4 });
     } else {
-      formattedNumber = absVal.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+      formattedNumber = absVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
     }
     return `${sign}${formattedNumber} ${baseAsset}`;
+  }
+
+  let countdownTimer: any = null;
+  function getNext2352UtcCountdown(): string {
+    const now = new Date();
+    const nextTarget = new Date(Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
+      23, 52, 0, 0
+    ));
+    if (now.getTime() >= nextTarget.getTime()) {
+      nextTarget.setUTCDate(nextTarget.getUTCDate() + 1);
+    }
+    const diffSec = Math.max(0, Math.floor((nextTarget.getTime() - now.getTime()) / 1000));
+    const h = Math.floor(diffSec / 3600);
+    const m = Math.floor((diffSec % 3600) / 60);
+    const s = diffSec % 60;
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  }
+
+  function startCountdownTimer() {
+    if (countdownTimer) return;
+    countdownTimer = setInterval(() => {
+      const el = document.getElementById('flat-rebalance-countdown');
+      if (el) {
+        el.textContent = `Next Rebalance in ${getNext2352UtcCountdown()}`;
+      }
+    }, 1000);
   }
 
   // Currency Formatter
@@ -1652,11 +1886,12 @@ if (session) {
     const norm = normalizeTelemetryRow(latest);
     if (!norm) return;
 
-    const nav = Number(norm.nav_usd) || 0;
-    const wallet = Number(norm.wallet_balance_usd) || 0;
-    const upnl = Number(norm.unrealized_pnl_usd) || 0;
-    const rpnl = Number(norm.realized_pnl_usd) || 0;
-    const fees = norm.totalFees;
+    const v31 = extractV31Meta(latest, cachedTelemetryHistory);
+    const nav = v31.navUsd;
+    const wallet = v31.walletBalanceUsd;
+    const upnl = v31.unrealizedPnlUsd;
+    const rpnl = v31.realizedPnlUsd;
+    const fees = v31.totalFeesUsd;
 
     if (navVal) navVal.textContent = formatUsd(nav);
     if (walletVal) walletVal.textContent = formatUsd(wallet);
@@ -1666,6 +1901,20 @@ if (session) {
     }
     if (rpnlVal) rpnlVal.textContent = formatUsd(rpnl);
     if (feesVal) feesVal.textContent = formatUsd(fees);
+
+    const netRetUsd = nav - v31.initialNavUsd;
+    const netRetPct = v31.initialNavUsd > 0 ? (netRetUsd / v31.initialNavUsd) * 100 : 0;
+    const retUsdEl = document.getElementById('card1-net-return-usd');
+    const retPctEl = document.getElementById('card1-net-return-pct');
+    if (retUsdEl) {
+      retUsdEl.textContent = `${netRetUsd >= 0 ? '+' : ''}${formatUsd(netRetUsd)}`;
+      retUsdEl.className = netRetUsd >= 0 ? 'font-bold text-emerald-400' : 'font-bold text-rose-400';
+    }
+    if (retPctEl) {
+      retPctEl.textContent = `${netRetPct >= 0 ? '+' : ''}${netRetPct.toFixed(2)}%`;
+      retPctEl.className = netRetPct >= 0 ? 'font-bold text-emerald-400' : 'font-bold text-rose-400';
+    }
+
     if (navBadge) {
       navBadge.textContent = 'SATELLITE MTM';
       navBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30';
@@ -1752,17 +2001,15 @@ if (session) {
   // SECTION 3 RENDERER (SVG CHART & BASKET)
   // ==========================================
   function renderSection3(latest: any, history: any[], livePricesMap?: Record<string, number>) {
-    // 1. Render Basket Exposure Table
-    const navUsd = Number(latest?.nav_usd) || 100000;
-    const ledgerUpnl = Number(latest?.unrealized_pnl_usd) || 0;
-    renderBasketTable(latest?.positions_lots || latest?.positions || {}, navUsd, ledgerUpnl, livePricesMap);
-
-    // 2. Render SVG Chart
+    const v31 = extractV31Meta(latest, history);
+    const positions = latest?.gonogo_report?.positions_v31 || latest?.positions_lots || latest?.positions || {};
+    renderBasketTable(positions, v31.navUsd, v31.unrealizedPnlUsd, livePricesMap);
+    renderV31AuditPanel(v31);
     renderChart(history);
   }
 
   function renderBasketTable(
-    positions: Record<string, any>,
+    positions: Record<string, any> | any[],
     navUsdParam?: number,
     totalLedgerUpnlUsd: number = 0,
     livePricesMap?: Record<string, number>
@@ -1770,66 +2017,62 @@ if (session) {
     const container = document.getElementById('basket-table-rows');
     if (!container) return;
 
-    const navUsd = Number(navUsdParam) || (latestTelemetryRow ? Number(latestTelemetryRow.nav_usd) : 100000) || 100000;
+    const v31 = extractV31Meta(latestTelemetryRow, cachedTelemetryHistory);
+    const navUsd = Number(navUsdParam) || v31.navUsd;
     const holdings = computeAllBasketHoldings(positions, navUsd, totalLedgerUpnlUsd, livePricesMap);
 
-    let activeLegsCount = 0;
     let totalGrossExposure = 0;
     let totalBasketUpnlUsd = 0;
 
-    const rowsHtml = holdings.map(h => {
-      const isLong = h.direction === 'LONG';
-      const isShort = h.direction === 'SHORT';
-      const isFlat = h.direction === 'FLAT';
+    for (const h of holdings) {
+      totalGrossExposure += Math.abs(h.notional_usd);
+      totalBasketUpnlUsd += h.upnl_usd;
+    }
 
-      if (!isFlat) {
-        activeLegsCount++;
-        totalGrossExposure += Math.abs(h.notional_usd);
-        totalBasketUpnlUsd += h.upnl_usd;
-      }
+    if (holdings.length === 0) {
+      startCountdownTimer();
+      container.innerHTML = `
+        <div class="p-6 sm:p-8 flex flex-col items-center justify-center text-center space-y-3 bg-slate-100/50 dark:bg-slate-900/40 rounded-xl border border-slate-200 dark:border-slate-800 m-2">
+          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-950/10 dark:bg-cyan-950/40 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30 text-xs font-mono font-bold">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+            <span>100% CASH / FLAT &mdash; Awaiting Next 23:52:00 UTC Guarded Hybrid Rebalance</span>
+          </div>
+          <div class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-slate-100 font-mono tracking-tight" id="flat-rebalance-countdown">
+            Next Rebalance in ${getNext2352UtcCountdown()}
+          </div>
+          <div class="text-xs font-mono text-slate-500 dark:text-slate-400">
+            PIT Eligible: <span class="font-bold text-emerald-400">${v31.factors.eligible_count} / 18</span> &bull; 
+            Active K: <span class="font-bold text-cyan-400">${v31.factors.active_k} Long / ${v31.factors.active_k} Short</span> &bull; 
+            Target Leverage: <span class="font-bold text-slate-700 dark:text-slate-200">${v31.factors.target_leverage.toFixed(2)}x</span>
+          </div>
+        </div>
+      `;
+    } else {
+      const rowsHtml = holdings.map(h => {
+        const isLong = h.direction === 'LONG';
 
-      // Column 1: Asset + Badge
-      let badgeHtml = '<span class="bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded text-[9px] font-bold shrink-0">FLAT</span>';
-      if (isLong) {
-        badgeHtml = '<span class="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 px-1.5 py-0.5 rounded text-[9px] font-bold shrink-0">LONG</span>';
-      } else if (isShort) {
-        badgeHtml = '<span class="bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30 px-1.5 py-0.5 rounded text-[9px] font-bold shrink-0">SHORT</span>';
-      }
+        const badgeHtml = isLong
+          ? '<span class="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 px-1.5 py-0.5 rounded text-[9px] font-bold shrink-0">LONG</span>'
+          : '<span class="bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30 px-1.5 py-0.5 rounded text-[9px] font-bold shrink-0">SHORT</span>';
 
-      // Column 2: Size (Lots)
-      const lotsFormatted = formatLotsWithAsset(h.qty_lots, h.symbol);
-
-      // Column 3: Exposure ($ / %)
-      let exposureTop = '$0.00';
-      let exposureBottom = '(0.00% of NAV)';
-      let exposureColor = 'text-slate-400';
-      let barWidthPct = 0;
-
-      if (!isFlat) {
+        const lotsFormatted = formatLotsWithAsset(h.qty_lots, h.symbol);
         const absNotional = Math.abs(h.notional_usd);
         const signNotional = h.notional_usd >= 0 ? '+' : '-';
-        exposureTop = `${signNotional}$${absNotional.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        exposureColor = isLong ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-rose-600 dark:text-rose-400 font-bold';
+        const exposureTop = `${signNotional}$${absNotional.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        const exposureColor = isLong ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-rose-600 dark:text-rose-400 font-bold';
         const weightPct = h.weight * 100;
-        exposureBottom = `(${weightPct >= 0 ? '+' : ''}${weightPct.toFixed(2)}% of NAV)`;
-        barWidthPct = Math.min(100, Math.max(2, Math.abs(weightPct) * 2));
-      }
+        const exposureBottom = `(${weightPct >= 0 ? '+' : ''}${weightPct.toFixed(2)}% of NAV)`;
+        const barWidthPct = Math.min(100, Math.max(2, Math.abs(weightPct) * 2));
 
-      // Column 4: Entry / Mark ($)
-      let entryMarkHtml = '<span class="text-slate-500">—</span>';
-      if (!isFlat) {
-        entryMarkHtml = `
+        const entryMarkHtml = `
           <div class="leading-tight"><span class="text-slate-400 text-[10px] mr-1">IN:</span><span class="text-slate-700 dark:text-slate-200 font-semibold">${fmtContractPrice(h.entry_price, h.symbol)}</span></div>
           <div class="leading-tight mt-1"><span class="text-slate-400 text-[10px] mr-1">MARK:</span><span class="text-cyan-600 dark:text-cyan-400 font-semibold">${fmtContractPrice(h.mark_price, h.symbol)}</span></div>
         `;
-      }
 
-      // Column 5: Unrealized PnL ($ / %)
-      let upnlHtml = `
-        <div class="font-bold text-slate-400 dark:text-slate-500 leading-tight">$0.00</div>
-        <div class="mt-1"><span class="inline-block px-1.5 py-0.5 rounded bg-slate-200/60 dark:bg-slate-800 text-slate-500 text-[10px] font-bold">0.00%</span></div>
-      `;
-      if (!isFlat) {
+        let upnlHtml = `
+          <div class="font-bold text-slate-400 dark:text-slate-500 leading-tight">$0.00</div>
+          <div class="mt-1"><span class="inline-block px-1.5 py-0.5 rounded bg-slate-200/60 dark:bg-slate-800 text-slate-500 text-[10px] font-bold">0.00%</span></div>
+        `;
         if (h.upnl_usd > 0.005) {
           upnlHtml = `
             <div class="font-bold text-emerald-600 dark:text-emerald-400 leading-tight">
@@ -1853,63 +2096,70 @@ if (session) {
             </div>
           `;
         }
-      }
 
-      return `
-        <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-3 sm:gap-4 px-5 py-3.5 hover:bg-slate-200/40 dark:hover:bg-slate-800/40 transition-colors">
-          <!-- Col 1: Asset -->
-          <div class="sm:col-span-2 flex items-center justify-between sm:justify-start space-x-2">
-            <span class="font-bold text-slate-900 dark:text-slate-100">${h.symbol}</span>
-            ${badgeHtml}
-          </div>
+        return `
+          <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-3 sm:gap-4 px-5 py-3.5 hover:bg-slate-200/40 dark:hover:bg-slate-800/40 transition-colors">
+            <!-- Col 1: Asset -->
+            <div class="sm:col-span-2 flex items-center justify-between sm:justify-start space-x-2">
+              <span class="font-bold text-slate-900 dark:text-slate-100">${h.symbol}</span>
+              ${badgeHtml}
+            </div>
 
-          <!-- Col 2: Size (Lots) -->
-          <div class="sm:col-span-2 flex justify-between sm:justify-end items-center sm:text-right">
-            <span class="sm:hidden text-slate-500 text-[10px]">SIZE:</span>
-            <span class="text-slate-700 dark:text-slate-300 font-semibold">${lotsFormatted}</span>
-          </div>
+            <!-- Col 2: Size (Lots) -->
+            <div class="sm:col-span-2 flex justify-between sm:justify-end items-center sm:text-right">
+              <span class="sm:hidden text-slate-500 text-[10px]">SIZE:</span>
+              <span class="text-slate-700 dark:text-slate-300 font-semibold">${lotsFormatted}</span>
+            </div>
 
-          <!-- Col 3: Exposure ($ / %) -->
-          <div class="sm:col-span-3 flex justify-between sm:justify-end items-center sm:text-right">
-            <span class="sm:hidden text-slate-500 text-[10px]">EXPOSURE:</span>
-            <div class="flex flex-col items-end">
-              <div class="${exposureColor}">${exposureTop}</div>
-              <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">${exposureBottom}</div>
-              ${!isFlat ? `
+            <!-- Col 3: Exposure ($ / %) -->
+            <div class="sm:col-span-3 flex justify-between sm:justify-end items-center sm:text-right">
+              <span class="sm:hidden text-slate-500 text-[10px]">EXPOSURE:</span>
+              <div class="flex flex-col items-end">
+                <div class="${exposureColor}">${exposureTop}</div>
+                <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">${exposureBottom}</div>
                 <div class="w-20 h-1 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden mt-1">
                   <div class="h-full ${isLong ? 'bg-emerald-500' : 'bg-rose-500'}" style="width: ${barWidthPct}%"></div>
                 </div>
-              ` : ''}
+              </div>
+            </div>
+
+            <!-- Col 4: Entry / Mark -->
+            <div class="sm:col-span-3 flex justify-between sm:justify-end items-center sm:text-right">
+              <span class="sm:hidden text-slate-500 text-[10px]">ENTRY / MARK:</span>
+              <div class="text-right">${entryMarkHtml}</div>
+            </div>
+
+            <!-- Col 5: uPnL -->
+            <div class="sm:col-span-2 flex justify-between sm:justify-end items-center sm:text-right">
+              <span class="sm:hidden text-slate-500 text-[10px]">UPNL:</span>
+              <div class="text-right">${upnlHtml}</div>
             </div>
           </div>
+        `;
+      }).join('');
 
-          <!-- Col 4: Entry / Mark -->
-          <div class="sm:col-span-3 flex justify-between sm:justify-end items-center sm:text-right">
-            <span class="sm:hidden text-slate-500 text-[10px]">ENTRY / MARK:</span>
-            <div class="text-right">${entryMarkHtml}</div>
-          </div>
-
-          <!-- Col 5: uPnL -->
-          <div class="sm:col-span-2 flex justify-between sm:justify-end items-center sm:text-right">
-            <span class="sm:hidden text-slate-500 text-[10px]">UPNL:</span>
-            <div class="text-right">${upnlHtml}</div>
-          </div>
-        </div>
-      `;
-    }).join('');
-
-    container.innerHTML = rowsHtml;
+      container.innerHTML = rowsHtml;
+    }
 
     // Update Footer Summary
     const activeLegsEl = document.getElementById('basket-active-legs');
     const grossExpEl = document.getElementById('basket-gross-exposure');
+    const fundingPnlEl = document.getElementById('basket-funding-pnl');
     const totalUpnlEl = document.getElementById('basket-total-upnl');
 
-    if (activeLegsEl) activeLegsEl.textContent = `${activeLegsCount} / 6`;
-    if (grossExpEl) grossExpEl.textContent = formatUsd(totalGrossExposure);
+    if (activeLegsEl) activeLegsEl.textContent = `${holdings.length} / ${v31.factors.active_k * 2}`;
+    if (grossExpEl) {
+      const grossLev = navUsd > 0 ? totalGrossExposure / navUsd : Number(latestTelemetryRow?.gross_leverage || 0);
+      grossExpEl.textContent = `${formatUsd(totalGrossExposure)} (${grossLev.toFixed(2)}x)`;
+    }
+    if (fundingPnlEl) {
+      const sign = v31.cumulativeFundingUsd >= 0 ? '+' : '';
+      fundingPnlEl.textContent = `${sign}${formatUsd(v31.cumulativeFundingUsd)}`;
+      fundingPnlEl.className = v31.cumulativeFundingUsd >= 0 ? 'font-bold text-emerald-400' : 'font-bold text-rose-400';
+    }
 
     if (totalUpnlEl) {
-      const effectiveTotalUpnl = Math.abs(totalBasketUpnlUsd) > 1e-4 ? totalBasketUpnlUsd : totalLedgerUpnlUsd;
+      const effectiveTotalUpnl = (holdings.length > 0 && Math.abs(totalBasketUpnlUsd) > 1e-4) ? totalBasketUpnlUsd : totalLedgerUpnlUsd;
       const basketUpnlPct = navUsd > 0 ? (effectiveTotalUpnl / navUsd) * 100 : 0;
       if (effectiveTotalUpnl > 0.005) {
         totalUpnlEl.textContent = `+${formatUsd(effectiveTotalUpnl)} (+${basketUpnlPct.toFixed(2)}%)`;
@@ -1921,6 +2171,129 @@ if (session) {
         totalUpnlEl.textContent = `$0.00 (0.00%)`;
         totalUpnlEl.className = 'font-bold text-slate-500 dark:text-slate-400';
       }
+    }
+  }
+
+  function renderV31AuditPanel(v31: V31MetaResult) {
+    const modelBadge = document.getElementById('v31-factors-model-badge');
+    const barModeEl = document.getElementById('v31-factors-bar-mode');
+    const eligibleEl = document.getElementById('v31-factors-eligible-count');
+    const kLevEl = document.getElementById('v31-factors-k-lev');
+    const neutralityEl = document.getElementById('v31-factors-neutrality');
+    const topLongsEl = document.getElementById('v31-top-longs-container');
+    const bottomShortsEl = document.getElementById('v31-bottom-shorts-container');
+
+    if (modelBadge) modelBadge.textContent = `MODEL: ${v31.factors.model_name}`;
+    if (barModeEl) barModeEl.textContent = v31.factors.bar_mode;
+    if (eligibleEl) eligibleEl.textContent = `${v31.factors.eligible_count} / 18`;
+    if (kLevEl) {
+      kLevEl.textContent = `K=${v31.factors.active_k} • ${v31.factors.target_leverage.toFixed(2)}x • ACI ${v31.factors.aci_multiplier.toFixed(2)}`;
+    }
+    if (neutralityEl) {
+      const isBetaPass = Math.abs(v31.factors.expected_beta_post) <= 0.030;
+      const isDollarPass = Math.abs(v31.factors.expected_dollar_post) <= 0.020;
+      const isEmerald = isBetaPass && isDollarPass;
+      neutralityEl.textContent = `β ${v31.factors.expected_beta_post.toExponential(2)} • $ ${v31.factors.expected_dollar_post.toExponential(2)}`;
+      neutralityEl.className = isEmerald ? 'font-bold text-emerald-400' : 'font-bold text-amber-400';
+    }
+
+    if (topLongsEl) {
+      if (v31.factors.top_longs.length === 0) {
+        topLongsEl.innerHTML = `<div class="text-slate-500 py-2 text-center">Awaiting telemetry...</div>`;
+      } else {
+        topLongsEl.innerHTML = v31.factors.top_longs.map(item => {
+          const isHullSwap = Math.abs(item.weight) < 1e-6;
+          const rowClass = isHullSwap ? 'opacity-75 bg-amber-500/5' : 'hover:bg-emerald-500/10';
+          const weightBadge = isHullSwap
+            ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30 cursor-help" title="Excluded by Dual-Nullspace Beta-Hull Swap">HULL SWAP • 0%</span>`
+            : `<span class="font-bold text-emerald-400">+${(item.weight * 100).toFixed(2)}%</span>`;
+          return `
+            <div class="flex items-center justify-between p-1.5 rounded transition-colors ${rowClass}">
+              <span class="font-bold text-slate-800 dark:text-slate-200">${item.symbol}</span>
+              <div class="flex items-center space-x-2">
+                <span class="text-slate-500 text-[11px]">${item.score >= 0 ? '+' : ''}${item.score.toFixed(4)}</span>
+                ${weightBadge}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    if (bottomShortsEl) {
+      if (v31.factors.bottom_shorts.length === 0) {
+        bottomShortsEl.innerHTML = `<div class="text-slate-500 py-2 text-center">Awaiting telemetry...</div>`;
+      } else {
+        bottomShortsEl.innerHTML = v31.factors.bottom_shorts.map(item => {
+          const isHullSwap = Math.abs(item.weight) < 1e-6;
+          const rowClass = isHullSwap ? 'opacity-75 bg-amber-500/5' : 'hover:bg-rose-500/10';
+          const weightBadge = isHullSwap
+            ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30 cursor-help" title="Excluded by Dual-Nullspace Beta-Hull Swap">HULL SWAP • 0%</span>`
+            : `<span class="font-bold text-rose-400">-${Math.abs(item.weight * 100).toFixed(2)}%</span>`;
+          return `
+            <div class="flex items-center justify-between p-1.5 rounded transition-colors ${rowClass}">
+              <span class="font-bold text-slate-800 dark:text-slate-200">${item.symbol}</span>
+              <div class="flex items-center space-x-2">
+                <span class="text-slate-500 text-[11px]">${item.score >= 0 ? '+' : ''}${item.score.toFixed(4)}</span>
+                ${weightBadge}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    const audit = v31.execAudit;
+    const regimeBadge = document.getElementById('v31-audit-regime-badge');
+    const costVal = document.getElementById('v31-audit-implied-cost-val');
+    const costBar = document.getElementById('v31-audit-cost-progress-bar');
+    const rebalancesVal = document.getElementById('v31-audit-rebalances-val');
+    const makerRatioVal = document.getElementById('v31-audit-maker-ratio-val');
+    const costWtVal = document.getElementById('v31-audit-cost-wt-val');
+    const isP0Val = document.getElementById('v31-audit-is-p0-val');
+    const beatsRatioVal = document.getElementById('v31-audit-beats-ratio-val');
+    const breakersVal = document.getElementById('v31-audit-breakers-val');
+    const repegsVal = document.getElementById('v31-audit-repegs-val');
+    const volFeesVal = document.getElementById('v31-audit-vol-fees-val');
+
+    if (costVal) costVal.textContent = `${audit.avg_implied_rt_cost_bps.toFixed(2)} bps RT`;
+    if (costBar) {
+      const pct = Math.min(100, Math.max(0, (audit.avg_implied_rt_cost_bps / 10.20) * 100));
+      costBar.style.width = `${pct}%`;
+      if (audit.avg_implied_rt_cost_bps <= 5.50) {
+        costBar.className = 'h-full bg-emerald-500 rounded-full transition-all duration-500';
+      } else if (audit.avg_implied_rt_cost_bps <= 10.20) {
+        costBar.className = 'h-full bg-amber-500 rounded-full transition-all duration-500';
+      } else {
+        costBar.className = 'h-full bg-rose-500 rounded-full transition-all duration-500';
+      }
+    }
+
+    if (regimeBadge) {
+      if (audit.rebalances_completed === 0) {
+        regimeBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-800 text-slate-400 border border-slate-700';
+        regimeBadge.textContent = 'AWAITING FIRST 23:52 UTC REBALANCE (0 / 30)';
+      } else if (audit.avg_implied_rt_cost_bps <= 5.50) {
+        regimeBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+        regimeBadge.textContent = 'BEATING REGIME A (<= 5.50 BPS)';
+      } else if (audit.avg_implied_rt_cost_bps <= 10.20) {
+        regimeBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30';
+        regimeBadge.textContent = 'BEATING TAKER (<= 10.20 BPS)';
+      } else {
+        regimeBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30';
+        regimeBadge.textContent = 'ABOVE TAKER COST';
+      }
+    }
+
+    if (rebalancesVal) rebalancesVal.textContent = `${audit.rebalances_completed} / 30`;
+    if (makerRatioVal) makerRatioVal.textContent = `${audit.avg_maker_fill_ratio_pct.toFixed(1)}%`;
+    if (costWtVal) costWtVal.textContent = `${audit.avg_cost_wt_bps.toFixed(2)} bps`;
+    if (isP0Val) isP0Val.textContent = `${audit.avg_is_p0_bps.toFixed(2)} bps`;
+    if (beatsRatioVal) beatsRatioVal.textContent = `${(audit.beats_regime_a_ratio * 100).toFixed(0)}%`;
+    if (breakersVal) breakersVal.textContent = `${audit.total_aborts} / ${audit.total_timeouts}`;
+    if (repegsVal) repegsVal.textContent = String(audit.total_repegs);
+    if (volFeesVal) {
+      volFeesVal.textContent = `$${audit.total_traded_notional_usd.toLocaleString('en-US', { maximumFractionDigits: 0 })} / $${audit.total_fees_usd.toFixed(2)}`;
     }
   }
 
@@ -2000,7 +2373,8 @@ if (session) {
     }
 
     // Period Return (Delta NAV & Delta %)
-    const firstNav = Number(visibleBars[0]?.nav_usd) || 100000;
+    const v31Chart = extractV31Meta(latestTelemetryRow, history);
+    const firstNav = Number(visibleBars[0]?.nav_usd) || v31Chart.initialNavUsd;
     const lastNav = Number(visibleBars[visibleBars.length - 1]?.nav_usd) || firstNav;
     const deltaNav = lastNav - firstNav;
     const deltaPct = firstNav > 0 ? (deltaNav / firstNav) * 100 : 0;
@@ -2391,7 +2765,13 @@ if (session) {
     const label = document.getElementById('binance-ws-label');
 
     try {
-      const streamUrl = 'wss://fstream.binance.com/stream?streams=btcusdc@bookTicker/ethusdc@bookTicker/solusdc@bookTicker/suiusdt@bookTicker/xrpusdc@bookTicker/dogeusdc@bookTicker';
+      const v31Positions = latestTelemetryRow?.gonogo_report?.positions_v31;
+      const activePositionSymbols = (Array.isArray(v31Positions) ? v31Positions : [])
+        .map((p: any) => String(p?.symbol || '').toUpperCase())
+        .filter(Boolean);
+      const allStreamSymbols = Array.from(new Set([...V31_TRADABLE_SYMBOLS, ...activePositionSymbols]));
+      const streamQuery = allStreamSymbols.map((s) => `${s.toLowerCase()}@bookTicker`).join('/');
+      const streamUrl = `wss://fstream.binance.com/stream?streams=${streamQuery}`;
       binanceWs = new WebSocket(streamUrl);
 
       binanceWs.onopen = () => {
@@ -2454,27 +2834,24 @@ if (session) {
   function fastTick() {
     if (!latestTelemetryRow) return;
 
-    const positions = latestTelemetryRow.positions_lots || latestTelemetryRow.positions || {};
-    const ledgerUpnl = Number(latestTelemetryRow.unrealized_pnl_usd) || 0;
-    const walletBalance = Number(latestTelemetryRow.wallet_balance_usd) || 0;
-    const navUsdInitial = Number(latestTelemetryRow.nav_usd) || 100000;
+    const v31 = extractV31Meta(latestTelemetryRow, cachedTelemetryHistory);
+    const positions = latestTelemetryRow.gonogo_report?.positions_v31 || latestTelemetryRow.positions_lots || latestTelemetryRow.positions || {};
+    const ledgerUpnl = v31.unrealizedPnlUsd;
+    const walletBalance = v31.walletBalanceUsd;
+    const navUsdInitial = v31.navUsd;
 
     // Recompute basket holdings with liveMidPrices
     const holdings = computeAllBasketHoldings(positions, navUsdInitial, ledgerUpnl, liveMidPrices);
 
-    let activeLegs = 0;
     let totalGrossExposure = 0;
     let totalBasketUpnl = 0;
 
     for (const h of holdings) {
-      if (h.direction !== 'FLAT') {
-        activeLegs++;
-        totalGrossExposure += Math.abs(h.notional_usd);
-        totalBasketUpnl += h.upnl_usd;
-      }
+      totalGrossExposure += Math.abs(h.notional_usd);
+      totalBasketUpnl += h.upnl_usd;
     }
 
-    const effectiveUpnl = (activeLegs > 0 && Math.abs(totalBasketUpnl) > 0.001) ? totalBasketUpnl : ledgerUpnl;
+    const effectiveUpnl = (holdings.length > 0 && Math.abs(totalBasketUpnl) > 0.001) ? totalBasketUpnl : ledgerUpnl;
     const liveNav = walletBalance + effectiveUpnl;
 
     // Update Card 1: NAV and Unrealized PnL
@@ -2486,11 +2863,25 @@ if (session) {
       upnlVal.className = effectiveUpnl >= 0 ? 'font-bold text-emerald-400' : 'font-bold text-rose-400';
     }
 
-    // Update 6-Asset Basket Table
+    // Update Card 1 Net Return ($ and %)
+    const liveNetReturnUsd = liveNav - v31.initialNavUsd;
+    const liveNetReturnPct = v31.initialNavUsd > 0 ? (liveNetReturnUsd / v31.initialNavUsd) * 100 : 0;
+    const retUsdEl = document.getElementById('card1-net-return-usd');
+    const retPctEl = document.getElementById('card1-net-return-pct');
+    if (retUsdEl) {
+      retUsdEl.textContent = `${liveNetReturnUsd >= 0 ? '+' : ''}${formatUsd(liveNetReturnUsd)}`;
+      retUsdEl.className = liveNetReturnUsd >= 0 ? 'font-bold text-emerald-400' : 'font-bold text-rose-400';
+    }
+    if (retPctEl) {
+      retPctEl.textContent = `${liveNetReturnPct >= 0 ? '+' : ''}${liveNetReturnPct.toFixed(2)}%`;
+      retPctEl.className = liveNetReturnPct >= 0 ? 'font-bold text-emerald-400' : 'font-bold text-rose-400';
+    }
+
+    // Update Holdings Table
     renderBasketTable(positions, liveNav, effectiveUpnl, liveMidPrices);
 
     // Update Card 6 & Multi-Partition Ledger
-    updatePoolSubLedger(liveNav);
+    updatePoolSubLedger(liveNav, v31.initialNavUsd);
   }
 
   function initSupabaseRealtime(accessToken: string) {
@@ -2569,14 +2960,19 @@ if (session) {
     }
   }
 
-  function updatePoolSubLedger(liveNavOverride?: number) {
+  function updatePoolSubLedger(liveNavOverride?: number, initialBaselineOverride?: number) {
     if (currentPartitions.length === 0) return;
 
+    const v31 = extractV31Meta(latestTelemetryRow, cachedTelemetryHistory);
     const liveNav = liveNavOverride !== undefined
       ? liveNavOverride
-      : (latestTelemetryRow ? Number(latestTelemetryRow.nav_usd) : 2750) || 2750;
+      : v31.navUsd;
 
-    const valResult = computePoolPartitionValuations(currentPartitions, liveNav);
+    const initialBaseline = initialBaselineOverride !== undefined
+      ? initialBaselineOverride
+      : v31.initialNavUsd;
+
+    const valResult = computePoolPartitionValuations(currentPartitions, liveNav, initialBaseline);
     latestValuationResult = valResult;
 
     // Update Card 6 Metrics

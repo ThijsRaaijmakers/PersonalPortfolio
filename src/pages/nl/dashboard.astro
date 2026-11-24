@@ -223,8 +223,10 @@ if (session) {
       return;
     }
 
+    const currentShifts = shifts;
+
     // Group shifts by shift_date
-    const grouped = shifts.reduce((acc: any, shift: any) => {
+    const grouped = currentShifts.reduce((acc: any, shift: any) => {
       const dateKey = shift.shift_date;
       if (!acc[dateKey]) {
         acc[dateKey] = [];
@@ -236,16 +238,16 @@ if (session) {
     let sortedDates = Object.keys(grouped).sort((a, b) => isAscending ? a.localeCompare(b) : b.localeCompare(a));
 
     function calculateOverallMetrics() {
-      const totalShifts = new Set(shifts.map((s: any) => s.shift_date)).size;
-      const uniqueVehicles = new Set(shifts.map((s: any) => s.vehicle_license_plate)).size;
-      const uniqueModels = new Set(shifts.map((s: any) => `${s.vehicle_make} ${s.vehicle_model}`)).size;
+      const totalShifts = new Set(currentShifts.map((s: any) => s.shift_date)).size;
+      const uniqueVehicles = new Set(currentShifts.map((s: any) => s.vehicle_license_plate)).size;
+      const uniqueModels = new Set(currentShifts.map((s: any) => `${s.vehicle_make} ${s.vehicle_model}`)).size;
 
-      const hpValues = shifts.map((s: any) => s.rdw_power_hp).filter((hp: any) => typeof hp === 'number' && hp > 0);
+      const hpValues = currentShifts.map((s: any) => s.rdw_power_hp).filter((hp: any) => typeof hp === 'number' && hp > 0);
       const avgHp = hpValues.length > 0 
         ? Math.round(hpValues.reduce((sum: number, val: number) => sum + val, 0) / hpValues.length)
         : 0;
 
-      const totalValue = shifts.reduce((sum: number, s: any) => sum + (s.rdw_catalog_price || 0), 0);
+      const totalValue = currentShifts.reduce((sum: number, s: any) => sum + (s.rdw_catalog_price || 0), 0);
 
       document.getElementById('metric-total')!.textContent = totalShifts.toString();
       document.getElementById('metric-vehicles')!.textContent = uniqueVehicles.toString();
@@ -256,7 +258,7 @@ if (session) {
 
     function renderRows() {
       if (!rowsContainer) return;
-      if (tableCount) tableCount.textContent = `${sortedDates.length} dienstdata (${shifts.length} ritten totaal)`;
+      if (tableCount) tableCount.textContent = `${sortedDates.length} dienstdata (${currentShifts.length} ritten totaal)`;
 
       const html = sortedDates.map((dateStr, index) => {
         const dayShifts = grouped[dateStr];
