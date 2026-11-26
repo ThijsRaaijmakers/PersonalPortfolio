@@ -4,6 +4,7 @@ export interface SatelliteDiagnosticContext {
   latestCoreRow?: Record<string, any> | null;
   recentCommands?: Array<Record<string, any>>;
   venue?: string;
+  livePricesMap?: Record<string, number>;
 }
 
 export interface CoreDiagnosticContext {
@@ -672,13 +673,22 @@ export function computeAllBasketHoldings(
 
 export function normalizeSatelliteSnapshot(ctx: SatelliteDiagnosticContext) {
   const row = ctx.latestRow || {};
-  const history = Array.isArray(ctx.historyRows) && ctx.historyRows.length > 0 ? ctx.historyRows : [row];
-  const v31 = extractV31Meta(row, history);
+  const rawHistory =
+    Array.isArray(ctx.historyRows) && ctx.historyRows.length > 0 ? ctx.historyRows : [row];
+  const sortedHistory = [...rawHistory].sort((a, b) => {
+    const dt = num(a?.timestamp_ms, 0) - num(b?.timestamp_ms, 0);
+    if (dt !== 0) return dt;
+    return num(a?.bar_idx, 0) - num(b?.bar_idx, 0);
+  });
+
+  const v31 = extractV31Meta(row, sortedHistory);
+  const g = v31.rawGonogoReport;
   const csd = typeof row.csd_status === 'object' && row.csd_status !== null ? row.csd_status : {};
   const exec =
     typeof row.execution_quality === 'object' && row.execution_quality !== null
       ? row.execution_quality
       : {};
+  const execAuditRaw = safeParseObj(g?.exec_audit);
   const gonogo =
     typeof row.gonogo_progress === 'object' && row.gonogo_progress !== null ? row.gonogo_progress : {};
   const rawPositions =
@@ -702,19 +712,67 @@ export function normalizeSatelliteSnapshot(ctx: SatelliteDiagnosticContext) {
   const initialNavUsd = v31.initialNavUsd;
   const totalFeesUsd = v31.totalFeesUsd;
   const cumulativeFundingUsd = v31.cumulativeFundingUsd;
-  const drawdownRatio = num(row.drawdown_pct, 0);
-  const grossLeverage = num(row.gross_leverage, 0);
-  const netDollarExp = num(row.net_dollar_exposure, 0);
-  const tailBeta = num(row.realized_tail_beta, 0);
+  const grossLeverage = num(g?.gross_leverage ?? row.gross_leverage, 0);
+  const tailBeta = num(g?.realized_tail_beta ?? row.realized_tail_beta, 0);
+  const absTailBeta = Math.abs(tailBeta);
+  const tailBetaLimit = v31.isV31 ? 0.030 : 0.035;
+  const tailBetaPass = absTailBeta <= tailBetaLimit;
   const zStress = num(row.z_stress, 0);
   const regimeGate = num(row.regime_gate_global ?? csd.regime_gate_global, 1.0);
   const gCsd = num(csd.g_csd ?? row.g_csd, 1.0);
   const rhoConc = num(csd.concordance_rho_h12 ?? row.concordance_rho_h12, 0.0);
   const activeSniperGate = Boolean(csd.active_sniper_gate ?? grossLeverage < 0.001);
 
+  const livePrices =
+    ctx.livePricesMap && Object.keys(ctx.livePricesMap).length > 0
+      ? ctx.livePricesMap
+      : getCachedBinanceFuturesPrices();
+  const holdings: EnrichedAssetHolding[] = computeAllBasketHoldings(
+    rawPositions,
+    navUsd,
+    unrealizedPnlUsd,
+    livePrices
+  );
+
+  // Net dollar exposure: prefer gonogo_report.net_dollar_exposure_usd -> active holdings sum -> row column
+  const holdingsNetExpUsd = holdings.reduce((sum, h) => sum + h.qty_lots * h.mark_price, 0);
+  const gNetExp = g?.net_dollar_exposure_usd != null ? num(g.net_dollar_exposure_usd, 0) : null;
+  const rowNetExp = row.net_dollar_exposure != null ? num(row.net_dollar_exposure, 0) : null;
+  const netDollarExp =
+    gNetExp != null && (Math.abs(gNetExp) > 1e-6 || holdings.length === 0)
+      ? gNetExp
+      : Math.abs(holdingsNetExpUsd) > 1e-6
+        ? holdingsNetExpUsd
+        : rowNetExp ?? 0;
+
+  // Drawdown & Historical Max Drawdown across all loaded bars
+  const isLegacyNominal100k = (val: number) => Math.abs(val - 1e5) < 0.01;
   const hwmUsd = v31.hwmUsd;
-  const histMaxDd = history.reduce((m, r) => Math.max(m, num(r?.drawdown_pct, 0)), drawdownRatio);
-  const maxDrawdownRatio = Math.max(num(gonogo.max_drawdown, 0), histMaxDd, drawdownRatio);
+  const computedTrailingDdRatio = hwmUsd > 0 ? Math.max(0, (hwmUsd - navUsd) / hwmUsd) : 0;
+  const gTrailingDd =
+    g?.trailing_drawdown_ratio != null ? Math.max(0, num(g.trailing_drawdown_ratio, 0)) : null;
+  const rowDdPct = row.drawdown_pct != null ? Math.abs(num(row.drawdown_pct, 0)) / 100 : 0;
+  const trailingDrawdownRatio =
+    gTrailingDd != null
+      ? gTrailingDd > 0
+        ? gTrailingDd
+        : computedTrailingDdRatio
+      : Math.max(computedTrailingDdRatio, rowDdPct);
+
+  let runningPeak =
+    initialNavUsd > 0 && !isLegacyNominal100k(initialNavUsd) ? initialNavUsd : 0;
+  let histMaxDdRatio = 0;
+  for (const hr of sortedHistory) {
+    const hn = num(hr?.nav_usd, 0);
+    if (hn <= 0 || isLegacyNominal100k(hn)) continue;
+    if (hn > runningPeak) runningPeak = hn;
+    if (runningPeak > 0) {
+      const dd = Math.max(0, (runningPeak - hn) / runningPeak);
+      if (dd > histMaxDdRatio) histMaxDdRatio = dd;
+    }
+  }
+  const reportedMaxDd = num(g?.max_drawdown_ratio ?? g?.max_drawdown ?? gonogo.max_drawdown, 0);
+  const maxDrawdownRatio = Math.max(reportedMaxDd, histMaxDdRatio, trailingDrawdownRatio);
 
   const makerFills = Math.round(
     num(exec.maker_fills_count ?? gonogo.maker_fills_count ?? row.maker_fills_count, 0)
@@ -725,7 +783,7 @@ export function normalizeSatelliteSnapshot(ctx: SatelliteDiagnosticContext) {
   const totalFills = makerFills + takerFills;
   let rawMakerRatio = num(
     exec.maker_taker_ratio ?? row.maker_taker_ratio ?? gonogo.maker_taker_ratio,
-    totalFills > 0 ? makerFills / totalFills : 0
+    totalFills > 0 ? makerFills / totalFills : v31.execAudit.avg_maker_fill_ratio_pct / 100.0
   );
   if (rawMakerRatio > 1.0) rawMakerRatio = rawMakerRatio / 100.0;
 
@@ -733,35 +791,87 @@ export function normalizeSatelliteSnapshot(ctx: SatelliteDiagnosticContext) {
     num(exec.gtx_rejects_count ?? gonogo.gtx_rejects_count ?? row.gtx_rejects_count, 0)
   );
   const l1QuantErr = num(
-    exec.mean_quantization_l1_error ??
+    row.quantization_l1_error ??
+      row.mean_quantization_l1_error ??
+      execAuditRaw?.mean_quantization_l1_error ??
+      execAuditRaw?.quantization_l1_error ??
+      exec.mean_quantization_l1_error ??
       gonogo.mean_quantization_l1_error ??
-      row.mean_quantization_l1_error,
+      g?.mean_quantization_l1_error,
     0
   );
 
-  const barsEvaluated = Math.max(Math.round(num(gonogo.bars_evaluated, barIdx)), barIdx);
-  const targetBars = Math.round(num(gonogo.target_bars, 2000));
-  const progressPct = Math.min(100, (barsEvaluated / Math.max(1, targetBars)) * 100);
-  const remainingBars = Math.max(0, targetBars - barsEvaluated);
-  const estDaysRemaining = remainingBars / 288;
-
-  const netSharpe = num(gonogo.net_annual_sharpe ?? gonogo.sharpe_ratio, 0);
-  const psrVs1 = num(gonogo.psr_vs_1_0 ?? gonogo.psr, 0);
-  const ulcerIndex = num(gonogo.ulcer_index, 0);
-  const invariantViolations = Math.round(num(gonogo.invariant_violations_count, 0));
-  const failureReasons: string[] = Array.isArray(gonogo.failure_reasons)
-    ? gonogo.failure_reasons.map(String)
-    : barsEvaluated < targetBars
-      ? [`bars_evaluated (${barsEvaluated}) < ${targetBars}`]
-      : [];
-
-  const livePrices = getCachedBinanceFuturesPrices();
-  const holdings: EnrichedAssetHolding[] = computeAllBasketHoldings(
-    rawPositions,
-    navUsd,
-    unrealizedPnlUsd,
-    livePrices
+  const netSharpe = num(gonogo.net_annual_sharpe ?? gonogo.sharpe_ratio ?? g?.net_annual_sharpe, 0);
+  const psrVs1 = num(gonogo.psr_vs_1_0 ?? gonogo.psr ?? g?.psr_vs_1_0, 0);
+  const ulcerIndex = num(gonogo.ulcer_index ?? g?.ulcer_index, 0);
+  const invariantViolations = Math.round(
+    num(gonogo.invariant_violations_count ?? g?.invariant_violations_count, 0)
   );
+
+  let protocolMode: 'V31_30D_EXECUTION_AUDIT' | 'V2_2000_BAR_SAMPLE';
+  let rebalancesCompleted: number;
+  let targetRebalances: number;
+  let barsEvaluated: number;
+  let targetBars: number;
+  let progressPct: number;
+  let estDaysRemaining: number;
+  let passedCurrently: boolean;
+  let auditStatus: string;
+  let failureReasons: string[];
+
+  if (v31.isV31) {
+    protocolMode = 'V31_30D_EXECUTION_AUDIT';
+    rebalancesCompleted = v31.execAudit.rebalances_completed;
+    targetRebalances = 30;
+    barsEvaluated = rebalancesCompleted;
+    targetBars = 30;
+    progressPct = Math.min(100, Math.max(0, (rebalancesCompleted / targetRebalances) * 100));
+    estDaysRemaining = Math.max(0, targetRebalances - rebalancesCompleted);
+    passedCurrently =
+      rebalancesCompleted >= 30 &&
+      v31.execAudit.avg_implied_rt_cost_bps <= 5.50 &&
+      absTailBeta <= 0.030 &&
+      maxDrawdownRatio <= 0.12 &&
+      invariantViolations === 0;
+    auditStatus =
+      rebalancesCompleted < 30 ? 'IN PROGRESS' : passedCurrently ? 'PASSED' : 'NO-GO';
+
+    failureReasons = [];
+    if (rebalancesCompleted < 30) {
+      failureReasons.push(`rebalances_completed (${rebalancesCompleted}) < 30 (IN PROGRESS)`);
+    }
+    if (rebalancesCompleted > 0 && v31.execAudit.avg_implied_rt_cost_bps > 5.50) {
+      failureReasons.push(
+        `avg_implied_rt_cost_bps (${v31.execAudit.avg_implied_rt_cost_bps.toFixed(2)}) > 5.50`
+      );
+    }
+    if (absTailBeta > 0.030) {
+      failureReasons.push(`abs_tail_beta (${absTailBeta.toFixed(4)}) > 0.030`);
+    }
+    if (maxDrawdownRatio > 0.12) {
+      failureReasons.push(
+        `max_drawdown_ratio (${(maxDrawdownRatio * 100).toFixed(2)}%) > 12.00%`
+      );
+    }
+    if (invariantViolations > 0) {
+      failureReasons.push(`invariant_violations (${invariantViolations}) > 0`);
+    }
+  } else {
+    protocolMode = 'V2_2000_BAR_SAMPLE';
+    rebalancesCompleted = 0;
+    targetRebalances = 2000;
+    barsEvaluated = Math.max(Math.round(num(gonogo.bars_evaluated, barIdx)), barIdx);
+    targetBars = Math.round(num(gonogo.target_bars, 2000));
+    progressPct = Math.min(100, (barsEvaluated / Math.max(1, targetBars)) * 100);
+    estDaysRemaining = Math.max(0, targetBars - barsEvaluated) / 288;
+    passedCurrently = Boolean(gonogo.passed_currently ?? false);
+    auditStatus = passedCurrently ? 'PASSED' : 'IN PROGRESS';
+    failureReasons = Array.isArray(gonogo.failure_reasons)
+      ? gonogo.failure_reasons.map(String)
+      : barsEvaluated < targetBars
+        ? [`bars_evaluated (${barsEvaluated}) < ${targetBars}`]
+        : [];
+  }
 
   return {
     captured_at_utc: now.toISOString(),
@@ -781,15 +891,15 @@ export function normalizeSatelliteSnapshot(ctx: SatelliteDiagnosticContext) {
       total_fees_usd: totalFeesUsd,
       fee_drag_bps: navUsd > 0 ? (totalFeesUsd / navUsd) * 10000 : 0,
       high_water_mark_usd: hwmUsd,
-      trailing_drawdown_ratio: drawdownRatio,
+      trailing_drawdown_ratio: trailingDrawdownRatio,
       max_drawdown_ratio: maxDrawdownRatio,
       gross_leverage: grossLeverage,
     },
     neutrality_and_regime: {
       realized_tail_beta: tailBeta,
-      abs_tail_beta: Math.abs(tailBeta),
-      tail_beta_limit: 0.035,
-      tail_beta_pass: Math.abs(tailBeta) <= 0.035,
+      abs_tail_beta: absTailBeta,
+      tail_beta_limit: tailBetaLimit,
+      tail_beta_pass: tailBetaPass,
       net_dollar_exposure_usd: netDollarExp,
       z_stress: zStress,
       regime_gate_global: regimeGate,
@@ -810,11 +920,15 @@ export function normalizeSatelliteSnapshot(ctx: SatelliteDiagnosticContext) {
     exec_audit: v31.execAudit,
     is_v31: v31.isV31,
     gonogo_protocol: {
+      protocol_mode: protocolMode,
+      status: auditStatus,
+      rebalances_completed: rebalancesCompleted,
+      target_rebalances: targetRebalances,
       bars_evaluated: barsEvaluated,
       target_bars: targetBars,
       progress_pct: progressPct,
       est_days_remaining: estDaysRemaining,
-      passed_currently: Boolean(gonogo.passed_currently ?? false),
+      passed_currently: passedCurrently,
       net_annual_sharpe: netSharpe,
       psr_vs_1_0: psrVs1,
       max_drawdown: maxDrawdownRatio,
@@ -851,19 +965,43 @@ export function buildSatelliteMarkdownSnapshot(ctx: SatelliteDiagnosticContext):
     )
     .join('\n');
 
-  const invSample = g.bars_evaluated >= g.target_bars ? '[PASS]' : '[HOLD_ACCUMULATING]';
-  const invSharpe = g.net_annual_sharpe >= 1.5 ? '[PASS]' : '[PENDING/BELOW]';
-  const invPsr = g.psr_vs_1_0 >= 0.95 ? '[PASS]' : '[PENDING/BELOW]';
-  const invDd = g.max_drawdown <= 0.08 ? '[PASS]' : '[FAIL]';
-  const invUi = g.ulcer_index <= 0.025 ? '[PASS]' : '[FAIL]';
-  const invBeta = nr.abs_tail_beta <= 0.035 ? '[PASS]' : '[FAIL]';
+  const betaLimitStr = nr.tail_beta_limit.toFixed(3);
+  const invBeta = nr.tail_beta_pass ? '[PASS]' : '[FAIL]';
+  const invViol = g.invariant_violations_count === 0 ? '[PASS]' : '[FAIL]';
   const invMaker =
     eq.total_fills_count === 0
       ? '[NO_FILLS_YET]'
       : eq.maker_taker_ratio >= 0.1
         ? '[PASS]'
         : '[WARN_LOW_MAKER]';
-  const invViol = g.invariant_violations_count === 0 ? '[PASS]' : '[FAIL]';
+
+  const progressHeaderLine = s.is_v31
+    ? `- **Heartbeat Index:** \`#${s.bar_idx.toLocaleString()}\` | **30-Day Live Paper Audit:** \`${g.rebalances_completed} / ${g.target_rebalances} Rebalances\` (\`${g.progress_pct.toFixed(1)}%\`, ~${g.est_days_remaining}d remaining) | **Audit Status:** \`${g.status}\``
+    : `- **Master Dollar Bar Index:** \`#${s.bar_idx}\` | **Go/No-Go Progress:** \`${g.bars_evaluated} / ${g.target_bars}\` (\`${g.progress_pct.toFixed(2)}%\`, ~${g.est_days_remaining.toFixed(1)}d remaining @ 288 bars/d)`;
+
+  const protocolSection = s.is_v31
+    ? [
+        `## 6. v3.1 30-Rebalance Live Paper Audit Protocol (Go/No-Go Gates)`,
+        `1. **Audit Sample Depth (Rebalances $\\ge 30$):** \`${g.rebalances_completed} / 30\` -> \`${g.rebalances_completed >= 30 ? '[PASS]' : '[IN_PROGRESS]'}\``,
+        `2. **Avg Implied Round-Trip Cost ($\\le 5.50\\text{ bps}$):** \`${s.exec_audit.avg_implied_rt_cost_bps.toFixed(2)} bps RT\` -> \`${s.exec_audit.avg_implied_rt_cost_bps <= 5.50 ? '[PASS]' : '[FAIL]'}\``,
+        `3. **Realized Tail Beta ($|\\beta_{\\text{BTC}}| \\le 0.030$):** \`${nr.abs_tail_beta.toFixed(4)}\` -> \`${invBeta}\``,
+        `4. **Max Historical Drawdown ($\\le 12.00\\%$):** \`${fmtPct(g.max_drawdown, 2)}\` -> \`${g.max_drawdown <= 0.12 ? '[PASS]' : '[FAIL]'}\``,
+        `5. **Hard Invariant Violations ($= 0$):** \`${g.invariant_violations_count}\` -> \`${invViol}\``,
+        `- **Overall Decision:** \`${g.passed_currently ? 'GO — AUDIT PASSED' : g.status}\``,
+        `- **Active Blockers:** \`${g.failure_reasons.length > 0 ? g.failure_reasons.join('; ') : 'NONE — READY FOR LIVE'}\``,
+      ]
+    : [
+        `## 6. N=2,000 Go/No-Go Protocol Invariants (8-Point Check)`,
+        `1. **Sample Depth ($N \\ge 2000$):** \`${g.bars_evaluated} / ${g.target_bars}\` -> \`${g.bars_evaluated >= g.target_bars ? '[PASS]' : '[HOLD_ACCUMULATING]'}\``,
+        `2. **Net Annualized Sharpe ($\\ge 1.50$):** \`${g.net_annual_sharpe.toFixed(2)}\` -> \`${g.net_annual_sharpe >= 1.5 ? '[PASS]' : '[PENDING/BELOW]'}\``,
+        `3. **Probabilistic Sharpe Ratio $\\text{PSR}(1.0) \\ge 0.95$:** \`${g.psr_vs_1_0.toFixed(3)}\` -> \`${g.psr_vs_1_0 >= 0.95 ? '[PASS]' : '[PENDING/BELOW]'}\``,
+        `4. **Max Trailing Drawdown ($\\le 8.00\\%$):** \`${fmtPct(g.max_drawdown, 2)}\` -> \`${g.max_drawdown <= 0.08 ? '[PASS]' : '[FAIL]'}\``,
+        `5. **Ulcer Index ($\\le 2.50\\%$):** \`${fmtPct(g.ulcer_index, 2)}\` -> \`${g.ulcer_index <= 0.025 ? '[PASS]' : '[FAIL]'}\``,
+        `6. **Realized Tail Beta ($|\\beta_{\\text{BTC}}| \\le ${betaLimitStr}$):** \`${nr.abs_tail_beta.toFixed(4)}\` -> \`${invBeta}\``,
+        `7. **Maker Fill Ratio ($\\ge 10.0\\%$):** \`${fmtPct(eq.maker_taker_ratio, 2)}\` -> \`${invMaker}\``,
+        `8. **Hard Invariant Violations ($= 0$):** \`${g.invariant_violations_count}\` -> \`${invViol}\``,
+        `- **Active Blockers:** \`${g.failure_reasons.length > 0 ? g.failure_reasons.join('; ') : 'NONE — READY FOR LIVE'}\``,
+      ];
 
   return [
     `# QUANT-SATELLITE v3.1 — AI DIAGNOSTIC SNAPSHOT (SLEEVE A: CRYPTO CLOB)`,
@@ -871,7 +1009,7 @@ export function buildSatelliteMarkdownSnapshot(ctx: SatelliteDiagnosticContext):
     `- **Captured At (CET):** ${s.captured_at_cet}`,
     `- **Last Bar Timestamp:** ${s.last_bar_utc} (\`${s.timestamp_ms}\`)`,
     `- **Venue / Mode:** \`${s.venue}\` | **Runtime C2 State:** \`${s.runtime_state}\``,
-    `- **Master Dollar Bar Index:** \`#${s.bar_idx}\` | **Go/No-Go Progress:** \`${g.bars_evaluated} / ${g.target_bars}\` (\`${g.progress_pct.toFixed(2)}%\`, ~${g.est_days_remaining.toFixed(1)}d remaining @ 288 bars/d)`,
+    progressHeaderLine,
     ``,
     `## 1. Financials, NAV & Leverage Decomposition`,
     `| Metric | Value | Invariant / Note |`,
@@ -883,11 +1021,11 @@ export function buildSatelliteMarkdownSnapshot(ctx: SatelliteDiagnosticContext):
     `| **Cumulative Funding PnL** | \`${fmtSignedUsd(f.cumulative_funding_usd)}\` | Perpetual funding cashflow |`,
     `| **Cumulative Exchange Fees** | \`${fmtUsd(f.total_fees_usd)}\` | Fee drag: \`${f.fee_drag_bps.toFixed(2)} bps\` of NAV |`,
     `| **High Water Mark (HWM)** | \`${fmtUsd(f.high_water_mark_usd)}\` | Peak MTM NAV |`,
-    `| **Trailing Drawdown** | \`${fmtPct(f.trailing_drawdown_ratio, 4)}\` | Max Historical DD: \`${fmtPct(f.max_drawdown_ratio, 4)}\` (Limit \`<= 8.00%\`) |`,
+    `| **Trailing Drawdown** | \`${fmtPct(f.trailing_drawdown_ratio, 4)}\` | Max Historical DD: \`${fmtPct(f.max_drawdown_ratio, 4)}\` (Limit \`<= 12.00%\`) |`,
     `| **Gross Leverage ($L_k$)** | \`${f.gross_leverage.toFixed(4)}x\` | Posture: \`${postureLabel}\` |`,
     ``,
     `## 2. Dual-Nullspace & Layer-1/2 Regime Telemetry`,
-    `- **Realized Tail Beta ($\\beta_{\\text{BTC}}$):** \`${nr.realized_tail_beta >= 0 ? '+' : ''}${nr.realized_tail_beta.toFixed(4)}\` (Abs: \`${nr.abs_tail_beta.toFixed(4)}\` <= \`0.0350\` ${invBeta} | Margin: \`${(0.035 - nr.abs_tail_beta).toFixed(4)}\`)`,
+    `- **Realized Tail Beta ($\\beta_{\\text{BTC}}$):** \`${nr.realized_tail_beta >= 0 ? '+' : ''}${nr.realized_tail_beta.toFixed(4)}\` (Abs: \`${nr.abs_tail_beta.toFixed(4)}\` <= \`${betaLimitStr}\` ${invBeta} | Margin: \`${(nr.tail_beta_limit - nr.abs_tail_beta).toFixed(4)}\`)`,
     `- **Net Dollar Exposure ($\\sum w_i$):** \`${fmtSignedUsd(nr.net_dollar_exposure_usd)}\``,
     `- **Market Stress Z-Score ($z_{\\text{stress}}$):** \`${nr.z_stress >= 0 ? '+' : ''}${nr.z_stress.toFixed(3)}\``,
     `- **Global Regime Gate ($G_{\\text{regime}}$):** \`${fmtPct(nr.regime_gate_global, 2)}\` (\`${nr.regime_gate_global.toFixed(4)}\`)`,
@@ -918,16 +1056,7 @@ export function buildSatelliteMarkdownSnapshot(ctx: SatelliteDiagnosticContext):
     `- **15s BBO Re-Pegs:** \`${s.exec_audit.total_repegs}\``,
     `- **Traded Volume / Fees:** \`$${s.exec_audit.total_traded_notional_usd.toLocaleString('en-US', { maximumFractionDigits: 0 })} / $${s.exec_audit.total_fees_usd.toFixed(2)}\``,
     ``,
-    `## 6. N=2,000 Go/No-Go Protocol Invariants (8-Point Check)`,
-    `1. **Sample Depth ($N \\ge 2000$):** \`${g.bars_evaluated} / ${g.target_bars}\` -> \`${invSample}\``,
-    `2. **Net Annualized Sharpe ($\\ge 1.50$):** \`${g.net_annual_sharpe.toFixed(2)}\` -> \`${invSharpe}\``,
-    `3. **Probabilistic Sharpe Ratio $\\text{PSR}(1.0) \\ge 0.95$:** \`${g.psr_vs_1_0.toFixed(3)}\` -> \`${invPsr}\``,
-    `4. **Max Trailing Drawdown ($\\le 8.00\\%$):** \`${fmtPct(g.max_drawdown, 2)}\` -> \`${invDd}\``,
-    `5. **Ulcer Index ($\\le 2.50\\%$):** \`${fmtPct(g.ulcer_index, 2)}\` -> \`${invUi}\``,
-    `6. **Realized Tail Beta ($|\\beta_{\\text{BTC}}| \\le 0.035$):** \`${nr.abs_tail_beta.toFixed(4)}\` -> \`${invBeta}\``,
-    `7. **Maker Fill Ratio ($\\ge 10.0\\%$):** \`${fmtPct(eq.maker_taker_ratio, 2)}\` -> \`${invMaker}\``,
-    `8. **Hard Invariant Violations ($= 0$):** \`${g.invariant_violations_count}\` -> \`${invViol}\``,
-    `- **Active Blockers:** \`${g.failure_reasons.length > 0 ? g.failure_reasons.join('; ') : 'NONE — READY FOR LIVE'}\``,
+    ...protocolSection,
   ].join('\n');
 }
 

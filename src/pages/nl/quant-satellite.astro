@@ -168,9 +168,9 @@ if (session) {
       </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- SECTION 1: TOP STATUS & N=2.000 PROGRESS   -->
-    <!-- ========================================== -->
+    <!-- ================================================= -->
+    <!-- SECTION 1: TOP STATUS & 30-DAGEN LIVE AUDIT GATE  -->
+    <!-- ================================================= -->
     <div class="rounded-2xl p-5 sm:p-6 bg-slate-50/90 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 shadow-xl space-y-4">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <!-- Runtime State Pill -->
@@ -186,9 +186,16 @@ if (session) {
             <span id="runtime-state-label">INITIALIZING...</span>
           </div>
 
+          <span
+            id="gonogo-audit-badge"
+            class="inline-flex items-center px-2.5 py-1 rounded-lg font-mono text-[11px] font-bold bg-amber-500/15 text-amber-500 border border-amber-500/40"
+          >
+            AUDITING (0/30)
+          </span>
+
           <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 font-mono text-xs text-slate-700 dark:text-slate-300">
-            <span class="text-slate-500">Bar Index:</span>
-            <span id="bar-index-label" class="font-bold text-cyan-600 dark:text-cyan-400">#-- / 2,000</span>
+            <span id="bar-index-title" class="text-slate-500">Heartbeat:</span>
+            <span id="bar-index-label" class="font-bold text-cyan-600 dark:text-cyan-400">#-- (15s)</span>
           </div>
 
           <div class="text-[11px] font-mono text-slate-500">
@@ -199,23 +206,23 @@ if (session) {
         <!-- Estimated Days Remaining -->
         <div class="text-right">
           <div id="est-days-label" class="text-xs font-mono font-bold text-cyan-600 dark:text-cyan-400">
-            Estimating Go/No-Go Window...
+            30-Dagen Audit Venster Berekenen...
           </div>
-          <div class="text-[10px] font-mono text-slate-500">
-            Based on 288 master bars/day (5-min intervals)
+          <div id="gonogo-rate-sublabel" class="text-[10px] font-mono text-slate-500">
+            1 rebalance/dag om 23:52 UTC &bull; 30-Rebalance Live Paper Audit
           </div>
         </div>
       </div>
 
-      <!-- N=2000 Progress Bar -->
+      <!-- 30-Day Audit Progress Bar -->
       <div class="space-y-1.5">
-        <div class="flex items-center justify-between text-xs font-mono">
+        <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
           <span class="text-slate-600 dark:text-slate-400 flex items-center space-x-1.5">
-            <span>N=2,000 Go/No-Go Statistical Validation Sample</span>
-            <span class="text-[10px] text-slate-500">(Target: 2,000 Out-of-Sample Bars)</span>
+            <span id="gonogo-progress-title">v3.1 30-Rebalance Live Paper Audit Protocol</span>
+            <span id="gonogo-progress-sub" class="text-[10px] text-slate-500">(Doel: 30 Guarded Hybride Rebalances)</span>
           </span>
           <span id="progress-pct-label" class="font-bold text-cyan-600 dark:text-cyan-400">
-            0.0% (0 / 2,000 Bars)
+            30-Dagen Live Paper Audit: 0 / 30 Rebalances (0.0%) &bull; Nog 30d &bull; Doel &le; 5.50 bps RT &amp; |&beta;| &le; 0.030
           </span>
         </div>
 
@@ -228,12 +235,12 @@ if (session) {
         </div>
 
         <!-- Milestone Markers -->
-        <div class="flex justify-between text-[10px] font-mono text-slate-500 px-0.5">
+        <div id="gonogo-milestones" class="flex justify-between text-[10px] font-mono text-slate-500 px-0.5">
           <span>0 (Deploy)</span>
-          <span>500 (25%)</span>
-          <span>1,000 (Mid Checkpoint)</span>
-          <span>1,500 (75%)</span>
-          <span class="font-bold text-emerald-500">2,000 (Go/No-Go Decision Gate)</span>
+          <span>7 (23%)</span>
+          <span>15 (Midden Audit)</span>
+          <span>22 (73%)</span>
+          <span class="font-bold text-emerald-500">30 Rebalances (Go/No-Go Beslispunt)</span>
         </div>
       </div>
     </div>
@@ -339,12 +346,12 @@ if (session) {
               <div class="group relative inline-flex items-center cursor-help">
                 <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-slate-200 dark:bg-slate-800 text-[9px] font-mono font-bold text-slate-500 hover:text-cyan-400 hover:bg-slate-700 transition-colors">?</span>
                 <div class="pointer-events-none absolute bottom-full left-0 mb-2 w-64 p-2.5 rounded-lg bg-slate-900/95 border border-slate-700 text-[11px] leading-relaxed text-slate-200 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity z-50 font-sans font-normal normal-case">
-                  Meet de gevoeligheid voor markt-crashes (doel &le; 0.035). Door tegelijkertijd Long en Short te gaan in verschillende munten blijft de portefeuille marktneutraal.
+                  Meet de gevoeligheid voor markt-crashes (doel &le; 0.030). Door tegelijkertijd Long en Short te gaan in verschillende munten blijft de portefeuille marktneutraal.
                 </div>
               </div>
             </div>
             <span id="beta-badge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
-              SAFE (&le; 0.035)
+              SAFE (&le; 0.030)
             </span>
           </div>
           <div class="flex items-baseline space-x-2">
@@ -544,12 +551,12 @@ if (session) {
             <div class="flex flex-wrap items-center gap-3 shrink-0">
               <!-- Timeframe Pills -->
               <div class="inline-flex p-1 rounded-xl bg-slate-200/80 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-xs font-mono">
-                <button type="button" data-chart-window="1h" title="1 Uur (12 Bars)" class="chart-tf-btn px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer">1H</button>
-                <button type="button" data-chart-window="6h" title="6 Uur (72 Bars)" class="chart-tf-btn px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer">6H</button>
-                <button type="button" data-chart-window="24h" title="24 Uur (288 Bars)" class="chart-tf-btn px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer">24H</button>
-                <button type="button" data-chart-window="3d" title="3 Dagen (864 Bars)" class="chart-tf-btn px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer">3D</button>
-                <button type="button" data-chart-window="1w" title="1 Week (2.016 Bars)" class="chart-tf-btn px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer">1W</button>
-                <button type="button" data-chart-window="all" title="Alle Geladen Sessie-Bars (>1.000)" class="chart-tf-btn active px-2.5 py-1 rounded-lg font-bold bg-white dark:bg-slate-800 text-cyan-600 dark:text-cyan-400 shadow-sm transition-colors cursor-pointer">ALL</button>
+                <button type="button" data-chart-window="1h" title="1 Uur" class="chart-tf-btn px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer">1H</button>
+                <button type="button" data-chart-window="6h" title="6 Uur" class="chart-tf-btn px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer">6H</button>
+                <button type="button" data-chart-window="24h" title="24 Uur" class="chart-tf-btn px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer">24H</button>
+                <button type="button" data-chart-window="3d" title="3 Dagen" class="chart-tf-btn px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer">3D</button>
+                <button type="button" data-chart-window="1w" title="1 Week" class="chart-tf-btn px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer">1W</button>
+                <button type="button" data-chart-window="all" title="Alle Geladen Sessiehistorie" class="chart-tf-btn active px-2.5 py-1 rounded-lg font-bold bg-white dark:bg-slate-800 text-cyan-600 dark:text-cyan-400 shadow-sm transition-colors cursor-pointer">ALL</button>
               </div>
 
               <!-- Interactive Series Toggles -->
@@ -562,9 +569,9 @@ if (session) {
                   <span class="w-2 h-2 rounded-full bg-amber-400"></span>
                   <span>Tail &beta;</span>
                 </button>
-                <button type="button" id="toggle-series-stop" title="Schakel ≤ 0.035 Stop Drempel In/Uit" class="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg border border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400 font-semibold cursor-pointer transition-all text-[11px]">
+                <button type="button" id="toggle-series-stop" title="Schakel &le; 0.030 Stop Drempel In/Uit" class="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg border border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400 font-semibold cursor-pointer transition-all text-[11px]">
                   <span class="w-2.5 h-0.5 bg-rose-400"></span>
-                  <span>&le; 0.035 Stop</span>
+                  <span id="toggle-series-stop-label">&le; 0.030 Stop</span>
                 </button>
               </div>
             </div>
@@ -604,11 +611,12 @@ if (session) {
             <!-- Grid Lines & Labels -->
             <g id="chart-grid-lines" stroke="#334155" stroke-width="0.5" opacity="0.3"></g>
             <g id="chart-y-labels" fill="#64748b" font-size="10" font-family="monospace"></g>
+            <g id="chart-x-labels" fill="#64748b" font-size="10" font-family="monospace"></g>
 
             <!-- High / Low Guide Lines & Labels -->
             <g id="chart-high-low-guides"></g>
 
-            <!-- 0.035 Beta Reference Line -->
+            <!-- 0.030 Beta Reference Line -->
             <line 
               id="chart-beta-threshold-line" 
               x1="65" y1="170" x2="1035" y2="170" 
@@ -625,7 +633,7 @@ if (session) {
               font-family="monospace" 
               text-anchor="end"
             >
-              &beta; STOP: 0.035
+              &beta; STOP: 0.030
             </text>
 
             <!-- Area Fill & Curves -->
@@ -1342,6 +1350,7 @@ if (session) {
 
   let pollingInterval: any = null;
   let cachedTelemetryHistory: any[] = [];
+  let cachedHistoryVenue: TradingVenue | null = null;
   let pendingTargetState = '';
   let latestTelemetryRow: Record<string, any> | null = null;
   let telemetryHistoryRows: Array<Record<string, any>> = [];
@@ -1361,9 +1370,16 @@ if (session) {
   let lastTickTime = 0;
 
   // Broker Charting State (TradingView Drag-to-Pan, Zoom, & Timeframes)
+  const TIMEFRAME_MS_MAP: Record<'1h' | '6h' | '24h' | '3d' | '1w', number> = {
+    '1h': 1 * 3_600_000,
+    '6h': 6 * 3_600_000,
+    '24h': 24 * 3_600_000,
+    '3d': 72 * 3_600_000,
+    '1w': 168 * 3_600_000,
+  };
   let activeChartWindow: '1h' | '6h' | '24h' | '3d' | '1w' | 'all' = 'all';
   let viewStartIdx = 0;
-  let viewEndIdx = 0;
+  let viewEndIdx = -1;
   let isPinnedToLive = true;
   let showSeriesNav = true;
   let showSeriesBeta = true;
@@ -1372,8 +1388,8 @@ if (session) {
 
   let isDragging = false;
   let dragStartX = 0;
-  let dragStartViewStart = 0;
-  let dragStartViewEnd = 0;
+  let dragStartMinTs = 0;
+  let dragStartMaxTs = 0;
 
   // Format lots with base asset name and non-truncating precision
   function formatLotsWithAsset(lots: number, symbol: string): string {
@@ -1475,10 +1491,13 @@ if (session) {
     const rhoConc = rawRho !== 0 ? rawRho : (grossLev > 0.01 ? 0.685 : 0.120);
 
     const l1QuantErr = Number(
+      row.quantization_l1_error ??
+      row.mean_quantization_l1_error ??
+      row.gonogo_report?.exec_audit?.mean_quantization_l1_error ??
+      row.gonogo_report?.exec_audit?.quantization_l1_error ??
       row.execution_quality?.mean_quantization_l1_error ??
       row.gonogo_progress?.mean_quantization_l1_error ??
-      row.gonogo_report?.mean_quantization_l1_error ??
-      row.quantization_l1_error ?? 0
+      row.gonogo_report?.mean_quantization_l1_error ?? 0
     );
 
     const ratio = Number(
@@ -1551,26 +1570,92 @@ if (session) {
     }
   }
 
-  // Paginated telemetry fetcher ensuring all >1,000 bars load cleanly
-  async function fetchAllTelemetryHistory(venue: TradingVenue): Promise<any[]> {
-    let allRows: any[] = [];
-    let from = 0;
+  const TELEMETRY_SCALAR_COLS =
+    'bar_idx,timestamp_ms,created_at,venue,runtime_state,nav_usd,wallet_balance_usd,unrealized_pnl_usd,realized_pnl_usd,total_fees_usd,drawdown_pct,gross_leverage,net_dollar_exposure,realized_tail_beta,z_stress,regime_gate_global,maker_taker_ratio';
+  const MAX_HISTORY_ROWS = 50000;
+
+  function normalizeAndSortTelemetryRows(rows: any[]): any[] {
+    const map = new Map<string | number, any>();
+    for (const r of rows) {
+      if (!r) continue;
+      const key = r.bar_idx != null ? Number(r.bar_idx) : Number(r.timestamp_ms || 0);
+      const existing = map.get(key);
+      if (!existing || (!existing.gonogo_report && r.gonogo_report)) {
+        map.set(key, r);
+      }
+    }
+    return Array.from(map.values()).sort((a, b) => {
+      const dt = Number(a?.timestamp_ms || 0) - Number(b?.timestamp_ms || 0);
+      if (dt !== 0) return dt;
+      return Number(a?.bar_idx || 0) - Number(b?.bar_idx || 0);
+    });
+  }
+
+  // Paginated telemetry fetcher (descending from newest + delta merge on auto-poll)
+  async function fetchAllTelemetryHistory(
+    venue: TradingVenue,
+    isIncrementalPoll = false
+  ): Promise<any[]> {
+    const { data: latestRowData } = await supabase
+      .from('quant_satellite_telemetry')
+      .select('*')
+      .eq('venue', venue)
+      .order('timestamp_ms', { ascending: false })
+      .order('bar_idx', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
     const chunkSize = 1000;
 
-    while (true) {
+    if (isIncrementalPoll && cachedHistoryVenue === venue && cachedTelemetryHistory.length > 0) {
+      const lastLoadedTs = Number(
+        cachedTelemetryHistory[cachedTelemetryHistory.length - 1]?.timestamp_ms || 0
+      );
+      const sinceTs = Math.max(0, lastLoadedTs - 60_000);
+      const deltaRows: any[] = [];
+      let from = 0;
+
+      while (from < 10_000) {
+        const { data, error } = await supabase
+          .from('quant_satellite_telemetry')
+          .select(TELEMETRY_SCALAR_COLS)
+          .eq('venue', venue)
+          .gt('timestamp_ms', sinceTs)
+          .order('timestamp_ms', { ascending: false })
+          .order('bar_idx', { ascending: false })
+          .range(from, from + chunkSize - 1);
+
+        if (error || !data || data.length === 0) break;
+        deltaRows.push(...data);
+        if (data.length < chunkSize) break;
+        from += chunkSize;
+      }
+
+      const merged = [...cachedTelemetryHistory, ...deltaRows];
+      if (latestRowData) merged.push(latestRowData);
+      return normalizeAndSortTelemetryRows(merged);
+    }
+
+    const allRows: any[] = [];
+    let from = 0;
+
+    while (allRows.length < MAX_HISTORY_ROWS) {
       const { data, error } = await supabase
         .from('quant_satellite_telemetry')
-        .select('*')
+        .select(TELEMETRY_SCALAR_COLS)
         .eq('venue', venue)
-        .order('timestamp_ms', { ascending: true })
+        .order('timestamp_ms', { ascending: false })
+        .order('bar_idx', { ascending: false })
         .range(from, from + chunkSize - 1);
 
       if (error || !data || data.length === 0) break;
-      allRows = allRows.concat(data);
+      allRows.push(...data);
       if (data.length < chunkSize) break;
       from += chunkSize;
     }
-    return allRows;
+
+    if (latestRowData) allRows.push(latestRowData);
+    return normalizeAndSortTelemetryRows(allRows);
   }
 
   async function loadQuantSatelliteDashboard() {
@@ -1641,19 +1726,20 @@ if (session) {
     try {
       const currentVenue = getActiveVenue();
 
-      // 1. Paginated Telemetry Fetching (>1,000 bars support)
-      let allRows: any[] = await fetchAllTelemetryHistory(currentVenue);
+      // 1. Paginated Telemetry Fetching (>10,000+ bars support, descending-first then sorted)
+      let allRows: any[] = await fetchAllTelemetryHistory(currentVenue, isAutoPoll);
 
       // Fallback to API endpoint if client query returns empty
       if (allRows.length === 0) {
         try {
-          const res = await fetch(`/api/quant/telemetry?venue=${currentVenue}&limit=2000&_t=${Date.now()}`, {
+          const res = await fetch(`/api/quant/telemetry?venue=${currentVenue}&limit=25000&fields=chart&_t=${Date.now()}`, {
             headers: { 'Authorization': `Bearer ${accessToken}` },
           });
           if (res.ok) {
             const json = await res.json();
             if (json.history && Array.isArray(json.history)) {
-              allRows = [...json.history].sort((a: any, b: any) => Number(a.timestamp_ms) - Number(b.timestamp_ms));
+              const combined = json.latest ? [...json.history, json.latest] : [...json.history];
+              allRows = normalizeAndSortTelemetryRows(combined);
             }
           }
         } catch (e) {
@@ -1662,6 +1748,7 @@ if (session) {
       }
 
       cachedTelemetryHistory = allRows;
+      cachedHistoryVenue = currentVenue;
       const latest = allRows.length > 0 ? allRows[allRows.length - 1] : null;
 
       latestTelemetryRow = latest;
@@ -1706,6 +1793,21 @@ if (session) {
     }
   }
 
+  function computeHistoricalMaxDrawdownRatio(history: any[], initialNav: number, trailingDdRatio: number): number {
+    let runningPeak = initialNav > 0 && Math.abs(initialNav - 1e5) >= 0.01 ? initialNav : 0;
+    let maxDd = 0;
+    for (const r of history) {
+      const hn = Number(r?.nav_usd) || 0;
+      if (hn <= 0 || Math.abs(hn - 1e5) < 0.01) continue;
+      if (hn > runningPeak) runningPeak = hn;
+      if (runningPeak > 0) {
+        const dd = Math.max(0, (runningPeak - hn) / runningPeak);
+        if (dd > maxDd) maxDd = dd;
+      }
+    }
+    return Math.max(maxDd, trailingDdRatio);
+  }
+
   // ==========================================
   // SECTION 1 RENDERER
   // ==========================================
@@ -1713,35 +1815,46 @@ if (session) {
     const pill = document.getElementById('runtime-state-pill');
     const dot = document.getElementById('runtime-state-dot');
     const label = document.getElementById('runtime-state-label');
+    const auditBadge = document.getElementById('gonogo-audit-badge');
+    const barIdxTitle = document.getElementById('bar-index-title');
     const barIdxLabel = document.getElementById('bar-index-label');
     const timeLabel = document.getElementById('latest-timestamp-label');
     const estDaysLabel = document.getElementById('est-days-label');
+    const rateSubLabel = document.getElementById('gonogo-rate-sublabel');
+    const progressTitle = document.getElementById('gonogo-progress-title');
+    const progressSub = document.getElementById('gonogo-progress-sub');
     const progressFill = document.getElementById('progress-bar-fill');
     const progressPctLabel = document.getElementById('progress-pct-label');
+    const milestonesEl = document.getElementById('gonogo-milestones');
 
     if (!latest) {
       const currentVenue = getActiveVenue();
       if (label && pill && dot) {
-        label.textContent = currentVenue === 'live' ? 'STANDBY • AWAITING LIVE DEPLOYMENT' : 'STANDBY • AWAITING TELEMETRY';
+        label.textContent = currentVenue === 'live' ? 'STANDBY • WACHT OP LIVE DEPLOYMENT' : 'STANDBY • WACHT OP TELEMETRIE';
         pill.className = 'inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-xl font-mono text-xs font-bold border transition-all duration-300 bg-slate-200/80 dark:bg-slate-800 text-slate-400 border-slate-300 dark:border-slate-700';
         dot.className = 'w-2 h-2 rounded-full bg-slate-400';
       }
-      if (barIdxLabel) barIdxLabel.textContent = '#0 / 2,000';
+      if (auditBadge) {
+        auditBadge.textContent = 'AUDITING (0/30)';
+        auditBadge.className = 'inline-flex items-center px-2.5 py-1 rounded-lg font-mono text-[11px] font-bold bg-amber-500/15 text-amber-500 border border-amber-500/40';
+      }
+      if (barIdxTitle) barIdxTitle.textContent = 'Heartbeat:';
+      if (barIdxLabel) barIdxLabel.textContent = '#0 (15s)';
       if (timeLabel) timeLabel.textContent = 'Timestamp: --';
       if (estDaysLabel) {
-        estDaysLabel.textContent = currentVenue === 'live' ? 'Awaiting Live Deployment...' : 'Awaiting Tokyo VPS Telemetry Stream...';
+        estDaysLabel.textContent = currentVenue === 'live' ? 'Wacht op Live Deployment...' : 'Wacht op Tokyo VPS Telemetrie Stream...';
         estDaysLabel.className = 'text-xs font-mono font-bold text-slate-500';
       }
       if (progressFill) progressFill.style.width = '0%';
-      if (progressPctLabel) progressPctLabel.textContent = '0.0% (0 / 2,000 Bars)';
+      if (progressPctLabel) {
+        progressPctLabel.textContent = '30-Dagen Live Paper Audit: 0 / 30 Rebalances (0.0%) • Nog 30d • Doel <= 5.50 bps RT & |β| <= 0.030';
+      }
       return;
     }
 
+    const v31 = extractV31Meta(latest, cachedTelemetryHistory);
     const state = latest.runtime_state || 'STATE_RUNNING';
     const barIdx = Number(latest.bar_idx) || 0;
-    const evaluated = latest.gonogo_progress?.bars_evaluated ?? barIdx;
-    const targetBars = latest.gonogo_progress?.target_bars ?? 2000;
-    const pct = Math.min(100, Math.max(0, (evaluated / targetBars) * 100));
 
     // Runtime state styling
     if (pill && dot && label) {
@@ -1761,30 +1874,105 @@ if (session) {
       }
     }
 
-    if (barIdxLabel) barIdxLabel.textContent = `#${barIdx.toLocaleString()} / 2,000`;
-
     if (timeLabel && latest.timestamp_ms) {
       const d = new Date(Number(latest.timestamp_ms));
       timeLabel.textContent = `Timestamp: ${d.toISOString().replace('T', ' ').substring(0, 19)} UTC`;
     }
 
-    // Remaining days based on 288 bars/day
-    const remainingBars = Math.max(0, targetBars - evaluated);
-    const remainingDays = (remainingBars / 288).toFixed(1);
+    if (v31.isV31) {
+      const targetRebalances = 30;
+      const rebalancesCompleted = v31.execAudit.rebalances_completed;
+      const pct = Math.min(100, Math.max(0, (rebalancesCompleted / targetRebalances) * 100));
+      const estDaysRemaining = Math.max(0, targetRebalances - rebalancesCompleted);
 
-    if (estDaysLabel) {
-      if (evaluated >= targetBars) {
-        estDaysLabel.textContent = 'GO/NO-GO SAMPLE COMPLETE (N >= 2,000)';
-        estDaysLabel.className = 'text-xs font-mono font-bold text-emerald-400';
-      } else {
-        estDaysLabel.textContent = `~${remainingDays} Days Remaining (${remainingBars} bars @ 288/day)`;
-        estDaysLabel.className = 'text-xs font-mono font-bold text-cyan-400';
+      const trailingDdRatio = v31.hwmUsd > 0 ? Math.max(0, (v31.hwmUsd - v31.navUsd) / v31.hwmUsd) : 0;
+      const maxDdRatio = computeHistoricalMaxDrawdownRatio(cachedTelemetryHistory, v31.initialNavUsd, trailingDdRatio);
+      const absTailBeta = Math.abs(Number(latest.realized_tail_beta ?? v31.rawGonogoReport?.realized_tail_beta ?? 0));
+      const gatesPass =
+        v31.execAudit.avg_implied_rt_cost_bps <= 5.50 &&
+        absTailBeta <= 0.030 &&
+        maxDdRatio <= 0.12;
+
+      if (barIdxTitle) barIdxTitle.textContent = 'Heartbeat:';
+      if (barIdxLabel) barIdxLabel.textContent = `#${barIdx.toLocaleString()} (15s)`;
+      if (progressTitle) progressTitle.textContent = 'v3.1 30-Rebalance Live Paper Audit Protocol';
+      if (progressSub) progressSub.textContent = '(Doel: 30 Guarded Hybride Rebalances)';
+      if (rateSubLabel) rateSubLabel.textContent = '1 rebalance/dag om 23:52 UTC • 30-Rebalance Live Paper Audit';
+
+      if (milestonesEl) {
+        milestonesEl.innerHTML = `
+          <span>0 (Deploy)</span>
+          <span>7 (23%)</span>
+          <span>15 (Midden Audit)</span>
+          <span>22 (73%)</span>
+          <span class="font-bold text-emerald-500">30 Rebalances (Go/No-Go Beslispunt)</span>
+        `;
       }
-    }
 
-    if (progressFill) progressFill.style.width = `${pct.toFixed(1)}%`;
-    if (progressPctLabel) {
-      progressPctLabel.textContent = `${pct.toFixed(1)}% (${evaluated.toLocaleString()} / ${targetBars.toLocaleString()} Bars)`;
+      if (auditBadge) {
+        if (rebalancesCompleted < 30) {
+          auditBadge.textContent = `AUDITING (${rebalancesCompleted}/30)`;
+          auditBadge.className = 'inline-flex items-center px-2.5 py-1 rounded-lg font-mono text-[11px] font-bold bg-amber-500/15 text-amber-500 border border-amber-500/40';
+        } else if (gatesPass) {
+          auditBadge.textContent = 'GO — AUDIT PASSED';
+          auditBadge.className = 'inline-flex items-center px-2.5 py-1 rounded-lg font-mono text-[11px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/40';
+        } else {
+          auditBadge.textContent = 'NO-GO — GATE BREACH';
+          auditBadge.className = 'inline-flex items-center px-2.5 py-1 rounded-lg font-mono text-[11px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/50';
+        }
+      }
+
+      if (estDaysLabel) {
+        if (rebalancesCompleted < 30) {
+          estDaysLabel.textContent = `~${estDaysRemaining}d resterend (${rebalancesCompleted} / 30 Rebalances)`;
+          estDaysLabel.className = 'text-xs font-mono font-bold text-cyan-400';
+        } else if (gatesPass) {
+          estDaysLabel.textContent = 'GO — 30-DAGEN PAPER AUDIT GESLAAGD (ALLE GATES GROEN)';
+          estDaysLabel.className = 'text-xs font-mono font-bold text-emerald-400';
+        } else {
+          estDaysLabel.textContent = 'NO-GO — EEN OF MEER RISICO-/KOSTENDREMPELS OVERSCHREDEN';
+          estDaysLabel.className = 'text-xs font-mono font-bold text-rose-400';
+        }
+      }
+
+      if (progressFill) progressFill.style.width = `${pct.toFixed(1)}%`;
+      if (progressPctLabel) {
+        progressPctLabel.textContent = `30-Dagen Live Paper Audit: ${rebalancesCompleted} / 30 Rebalances (${pct.toFixed(1)}%) • Nog ${estDaysRemaining}d • Doel <= 5.50 bps RT & |β| <= 0.030`;
+      }
+    } else {
+      const evaluated = latest.gonogo_progress?.bars_evaluated ?? barIdx;
+      const targetBars = latest.gonogo_progress?.target_bars ?? 2000;
+      const pct = Math.min(100, Math.max(0, (evaluated / targetBars) * 100));
+      const remainingBars = Math.max(0, targetBars - evaluated);
+      const remainingDays = (remainingBars / 288).toFixed(1);
+
+      if (barIdxTitle) barIdxTitle.textContent = 'Bar Index:';
+      if (barIdxLabel) barIdxLabel.textContent = `#${barIdx.toLocaleString()} / 2,000`;
+      if (progressTitle) progressTitle.textContent = 'N=2,000 Go/No-Go Statistische Validatieset';
+      if (progressSub) progressSub.textContent = '(Doel: 2.000 Out-of-Sample Bars)';
+      if (rateSubLabel) rateSubLabel.textContent = 'Gebaseerd op 288 master bars/dag (5-min intervallen)';
+
+      if (auditBadge) {
+        auditBadge.textContent = evaluated >= targetBars ? 'SAMPLE COMPLEET' : `EVALUEREN (${evaluated}/${targetBars})`;
+        auditBadge.className = evaluated >= targetBars
+          ? 'inline-flex items-center px-2.5 py-1 rounded-lg font-mono text-[11px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/40'
+          : 'inline-flex items-center px-2.5 py-1 rounded-lg font-mono text-[11px] font-bold bg-amber-500/15 text-amber-500 border border-amber-500/40';
+      }
+
+      if (estDaysLabel) {
+        if (evaluated >= targetBars) {
+          estDaysLabel.textContent = 'GO/NO-GO SAMPLE COMPLEET (N >= 2,000)';
+          estDaysLabel.className = 'text-xs font-mono font-bold text-emerald-400';
+        } else {
+          estDaysLabel.textContent = `~${remainingDays} Dagen Resterend (${remainingBars} bars @ 288/dag)`;
+          estDaysLabel.className = 'text-xs font-mono font-bold text-cyan-400';
+        }
+      }
+
+      if (progressFill) progressFill.style.width = `${pct.toFixed(1)}%`;
+      if (progressPctLabel) {
+        progressPctLabel.textContent = `${pct.toFixed(1)}% (${evaluated.toLocaleString()} / ${targetBars.toLocaleString()} Bars)`;
+      }
     }
   }
 
@@ -1859,7 +2047,7 @@ if (session) {
       if (netExpVal) netExpVal.textContent = '$0.00';
       if (grossLevVal) grossLevVal.textContent = '0.00x';
       if (betaBadge) {
-        betaBadge.textContent = 'SAFE (<= 0.035)';
+        betaBadge.textContent = 'SAFE (<= 0.030)';
         betaBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30';
       }
 
@@ -1921,7 +2109,11 @@ if (session) {
     }
 
     // Card 2: Drawdown & Tail Risk
-    const dd = Number(norm.drawdown_pct) || 0;
+    const rawRowDdPct = Number(norm.drawdown_pct) || 0;
+    const gDdRatio = v31.rawGonogoReport?.trailing_drawdown_ratio != null
+      ? Number(v31.rawGonogoReport.trailing_drawdown_ratio)
+      : (v31.hwmUsd > 0 ? Math.max(0, (v31.hwmUsd - nav) / v31.hwmUsd) : 0);
+    const dd = Math.abs(rawRowDdPct) > 1e-6 ? rawRowDdPct : (gDdRatio > 0 ? -(gDdRatio * 100) : 0);
     const ulcer = Number(norm.gonogo_report?.ulcer_index ?? norm.gonogo_progress?.ulcer_index ?? norm.ulcer_index ?? 0);
     const zStress = Number(norm.z_stress) || 0;
 
@@ -1947,20 +2139,35 @@ if (session) {
     }
 
     // Card 3: Dual-Nullspace Neutrality
-    const tailBeta = Number(norm.realized_tail_beta) || 0;
-    const netExp = Number(norm.net_dollar_exposure) || 0;
-    const grossLev = Number(norm.gross_leverage) || 0;
+    const tailBeta = Number(v31.rawGonogoReport?.realized_tail_beta ?? norm.realized_tail_beta) || 0;
+    const betaLimit = v31.isV31 ? 0.030 : 0.035;
+    const activeHoldings = computeAllBasketHoldings(
+      latest.gonogo_report?.positions_v31 || latest.positions_lots || latest.positions || {},
+      nav,
+      upnl,
+      liveMidPrices
+    );
+    const activeNetSum = activeHoldings.reduce((s, h) => s + h.qty_lots * h.mark_price, 0);
+    const gNetExp = v31.rawGonogoReport?.net_dollar_exposure_usd != null ? Number(v31.rawGonogoReport.net_dollar_exposure_usd) : null;
+    const rowNetExp = norm.net_dollar_exposure != null ? Number(norm.net_dollar_exposure) : null;
+    const netExp =
+      gNetExp != null && (Math.abs(gNetExp) > 1e-6 || activeHoldings.length === 0)
+        ? gNetExp
+        : Math.abs(activeNetSum) > 1e-6
+          ? activeNetSum
+          : (rowNetExp || 0);
+    const grossLev = Number(v31.rawGonogoReport?.gross_leverage ?? norm.gross_leverage) || 0;
 
     if (betaVal) betaVal.textContent = tailBeta.toFixed(3);
     if (netExpVal) netExpVal.textContent = formatUsd(netExp);
     if (grossLevVal) grossLevVal.textContent = `${grossLev.toFixed(2)}x`;
 
     if (betaBadge) {
-      if (tailBeta <= 0.035) {
-        betaBadge.textContent = 'SAFE (<= 0.035)';
+      if (Math.abs(tailBeta) <= betaLimit) {
+        betaBadge.textContent = `SAFE (<= ${betaLimit.toFixed(3)})`;
         betaBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30';
       } else {
-        betaBadge.textContent = 'BETA BREACH (> 0.035)';
+        betaBadge.textContent = `BETA BREACH (> ${betaLimit.toFixed(3)})`;
         betaBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-500/20 text-rose-400 border border-rose-500/50';
       }
     }
@@ -2309,24 +2516,144 @@ if (session) {
     }
   }
 
-  // Recalibrate chart window when active window changes or pinning to live
+  function lowerBoundByTs(rows: any[], targetTs: number): number {
+    let lo = 0;
+    let hi = rows.length;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (Number(rows[mid]?.timestamp_ms || 0) < targetTs) {
+        lo = mid + 1;
+      } else {
+        hi = mid;
+      }
+    }
+    return lo;
+  }
+
+  function upperBoundByTs(rows: any[], targetTs: number): number {
+    let lo = 0;
+    let hi = rows.length;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (Number(rows[mid]?.timestamp_ms || 0) <= targetTs) {
+        lo = mid + 1;
+      } else {
+        hi = mid;
+      }
+    }
+    return lo;
+  }
+
+  function formatDurationSpan(spanMs: number): string {
+    if (spanMs <= 0) return '0m';
+    const totalMins = Math.round(spanMs / 60_000);
+    if (totalMins < 60) return `${totalMins}m`;
+    const totalHours = spanMs / 3_600_000;
+    if (totalHours < 48) return `${totalHours.toFixed(1)}h`;
+    const days = Math.floor(totalHours / 24);
+    const remHours = Math.round(totalHours % 24);
+    return remHours > 0 ? `${days}d ${remHours}h` : `${days}d`;
+  }
+
+  function formatAxisTimeUtc(tsMs: number, spanMs: number, includeDateEdge: boolean): string {
+    const d = new Date(tsMs);
+    if (isNaN(d.getTime())) return '--';
+    const iso = d.toISOString();
+    const mmdd = iso.substring(5, 10);
+    const hhmm = iso.substring(11, 16);
+    if (spanMs > 30 * 3_600_000 || includeDateEdge) {
+      return `${mmdd} ${hhmm}`;
+    }
+    return hhmm;
+  }
+
+  // Min-Max time-bucket downsampling preserving exact viewport boundaries, peaks & troughs
+  function downsampleBarsMinMax(bars: any[], numBuckets = 400): any[] {
+    if (bars.length <= 800) return bars;
+    const n = bars.length;
+    const minTs = Number(bars[0]?.timestamp_ms || 0);
+    const maxTs = Number(bars[n - 1]?.timestamp_ms || 0);
+    const tsSpan = maxTs - minTs;
+
+    const bucketStats = new Map<
+      number,
+      { firstIdx: number; lastIdx: number; minIdx: number; minVal: number; maxIdx: number; maxVal: number }
+    >();
+
+    for (let i = 0; i < n; i++) {
+      const b =
+        tsSpan > 0
+          ? Math.min(numBuckets - 1, Math.floor(((Number(bars[i]?.timestamp_ms || 0) - minTs) / tsSpan) * numBuckets))
+          : Math.min(numBuckets - 1, Math.floor((i / n) * numBuckets));
+      const nav = Number(bars[i]?.nav_usd) || 0;
+      const cur = bucketStats.get(b);
+      if (!cur) {
+        bucketStats.set(b, {
+          firstIdx: i,
+          lastIdx: i,
+          minIdx: i,
+          minVal: nav,
+          maxIdx: i,
+          maxVal: nav,
+        });
+      } else {
+        cur.lastIdx = i;
+        if (nav < cur.minVal) {
+          cur.minVal = nav;
+          cur.minIdx = i;
+        }
+        if (nav > cur.maxVal) {
+          cur.maxVal = nav;
+          cur.maxIdx = i;
+        }
+      }
+    }
+
+    const keepIndices = new Set<number>([0, n - 1]);
+    for (const stat of bucketStats.values()) {
+      keepIndices.add(stat.firstIdx);
+      keepIndices.add(stat.minIdx);
+      keepIndices.add(stat.maxIdx);
+      keepIndices.add(stat.lastIdx);
+    }
+
+    const sortedIdx = Array.from(keepIndices).sort((a, b) => a - b);
+    return sortedIdx.map((idx) => bars[idx]);
+  }
+
+  // Recalibrate chart window using true timestamp_ms calendar durations
   function recalcViewWindowToLive() {
     const total = cachedTelemetryHistory.length;
     if (total === 0) {
       viewStartIdx = 0;
-      viewEndIdx = 0;
+      viewEndIdx = -1;
+      isPinnedToLive = true;
+      updateJumpToLiveBtn();
       return;
     }
-    let windowBars = total;
-    if (activeChartWindow === '1h') windowBars = 12;
-    else if (activeChartWindow === '6h') windowBars = 72;
-    else if (activeChartWindow === '24h') windowBars = 288;
-    else if (activeChartWindow === '3d') windowBars = 864;
-    else if (activeChartWindow === '1w') windowBars = 2016;
-    else if (activeChartWindow === 'all') windowBars = total;
 
-    viewEndIdx = total;
-    viewStartIdx = Math.max(0, total - windowBars);
+    if (activeChartWindow === 'all') {
+      viewStartIdx = 0;
+      viewEndIdx = total - 1;
+      isPinnedToLive = true;
+      updateJumpToLiveBtn();
+      return;
+    }
+
+    const durationMs = TIMEFRAME_MS_MAP[activeChartWindow];
+    const firstTs = Number(cachedTelemetryHistory[0]?.timestamp_ms || 0);
+    const latestTs = Number(cachedTelemetryHistory[total - 1]?.timestamp_ms || 0);
+    const cutoffMs = latestTs - durationMs;
+
+    if (firstTs >= cutoffMs) {
+      viewStartIdx = 0;
+      viewEndIdx = total - 1;
+    } else {
+      const startIdx = lowerBoundByTs(cachedTelemetryHistory, cutoffMs);
+      viewStartIdx = Math.max(0, Math.min(total - 1, startIdx));
+      viewEndIdx = total - 1;
+    }
+
     isPinnedToLive = true;
     updateJumpToLiveBtn();
   }
@@ -2348,9 +2675,11 @@ if (session) {
     const betaPath = document.getElementById('chart-beta-path');
     const gridLines = document.getElementById('chart-grid-lines');
     const yLabels = document.getElementById('chart-y-labels');
+    const xLabels = document.getElementById('chart-x-labels');
     const highLowGuides = document.getElementById('chart-high-low-guides');
     const betaThresholdLine = document.getElementById('chart-beta-threshold-line');
     const betaThresholdLabel = document.getElementById('chart-beta-threshold-label');
+    const stopToggleLabel = document.getElementById('toggle-series-stop-label');
     const chartSubtitle = document.getElementById('chart-subtitle');
     const periodReturnEl = document.getElementById('chart-period-return');
     const periodStatsEl = document.getElementById('chart-period-stats');
@@ -2362,34 +2691,53 @@ if (session) {
       if (betaPath) betaPath.setAttribute('d', '');
       if (gridLines) gridLines.innerHTML = '';
       if (yLabels) yLabels.innerHTML = '';
+      if (xLabels) xLabels.innerHTML = '';
       if (highLowGuides) highLowGuides.innerHTML = '';
       if (periodReturnEl) periodReturnEl.textContent = '+$0.00 (+0.00%)';
-      if (periodStatsEl) periodStatsEl.textContent = 'Period High: -- • Period Low: -- • Bars in View: 0';
+      if (periodStatsEl) periodStatsEl.textContent = 'Periode Hoogste: -- • Periode Laagste: -- • Bars in Beeld: 0';
       return;
     }
 
     if (emptyState) emptyState.classList.add('hidden');
 
-    // Slice according to drag-to-pan & timeframe view bounds
-    const end = Math.min(history.length, Math.max(1, viewEndIdx || history.length));
-    const start = Math.max(0, Math.min(end - 1, viewStartIdx));
-    let visibleBars = history.slice(start, end);
+    // Inclusive slice [viewStartIdx .. viewEndIdx] clamped safely
+    const safeEnd = viewEndIdx >= 0 ? Math.min(history.length - 1, viewEndIdx) : history.length - 1;
+    const safeStart = Math.max(0, Math.min(safeEnd, viewStartIdx));
+    let visibleBars = history.slice(safeStart, safeEnd + 1);
 
     if (visibleBars.length === 0) {
       visibleBars = history.slice(-1);
     }
 
-    // Update Subtitle
-    if (chartSubtitle) {
-      chartSubtitle.textContent = `// MULTI-BAR TELEMETRY (${visibleBars.length} BARS IN VIEW • TOTAL LOADED: ${history.length})`;
-    }
-
-    // Period Return (Delta NAV & Delta %)
     const v31Chart = extractV31Meta(latestTelemetryRow, history);
+    const minTs = Number(visibleBars[0]?.timestamp_ms || 0);
+    const maxTs = Number(visibleBars[visibleBars.length - 1]?.timestamp_ms || minTs);
+    const tsSpan = Math.max(maxTs - minTs, 1);
+    const spanStr = formatDurationSpan(maxTs - minTs);
+
+    // Compute exact Period Return & High/Low over full un-downsampled visible slice
     const firstNav = Number(visibleBars[0]?.nav_usd) || v31Chart.initialNavUsd;
     const lastNav = Number(visibleBars[visibleBars.length - 1]?.nav_usd) || firstNav;
     const deltaNav = lastNav - firstNav;
     const deltaPct = firstNav > 0 ? (deltaNav / firstNav) * 100 : 0;
+
+    let periodMinNav = Infinity;
+    let periodMaxNav = -Infinity;
+    let maxObservedBeta = 0.045;
+    for (const d of visibleBars) {
+      const nv = Number(d.nav_usd) || 0;
+      if (nv < periodMinNav) periodMinNav = nv;
+      if (nv > periodMaxNav) periodMaxNav = nv;
+      const tb = Number(d.realized_tail_beta) || 0;
+      if (tb > maxObservedBeta) maxObservedBeta = tb;
+    }
+    if (!Number.isFinite(periodMinNav)) periodMinNav = firstNav;
+    if (!Number.isFinite(periodMaxNav)) periodMaxNav = firstNav;
+
+    // Update Subtitle & Period Stats
+    if (chartSubtitle) {
+      chartSubtitle.textContent = `// MULTI-BAR TELEMETRIE (${visibleBars.length.toLocaleString()} BARS IN BEELD • SPAN: ${spanStr} • TOTAAL GELADEN: ${history.length.toLocaleString()})`;
+    }
 
     if (periodReturnEl) {
       const sign = deltaNav >= 0 ? '+' : '-';
@@ -2399,12 +2747,12 @@ if (session) {
         : 'px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-rose-500/10 text-rose-400 border border-rose-500/30';
     }
 
-    // Period Stats (High, Low, Count)
-    const periodMinNav = Math.min(...visibleBars.map(d => Number(d.nav_usd) || 0));
-    const periodMaxNav = Math.max(...visibleBars.map(d => Number(d.nav_usd) || 0));
     if (periodStatsEl) {
-      periodStatsEl.textContent = `Period High: ${formatUsd(periodMaxNav)} • Period Low: ${formatUsd(periodMinNav)} • Bars in View: ${visibleBars.length}`;
+      periodStatsEl.textContent = `Periode Hoogste: ${formatUsd(periodMaxNav)} • Periode Laagste: ${formatUsd(periodMinNav)} • Bars in Beeld: ${visibleBars.length.toLocaleString()} • Span: ${spanStr}`;
     }
+
+    // Min-Max downsampling for smooth 60fps rendering when viewport exceeds 800 rows
+    const renderBars = downsampleBarsMinMax(visibleBars, 400);
 
     // Canvas layout dimensions
     const width = 1100;
@@ -2427,14 +2775,14 @@ if (session) {
     minNav = Math.max(0, minNav - navMargin);
     maxNav = maxNav + navMargin;
 
-    // Beta min & max (0.0 to 0.05 min range)
-    let minBeta = 0.0;
-    let maxBeta = Math.max(0.045, ...visibleBars.map(d => Number(d.realized_tail_beta) || 0));
+    // Beta min & max
+    const minBeta = 0.0;
+    const maxBeta = maxObservedBeta;
 
-    // Coordinate scale functions
-    const scaleX = (idx: number) => {
-      if (visibleBars.length <= 1) return padLeft + chartW / 2;
-      return padLeft + (idx / (visibleBars.length - 1)) * chartW;
+    // Time-proportional X coordinate scaling (prevents gaps / varying bar frequencies from warping time)
+    const scaleXByTs = (ts: number) => {
+      if (renderBars.length <= 1 || maxTs <= minTs) return padLeft + chartW / 2;
+      return padLeft + ((ts - minTs) / tsSpan) * chartW;
     };
 
     const scaleYNav = (val: number) => {
@@ -2445,10 +2793,11 @@ if (session) {
       return padTop + chartH - ((val - minBeta) / (maxBeta - minBeta)) * chartH;
     };
 
-    // Draw Grid Lines & Y-Axis Labels
+    // Draw Horizontal Grid Lines, Y-Axis Labels & Time-Proportional X-Axis Ticks
     if (gridLines && yLabels) {
       let gridHtml = '';
       let labelHtml = '';
+      let xLabelHtml = '';
 
       for (let i = 0; i <= 4; i++) {
         const frac = i / 4;
@@ -2463,15 +2812,24 @@ if (session) {
         if (showSeriesBeta) {
           labelHtml += `<text x="${width - padRight + 8}" y="${y + 3}" text-anchor="start" fill="#fbbf24">${betaVal.toFixed(3)}</text>`;
         }
+
+        if (maxTs > minTs) {
+          const tickTs = minTs + frac * tsSpan;
+          const x = padLeft + frac * chartW;
+          const anchor = i === 0 ? 'start' : i === 4 ? 'end' : 'middle';
+          gridHtml += `<line x1="${x.toFixed(1)}" y1="${padTop}" x2="${x.toFixed(1)}" y2="${padTop + chartH}" />`;
+          xLabelHtml += `<text x="${x.toFixed(1)}" y="${padTop + chartH + 16}" text-anchor="${anchor}">${formatAxisTimeUtc(tickTs, maxTs - minTs, i === 0 || i === 4)} UTC</text>`;
+        }
       }
 
       gridLines.innerHTML = gridHtml;
       yLabels.innerHTML = labelHtml;
+      if (xLabels) xLabels.innerHTML = xLabelHtml;
     }
 
     // Draw High / Low Guide Lines
     if (highLowGuides) {
-      if (showSeriesNav && visibleBars.length > 0) {
+      if (showSeriesNav && renderBars.length > 0) {
         const yHigh = scaleYNav(periodMaxNav);
         const yLow = scaleYNav(periodMinNav);
         highLowGuides.innerHTML = `
@@ -2485,8 +2843,9 @@ if (session) {
       }
     }
 
-    // Beta threshold reference line (0.035 Stop)
-    const thresholdY = scaleYBeta(0.035);
+    // Beta threshold reference line (0.030 Stop in v3.1, 0.035 legacy)
+    const betaStopLimit = v31Chart.isV31 || history.length === 0 ? 0.030 : 0.035;
+    const thresholdY = scaleYBeta(betaStopLimit);
     if (betaThresholdLine) {
       if (showSeriesStop) {
         betaThresholdLine.setAttribute('y1', thresholdY.toString());
@@ -2499,6 +2858,7 @@ if (session) {
       }
     }
     if (betaThresholdLabel) {
+      betaThresholdLabel.textContent = `β STOP: ${betaStopLimit.toFixed(3)}`;
       if (showSeriesStop) {
         betaThresholdLabel.setAttribute('y', (thresholdY - 4).toString());
         betaThresholdLabel.setAttribute('x', (width - padRight - 5).toString());
@@ -2507,16 +2867,19 @@ if (session) {
         betaThresholdLabel.style.display = 'none';
       }
     }
+    if (stopToggleLabel) {
+      stopToggleLabel.textContent = `≤ ${betaStopLimit.toFixed(3)} Stop`;
+    }
 
-    // Build Curve Points & Paths
-    const navPoints = visibleBars.map((d, i) => ({
-      x: scaleX(i),
+    // Build Curve Points & Paths using time-proportional X scale
+    const navPoints = renderBars.map((d) => ({
+      x: scaleXByTs(Number(d.timestamp_ms || 0)),
       y: scaleYNav(Number(d.nav_usd) || 0),
       data: d,
     }));
 
-    const betaPoints = visibleBars.map((d, i) => ({
-      x: scaleX(i),
+    const betaPoints = renderBars.map((d) => ({
+      x: scaleXByTs(Number(d.timestamp_ms || 0)),
       y: scaleYBeta(Number(d.realized_tail_beta) || 0),
     }));
 
@@ -2548,7 +2911,7 @@ if (session) {
     }
   }
 
-  // TradingView Drag-to-Pan and Mouse Wheel Zoom interaction handler
+  // TradingView Time-Proportional Drag-to-Pan and Mouse Wheel Zoom
   function setupChartInteractions() {
     const svgEl = document.getElementById('telemetry-chart-svg');
     if (!svgEl || svgEl.dataset.interactionsBound) return;
@@ -2564,46 +2927,54 @@ if (session) {
       return ((clientX - rect.left) / rect.width) * width;
     };
 
-    // Mousedown
     const onPointerDown = (e: MouseEvent | TouchEvent) => {
       if (cachedTelemetryHistory.length <= 1) return;
       const clientX = 'touches' in e ? e.touches[0].clientX : (e as MouseEvent).clientX;
       const svgX = getSvgX(clientX);
       if (svgX < padLeft || svgX > width - padRight) return;
 
+      const curEnd = viewEndIdx >= 0 ? Math.min(cachedTelemetryHistory.length - 1, viewEndIdx) : cachedTelemetryHistory.length - 1;
+      const curStart = Math.max(0, Math.min(curEnd, viewStartIdx));
+
       isDragging = true;
       dragStartX = clientX;
-      dragStartViewStart = viewStartIdx;
-      dragStartViewEnd = viewEndIdx;
+      dragStartMinTs = Number(cachedTelemetryHistory[curStart]?.timestamp_ms || 0);
+      dragStartMaxTs = Number(cachedTelemetryHistory[curEnd]?.timestamp_ms || dragStartMinTs);
       svgEl.style.cursor = 'grabbing';
     };
 
-    // Mousemove / Drag
     const onPointerMove = (e: MouseEvent | TouchEvent) => {
       const clientX = 'touches' in e ? e.touches[0].clientX : (e as MouseEvent).clientX;
 
-      if (isDragging) {
+      if (isDragging && cachedTelemetryHistory.length > 1) {
         const deltaX = clientX - dragStartX;
         const rect = svgEl.getBoundingClientRect();
-        const deltaRatio = deltaX / rect.width;
-        const currentSpan = Math.max(5, dragStartViewEnd - dragStartViewStart);
-        const deltaBars = Math.round(deltaRatio * currentSpan);
+        const deltaRatio = deltaX / Math.max(1, rect.width);
+        const visibleSpanMs = Math.max(60_000, dragStartMaxTs - dragStartMinTs);
+        const shiftMs = deltaRatio * visibleSpanMs;
 
-        let newStart = dragStartViewStart - deltaBars;
-        let newEnd = dragStartViewEnd - deltaBars;
+        const globalMinTs = Number(cachedTelemetryHistory[0]?.timestamp_ms || 0);
+        const globalMaxTs = Number(cachedTelemetryHistory[cachedTelemetryHistory.length - 1]?.timestamp_ms || 0);
 
-        if (newStart < 0) {
-          newStart = 0;
-          newEnd = Math.min(cachedTelemetryHistory.length, currentSpan);
+        let newMinTs = dragStartMinTs - shiftMs;
+        let newMaxTs = dragStartMaxTs - shiftMs;
+
+        if (newMinTs < globalMinTs) {
+          newMinTs = globalMinTs;
+          newMaxTs = Math.min(globalMaxTs, globalMinTs + visibleSpanMs);
         }
-        if (newEnd > cachedTelemetryHistory.length) {
-          newEnd = cachedTelemetryHistory.length;
-          newStart = Math.max(0, newEnd - currentSpan);
+        if (newMaxTs > globalMaxTs) {
+          newMaxTs = globalMaxTs;
+          newMinTs = Math.max(globalMinTs, globalMaxTs - visibleSpanMs);
         }
+
+        let newStart = Math.max(0, Math.min(cachedTelemetryHistory.length - 1, lowerBoundByTs(cachedTelemetryHistory, newMinTs)));
+        let newEnd = Math.max(newStart, Math.min(cachedTelemetryHistory.length - 1, upperBoundByTs(cachedTelemetryHistory, newMaxTs) - 1));
+        if (newEnd === newStart && newStart > 0) newStart--;
 
         viewStartIdx = newStart;
         viewEndIdx = newEnd;
-        isPinnedToLive = (viewEndIdx >= cachedTelemetryHistory.length);
+        isPinnedToLive = viewEndIdx >= cachedTelemetryHistory.length - 1;
         updateJumpToLiveBtn();
         renderChart(cachedTelemetryHistory);
         return;
@@ -2619,34 +2990,47 @@ if (session) {
       }
     };
 
-    // Wheel zoom
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
       if (cachedTelemetryHistory.length <= 5) return;
 
-      const zoomFactor = e.deltaY > 0 ? 1.2 : 0.8;
-      const span = Math.max(5, viewEndIdx - viewStartIdx);
-      const newSpan = Math.max(10, Math.min(cachedTelemetryHistory.length, Math.round(span * zoomFactor)));
+      const globalMinTs = Number(cachedTelemetryHistory[0]?.timestamp_ms || 0);
+      const globalMaxTs = Number(cachedTelemetryHistory[cachedTelemetryHistory.length - 1]?.timestamp_ms || 0);
+      const globalSpanMs = Math.max(60_000, globalMaxTs - globalMinTs);
+
+      const curEnd = viewEndIdx >= 0 ? Math.min(cachedTelemetryHistory.length - 1, viewEndIdx) : cachedTelemetryHistory.length - 1;
+      const curStart = Math.max(0, Math.min(curEnd, viewStartIdx));
+      const curMinTs = Number(cachedTelemetryHistory[curStart]?.timestamp_ms || globalMinTs);
+      const curMaxTs = Number(cachedTelemetryHistory[curEnd]?.timestamp_ms || globalMaxTs);
+      const curSpanMs = Math.max(60_000, curMaxTs - curMinTs);
+
+      const zoomFactor = e.deltaY > 0 ? 1.25 : 0.8;
+      const minZoomMs = Math.min(globalSpanMs, 5 * 60_000);
+      const newSpanMs = Math.max(minZoomMs, Math.min(globalSpanMs, curSpanMs * zoomFactor));
 
       const svgX = getSvgX(e.clientX);
       const frac = Math.max(0, Math.min(1, (svgX - padLeft) / chartW));
-      const centerBar = viewStartIdx + frac * span;
+      const centerTs = curMinTs + frac * curSpanMs;
 
-      let newStart = Math.round(centerBar - frac * newSpan);
-      let newEnd = newStart + newSpan;
+      let newMinTs = centerTs - frac * newSpanMs;
+      let newMaxTs = newMinTs + newSpanMs;
 
-      if (newStart < 0) {
-        newStart = 0;
-        newEnd = Math.min(cachedTelemetryHistory.length, newSpan);
+      if (newMinTs < globalMinTs) {
+        newMinTs = globalMinTs;
+        newMaxTs = Math.min(globalMaxTs, newMinTs + newSpanMs);
       }
-      if (newEnd > cachedTelemetryHistory.length) {
-        newEnd = cachedTelemetryHistory.length;
-        newStart = Math.max(0, newEnd - newSpan);
+      if (newMaxTs > globalMaxTs) {
+        newMaxTs = globalMaxTs;
+        newMinTs = Math.max(globalMinTs, newMaxTs - newSpanMs);
       }
+
+      let newStart = Math.max(0, Math.min(cachedTelemetryHistory.length - 1, lowerBoundByTs(cachedTelemetryHistory, newMinTs)));
+      let newEnd = Math.max(newStart, Math.min(cachedTelemetryHistory.length - 1, upperBoundByTs(cachedTelemetryHistory, newMaxTs) - 1));
+      if (newEnd === newStart && newStart > 0) newStart--;
 
       viewStartIdx = newStart;
       viewEndIdx = newEnd;
-      isPinnedToLive = (viewEndIdx >= cachedTelemetryHistory.length);
+      isPinnedToLive = viewEndIdx >= cachedTelemetryHistory.length - 1;
       updateJumpToLiveBtn();
       renderChart(cachedTelemetryHistory);
     };
@@ -2662,7 +3046,6 @@ if (session) {
 
     svgEl.addEventListener('wheel', onWheel, { passive: false });
 
-    // Jump to live button
     const jumpBtn = document.getElementById('chart-jump-live-btn');
     jumpBtn?.addEventListener('click', () => {
       recalcViewWindowToLive();
@@ -2741,7 +3124,7 @@ if (session) {
 
     if (hud && tipMeta && tipNav && tipBeta && tipLev) {
       const d = new Date(Number(record.timestamp_ms));
-      const timeStr = d.toISOString().replace('T', ' ').substring(0, 16);
+      const timeStr = isNaN(d.getTime()) ? '--' : d.toISOString().replace('T', ' ').substring(0, 19);
       tipMeta.textContent = `Bar #${record.bar_idx} • ${timeStr} UTC`;
 
       const bNav = Number(record.nav_usd) || 0;
@@ -2910,13 +3293,17 @@ if (session) {
         const row = payload.new as any;
         if (row && (row.venue || 'paper') === getActiveVenue()) {
           latestTelemetryRow = row;
-          const idx = cachedTelemetryHistory.findIndex(r => r.id === row.id || (r.bar_idx === row.bar_idx && r.timestamp_ms === row.timestamp_ms));
+          const idx = cachedTelemetryHistory.findIndex(r =>
+            (row.id != null && r.id === row.id) ||
+            (row.bar_idx != null && r.bar_idx === row.bar_idx) ||
+            (r.bar_idx === row.bar_idx && r.timestamp_ms === row.timestamp_ms)
+          );
           if (idx >= 0) {
             cachedTelemetryHistory[idx] = row;
           } else {
             cachedTelemetryHistory.push(row);
-            cachedTelemetryHistory.sort((a, b) => Number(a.timestamp_ms) - Number(b.timestamp_ms));
           }
+          cachedTelemetryHistory = normalizeAndSortTelemetryRows(cachedTelemetryHistory);
           telemetryHistoryRows = cachedTelemetryHistory;
 
           renderSection1(latestTelemetryRow);
@@ -3272,13 +3659,14 @@ if (session) {
         latestCoreRow: latestCoreRow,
         recentCommands: recentCommands,
         venue: activeVenue,
+        livePricesMap: liveMidPrices,
       });
 
       const ok = await copyTextToClipboard(md);
       if (ok) {
         if (copySatLabel) copySatLabel.textContent = 'Gekopieerd!';
         setTimeout(() => {
-          if (copySatLabel) copySatLabel.textContent = 'Copy AI Snapshot';
+          if (copySatLabel) copySatLabel.textContent = 'Kopieer AI Snapshot';
         }, 2000);
         showDiagnosticToast('[OK] Quant-Satellite AI Snapshot gekopieerd naar klembord!');
       } else {
@@ -3296,6 +3684,7 @@ if (session) {
         latestCoreRow: latestCoreRow,
         recentCommands: recentCommands,
         venue: activeVenue,
+        livePricesMap: liveMidPrices,
       });
 
       const barIdx = latestTelemetryRow?.bar_idx ?? 0;
@@ -3310,6 +3699,7 @@ if (session) {
     satPaperBtn?.addEventListener('click', async () => {
       const current = getActiveVenue();
       if (current === 'paper') return;
+      isPinnedToLive = true;
       setActiveVenue('paper');
       updateSatEnvButtons('paper');
       await fetchAndRenderAll(accessToken, false);
@@ -3318,6 +3708,7 @@ if (session) {
     satLiveBtn?.addEventListener('click', async () => {
       const current = getActiveVenue();
       if (current === 'live') return;
+      isPinnedToLive = true;
       setActiveVenue('live');
       updateSatEnvButtons('live');
       await fetchAndRenderAll(accessToken, false);
@@ -3327,6 +3718,7 @@ if (session) {
       const customEvt = e as CustomEvent<{ venue: TradingVenue }>;
       const nextVenue = customEvt.detail?.venue;
       if (nextVenue) {
+        isPinnedToLive = true;
         updateSatEnvButtons(nextVenue);
         await fetchAndRenderAll(accessToken, false);
       }
@@ -3337,8 +3729,9 @@ if (session) {
     tfButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         const windowAttr = btn.getAttribute('data-chart-window') as any;
-        if (!windowAttr || windowAttr === activeChartWindow) return;
+        if (!windowAttr) return;
         activeChartWindow = windowAttr;
+        isDragging = false;
 
         tfButtons.forEach(b => {
           b.classList.remove('active', 'font-bold', 'bg-white', 'dark:bg-slate-800', 'text-cyan-600', 'dark:text-cyan-400', 'shadow-sm');
